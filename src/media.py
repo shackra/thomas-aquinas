@@ -18,6 +18,7 @@
 
 import logging
 import os
+import common
 
 try:
     import sfml
@@ -35,8 +36,7 @@ def loadmedia(mediafile, mediatype=None):
     Si dicho argumento esta en None, la funcion tratara de cargar el audio-
     visual de forma automatica (no recomendado para archivos de sonido y/o
     musicales. Por defecto tratara de devolver un objeto de sonido)."""
-    # mediapath = os.path.join(blah.getmediapath(), mediafile)
-    mediapath = mediafile
+    mediapath = common.conf.fromrootfolderget(mediafile)
     extension = os.path.splitext(mediapath)[-1]
 
     # Tratamos de cargar el audiovisual segun
@@ -65,3 +65,28 @@ def loadmedia(mediafile, mediatype=None):
 
     # copiar objetos no es necesario para objetos de SFML
     return sfmlobject
+
+    def loadsong(mediafile):
+        """ Retorna un objeto SFML para la música dado un archivo.
+        """
+        mediapath = common.conf.fromrootfolderget(mediafile)
+        try:
+            sfmlobject = sfml.Music.open_from_file(mediapath)
+            return sfmlobject
+        except IOError:
+            logging.error("El archivo {arch} tiene una "
+                          "extension incorrecta".format(arch=mediapath))
+            raise
+
+    def loadsound(mediafile):
+        """ Retorna un objeto SFML para el sonido dado un archivo.
+        """
+        mediapath = common.conf.fromrootfolderget(mediafile)
+        try:
+            soundbuffer = sfml.SoundBuffer.load_from_file(mediapath)
+            sfmlobject = sfml.Sound(soundbuffer)
+            return sfmlobject
+        except IOError:
+            logging.error("El archivo {arch} tiene una "
+                          "extension incorrecta".format(arch=mediapath))
+            raise

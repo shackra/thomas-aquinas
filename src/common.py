@@ -21,21 +21,140 @@ import os
 import ConfigParser
 
 class Conf:
-    def __init__(self, configurationfiles):
-        self.confilepath = configurationfiles
-        self.__parsed = ConfigParser.SafeConfigParser()
-        self.__parsed(self.confilepath)
+    def __init__(self, gamefolder, configurationfiles):
+        self.loadconf(configurationfiles)
+        self._checkconf()
         self.__os = os.name
         
         if self.__os == "posix":
-            self.__USERFOLDER = os.environ["HOME"]
-            self.__ROOTFOLDER = "/usr/share/games"
-        elif self.__os == "nt":
-            self.__USERFOLDER = os.environ["APPDATA"]
-            self.__ROOTFOLDER = os.environ["PROGRAMFILES"]
+            self.__USERFOLDER = self.joinpaths(os.environ["HOME"], ".{game}")
 
-        self._checkconf()
+            if self.__parsed.has_option("DATA_PATH", "root_path"):
+                self.__ROOTFOLDER = self.__parsed.get("DATA_PATH", "root_path")
+            else:
+                self.__ROOTFOLDER = "/usr/share/games/{game}"
+
+        elif self.__os == "nt":
+            self.__USERFOLDER = self.joinpaths(os.environ["APPDATA"], "{game}")
+
+            if self.__parsed.has_option("DATA_PATH", "root_path"):
+                self.__ROOTFOLDER = self.__parsed.get("DATA_PATH", "root_path")
+            else:
+                self.__ROOTFOLDER = self.joinpaths(os.environ["PROGRAMFILES"],
+                                               "{game}")
         
+        self.__USERFOLDER = self.__USERFOLDER.format(game=gamefolder)
+        self.__ROOTFOLDER = self.__ROOTFOLDER.format(game=gamefolder)
+        
+    def loadconf(self, configurationfiles=None):
+        """ Carga la configuracion del juego y del usuario u otras.
+        
+        Si configurationfiles es una cadena o una lista de cadenas de texto
+        los usara 
+        """
+        if configurationfiles:
+            self.confilepath = self.__convertpath(configurationfiles)
+            self.__parsed = ConfigParser.SafeConfigParser()
+            self.__parsed(self.confilepath)
+        else:
+            # queremos recargar la configuracion, eh?
+            self.__parsed(self.confilepath)
+
+    def saveconf(self, onuserfolder=True, filepath=None):
+        """ Salva la configuracion actual en un archivo ini.
+        
+        Si onuserfolder es verdadero, se guardara toda la configuracion
+        en la carpeta personal del usuario. De lo contrario se guardara
+        en el archivo especificado por filepath.
+
+        en caso de problemas de escritura en filepath, se escribira
+        el archivo de configuracion en la carpeta del usuario."""
+        
+        confilepath = None
+        
+        if onuserfolder:
+            try:
+                confilepath = open(
+                    self.joinpaths(self.getuserdir(), "gameconf.ini"), "w")
+            except IOError:
+                # logging
+                raise
+        else:
+            if filepath and isinstance(filepath, str):
+                try:
+                    confilepath = open(
+                    self.__convertpath(filepath), "w")
+                except IOError:
+                    # logging
+                    confilepath = open(
+                        self.joinpaths(self.getuserdir(), "gameconf.ini"), "w")
+            else:
+                # logging
+                try:
+                    confilepath = open(
+                        self.joinpaths(self.getuserdir(), "gameconf.ini"), "w")
+                except IOError:
+                    # logging
+                    raise
+
+        self.__parsed.write(confilepath)
+        confilepath.close()
+
+    def fromuserfolderget(self, *args):
+        """ Retorna una direccion absoluta del directorio en la carpeta personal
+        """
+        return self.joinpaths(self.getuserfolder(), args)
+
+    def fromrootfolderget(self, *args):
+        """ Retorna una direccion absoluta desde el directorio del juego.
+        """
+        return self.joinpaths(self.getrootfolder(), args)
+
+    def getuserdir(self):
+        """ Retorna el directorio personal del usuario.
+        """
+        return self.__convertpath(self.__USERFOLDER)
+
+    def getrootfolder(self):
+        """ Retorna el directorio donde se almacena el juego.
+        """
+        return self.__convertpath(self.__ROOTFOLDER)
+
+    def joinpaths(*args):
+        """ Retorna una direccion de archivo juntando todos los argumentos.
+        """
+        argspath = ""
+        for arg in args:
+            argspath = arg + "/"
+
+        return self.__convertpath(argspath)
+
+    def __convertpath(self, whichone):
+        """ Convierte y retorna direcciones de archivos de forma adecuada.
+
+        Para cualquier direccion de archivos se usara las barras inclinadas,
+        incluso para archivos dentro de Windows. Éste metodo se encargara
+        de retornar la dirección correcta del archivo, según el sistema
+        operativo en uso.
+        En caso de que whichone sea una lista, se iterara la lista y se
+        devolvera el mismo tipo con las direcciones corregidas."""
+        if isinstance(whichone, str):
+            try:
+                unicodewhichone = whichone.decode("utf-8")
+            except:
+                unicodewhichone = whichone
+                if self.__os == "nt":
+                    return unicodewhichone.replace("/", "\\")
+                else:
+                    return unicodewhichone
+        elif isinstance(whichone, list):
+            pathlist = []
+            for thisone in whichone:
+                pathlist.append(self.__convertpath(thisone))
+            return pathlist
+        else:
+            raise ValueError, "argument is not a str or list object"
+
     def _checkconf(self):
         """ Revisa que los datos basicos existan.
         
@@ -46,7 +165,7 @@ class Conf:
         problem = None
         # Variables que contienen la ubicacion de los archivos audiovisuales
         if self.__parsed.has_section("DATA_PATH"):
-            for opcion in ["common_data"]:
+            for opcion in ["root_path", "common_data"]:
                 if not self.__parsed.has_option("DATA_PATH", opcion):
                     problem = (opcion, "option")
                     break
