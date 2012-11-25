@@ -268,6 +268,6 @@ class Conf:
             return True
 
 
-def __name__ != "__main__":
+def __name__ =! "__main__":
     # Esta linea a de cambiarse segun el proyecto en el que se use el modulo
     conf = Conf("gameconf.ini")
