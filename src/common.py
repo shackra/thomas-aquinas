@@ -20,11 +20,18 @@ import logging
 import os
 import ConfigParser
 
+LOGGING_FORMAT = "%(levelname)s - #%(lineno)d - %(funcName)s: %(message)s"
+logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+
 class Conf:
     def __init__(self, gamefolder, configurationfiles):
-        self.loadconf(configurationfiles)
-        self._checkconf()
+        logging.info("Iniciando una instancia de la clase Conf")
+        logging.debug("Cargando la configuracion: %s..." % configurationfiles)
         self.__os = os.name
+        self.loadconf(configurationfiles)
+        logging.info("Configuracion %s cargada con exito!" % configurationfiles)
+        self._checkconf()
+        logging.debug("Revisando que la configuracion sea valida...")
         
         if self.__os == "posix":
             self.__USERFOLDER = self.joinpaths(os.environ["HOME"], ".{game}")
@@ -53,12 +60,15 @@ class Conf:
         los usara 
         """
         if configurationfiles:
+            logging.debug("Convirtiendo la ubicacion de "
+                          "los archivos de configuracion...")
             self.confilepath = self.__convertpath(configurationfiles)
+            logging.debug("Conversion completada!: %s" % self.confilepath)
             self.__parsed = ConfigParser.SafeConfigParser()
-            self.__parsed(self.confilepath)
+            self.__parsed.read(self.confilepath)
         else:
             # queremos recargar la configuracion, eh?
-            self.__parsed(self.confilepath)
+            self.__parsed.read(self.confilepath)
 
     def saveconf(self, onuserfolder=True, filepath=None):
         """ Salva la configuracion actual en un archivo ini.
@@ -72,33 +82,45 @@ class Conf:
         
         confilepath = None
         
-        if onuserfolder:
+        if onuserfolder == True:
+            # Guardamos la configuracion en la carpeta personal
+            # del usuario.
             try:
                 confilepath = open(
                     self.joinpaths(self.getuserdir(), "gameconf.ini"), "w")
-            except IOError:
-                # logging
+            except IOError as e:
+                logging.exception(e)
                 raise
         else:
+            # Guardamos la configuracion en otra carpeta,
+            # especificada por el usuario.
             if filepath and isinstance(filepath, str):
                 try:
                     confilepath = open(
                     self.__convertpath(filepath), "w")
-                except IOError:
-                    # logging
+                except IOError as e:
+                    logging.exception(e)
                     confilepath = open(
                         self.joinpaths(self.getuserdir(), "gameconf.ini"), "w")
             else:
-                # logging
+                logging.error("%s no es del tipo str" % filepath)
+                logging.debug("Guardando la configuracion"
+                              " en la carpeta personal")
                 try:
                     confilepath = open(
                         self.joinpaths(self.getuserdir(), "gameconf.ini"), "w")
-                except IOError:
-                    # logging
+                except IOError as e:
+                    logging.exception(e)
                     raise
 
-        self.__parsed.write(confilepath)
-        confilepath.close()
+        try:
+            self.__parsed.write(confilepath)
+            confilepath.close()
+        except:
+            logging.exception("El archivo de configuracion no"
+                              " pudo ser guardado en ningun "
+                              "sitio, ¿Tiene el usuario espacio"
+                              " en su disco duro?")
 
     def fromuserfolderget(self, *args):
         """ Retorna una direccion absoluta del directorio en la carpeta personal
@@ -110,7 +132,7 @@ class Conf:
         """
         return self.joinpaths(self.getrootfolder(), args)
 
-    def getuserdir(self):
+    def getuserfolder(self):
         """ Retorna el directorio personal del usuario.
         """
         return self.__convertpath(self.__USERFOLDER)
@@ -120,13 +142,18 @@ class Conf:
         """
         return self.__convertpath(self.__ROOTFOLDER)
 
-    def joinpaths(*args):
+    def joinpaths(self, *args):
         """ Retorna una direccion de archivo juntando todos los argumentos.
         """
         argspath = ""
         for arg in args:
-            argspath = arg + "/"
+            if arg == args[-1]:
+                argspath += str(arg)
+            else:
+                argspath += str(arg) + "/"
 
+        # saneamos la ruta, por aquello de los dobles "/"
+        argspath = argspath.replace("//", "/")
         return self.__convertpath(argspath)
 
     def __convertpath(self, whichone):
@@ -138,19 +165,36 @@ class Conf:
         operativo en uso.
         En caso de que whichone sea una lista, se iterara la lista y se
         devolvera el mismo tipo con las direcciones corregidas."""
-        if isinstance(whichone, str):
+
+        if isinstance(whichone, str) or isinstance(whichone, unicode):
+            logging.debug("Hemos recibido una cadena de texto")
             try:
                 unicodewhichone = whichone.decode("utf-8")
+                logging.debug("La cadena de texto fue decodificada "
+                              "de utf-8: %s" % unicodewhichone)
             except:
+                logging.exception("La cadena no pudo ser decodificada,"
+                              " usandola tal y como la enviaron: %s" % whichone)
                 unicodewhichone = whichone
-                if self.__os == "nt":
-                    return unicodewhichone.replace("/", "\\")
-                else:
-                    return unicodewhichone
+
+            if self.__os == "nt":
+                logging.debug("Convirtiendo '/' a '\\' "
+                              "para compatibilidad con Windows")
+                return unicodewhichone.replace("/", "\\")
+            else:
+                logging.debug("No hay nada que convertir, "
+                              "no estamos en Windows")
+                return unicodewhichone
+
         elif isinstance(whichone, list):
+            logging.debug("Hemos recibido una lista")
             pathlist = []
+            logging.debug("Iterando la lista...")
             for thisone in whichone:
-                pathlist.append(self.__convertpath(thisone))
+                logging.debug("Convirtiendo la cadena: %s..." % thisone)
+                thisone = self.__convertpath(thisone)
+                logging.debug("Convertido: %s" % thisone)
+                pathlist.append(thisone)
             return pathlist
         else:
             raise ValueError, "argument is not a str or list object"
@@ -197,7 +241,7 @@ class Conf:
         # Finalmente disparamos una excepcion
         if problem: raise Exception, problem
             
-    def getosname():
+    def getosname(self):
         """ Retorna el nombre del sistema operativo.
 
         nt: para cualquier sistema operativo Windows.
@@ -249,7 +293,7 @@ class Conf:
         Este dato no sera guardado en un archivo de configuracion hasta llamar
         al metodo saveconf().
         """
-        self.__parsed.set("CONTROLLER", str(button), code)
+        self.__parsed.set("CONTROLLER", str(button), str(code))
 
     def usingkeyboard(self):
         """ Retorna verdadero si se esta usando el teclado.
@@ -267,7 +311,19 @@ class Conf:
         else:
             return True
 
+    def alternatecontrollertype(self):
+        """ Alterna entre el tipo de controlador a usar por el usuario.
 
-def __name__ =! "__main__":
+        los tipos son:
+          · Keyboard & Mouse
+          · Joystick"""
+
+        self.__parsed.set("CONTROLLER", "keyboard_or_joystick", 
+                          str(\
+                              not self.__parsed.getboolean("CONTROLLER", 
+                                                        "keyboard_or_joystick"))
+        )
+
+if __name__ != "__main__":
     # Esta linea a de cambiarse segun el proyecto en el que se use el modulo
-    conf = Conf("gameconf.ini")
+    settings = Conf("test game", "gameconf.ini")
