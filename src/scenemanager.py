@@ -19,6 +19,9 @@
 import logging
 import common
 import sfml
+import media
+
+class TAGlobalVariableException(Exception): pass
 
 class Director:
     """Objeto principal del juego.
@@ -30,15 +33,17 @@ class Director:
     El diseño de esta clase esta fuertemente basada en director.py
     del proyecto Asadetris desarrollado por Hugo de LosersJuegos"""
 
-    def __init__(self):
+    def __init__(self, icon):
         self.window = sfml.RenderWindow(sfml.VideoMode(
             common.settings.getscreensize()), common.settings.getscreentitle())
         self.window.framerate_limit = 60
+        self.window.icon = media.loadmedia("icon.png")
 
         self.__actualscene = None
         self.__fullscreenmode = False
-        self.__exit_game = False
+        self.__exitgame = False
         # revisar si hay Joysticks conectados al PC.
+        self.__globalvariables = {}
 
     def loop(self):
         "¡El juego se pone en marcha!"
@@ -46,11 +51,11 @@ class Director:
         timesleep = sfml.system.Time
         timesleep.microseconds = 10000
 
-        while not self.__exit_game:
+        while not self.__exitgame:
             # propagacion de eventos
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
-                    self.__exit_game = True
+                    self.__exitgame = True
                 elif type(event) is sfml.KeyEvent and event.pressed:
                     # alternamos entre modo pantalla completa y modo ventana
                     self.alternatefullscreen()
@@ -65,6 +70,8 @@ class Director:
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
             self.__actualscene.on_draw(self.window)
+            # TODO: crear un sistema de widgets personalizable
+            #   con CSS.
             self.window.display()
 
         ## GAME OVER!
@@ -75,5 +82,42 @@ class Director:
         "Cambia la escena actual."
         self.__actualscene = scene
 
-    def alternatefullscreen(self):
+    def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
+        if not self.__fullscreenmode:
+            self.window = self.window.recreate(
+                sfml.VideoMode(self.window.width,
+                               self.window.height), 
+                self.window.title,
+                sfml.Style.FULLSCREEN)
+            self.__fullscreenmode = True
+        else:
+            self.window = self.window.recreate(
+                sfml.VideoMode(self.window.width,
+                               self.window.height), 
+                self.window.title)
+            self.__fullscreenmode = False
+
+    def setglobalvariable(self, name, value):
+        """ Crea una variable global a la cual cualquier escena puede acceder.
+
+        es algo dificil compartir datos entre escenas, por ello se usara la
+        clase Director para almacenar variables que luego puedan ser usadas
+        por otras escenas.
+        """
+        self.__globalvariables[str(name)] = value
+
+    def getglobalvariable(self, name):
+        """ Retorna alguna el valor de alguna variable global.
+        """
+        if self.__globalvariables.has_key(str(name)):
+            return self.__globalvariables[str(name)]
+        else:
+            raise TAGlobalVariableException, "{0} variable no definida".format(
+                name)
+
+    def delglobalvariable(self, name):
+        """ Borra una variable global previamente definida.
+        """
+        if self.__globalvariables.has_key(str(name)):
+            self.__globalvariables.pop(str(name))

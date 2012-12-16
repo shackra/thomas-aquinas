@@ -18,6 +18,7 @@
 
 import logging
 from thirdparty.pytmx import tmxloader
+import common
 
 class AbstractScene:
     """Escena abstracta del juego.
@@ -53,21 +54,23 @@ class AbstractScene:
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
         http://www.mapeditor.org/"
-        ## TODO: usar pytmx para cargar los mapas hechos en Tiled 
-        # self.__mapscene = tmxloader.load_tmx
+        mapfilepath = common.conf.joinpaths(common.conf.getrootfolder(),
+                                            "maps", mapfilepath)
+        self.__tmxmapfile = mapfilepath
+        self.__tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
         ## TODO: Para saber más sobre scrolling de mapas enormes
         #   Buscar el proyecto lib2d de Bitcraft en pygame.org
-        pass
 
     def movecamera(self, x, y):
         "Mueve la 'camara' del juego."
         # TODO: implementar screen scrolling aquí, ver comentarios en
         # el metodo loadmap().
+        # TODO: usar pytweener para suavizar el movimiento de la camara
         pass
 
     def __str__(self):
         "Util para darle un nombre a tu escena."
         raise NotImplemented("Implemente el metodo __str__")
         # por ejemplo:
-        #     return "<Scene: Escena numero 1>"
+        #  return "<Scene: Escena #1, File: {0}>".format(self.__tmxmapfile)
         # o como usted más prefiera :)

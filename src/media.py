@@ -26,7 +26,7 @@ except ImportError:
     logging.fatal("No se puede importar SFML, no existe en el sistema")
     raise
 
-def loadmedia(mediafile, mediatype=None):
+def loadmedia(mediafile, mediatype=None, toram=True):
     """ Retorna un objeto SFML.
 
     Cargamos un archivo audiovisual (sea una imagen, sonido o cancion) y
@@ -35,21 +35,29 @@ def loadmedia(mediafile, mediatype=None):
     archivo multimedia (img para imagen, snd para sonido o msc para musica)
     Si dicho argumento esta en None, la funcion tratara de cargar el audio-
     visual de forma automatica (no recomendado para archivos de sonido y/o
-    musicales. Por defecto tratara de devolver un objeto de sonido)."""
+    musicales. Por defecto tratara de devolver un objeto de sonido).
+
+    'toram' nos indica si debemos cargar los archivos de imagen a la memoria
+    RAM o a la memoria de la tarjeta de video. Si es True, cargara a la RAM"""
     mediapath = common.conf.fromrootfolderget(mediafile)
     extension = os.path.splitext(mediapath)[-1]
 
     # Tratamos de cargar el audiovisual segun
     # su tipo de archivo.
 
-    if extension in [".jpg", ".jpe", ".png", ".tif", ".tga", ".bmp",
-                     ".jpeg"]:
+    if extension in ["bmp", "png", "tga", "jpg", "gif", "psd", "hdr", "pic"]:
         try:
-            sfmlobject = sfml.Texture.load_from_file(mediapath)
+            if toram:
+                sfmlobject = sfml.Image.load_from_file(mediapath)
+            else:
+                sfmlobject = sfml.Texture.load_from_file(mediapath)
         except IOError:
-            logging.error("El archivo {arch} tiene una "
+            logging.exception("El archivo {arch} tiene una "
                           "extension incorrecta".format(arch=mediapath))
             raise
+        except sfml.SFMLException as e:
+            logging.exception("No se pudo cargar el archivo de imagen"
+                              "{arch}, razón: {e}".format(arch=arch, e=e))
 
     elif extension in [".ogg", ".oga", ".mp3", ".flac", ".wav"]:
         try:
