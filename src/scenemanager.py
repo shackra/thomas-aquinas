@@ -45,6 +45,12 @@ class Director:
         # revisar si hay Joysticks conectados al PC.
         self.__globalvariables = {}
 
+    def __getitem__(self, item):
+        return self.__globalvariables[str(item)]
+
+    def __iter__(self):
+        return self.__globalvariables.items()
+
     def loop(self):
         "¡El juego se pone en marcha!"
 
@@ -57,11 +63,15 @@ class Director:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
                 elif type(event) is sfml.KeyEvent and event.pressed:
-                    # alternamos entre modo pantalla completa y modo ventana
-                    self.alternatefullscreen()
+                    if event.code is sfml.Keyboard.F3:
+                        # alternamos entre modo pantalla completa y modo ventana
+                        self.alternatefullscreen()
 
-                    # Le pasamos el evento a la escena para que haga algo
-                    self.__actualscene.on_event(event)
+                # Le pasamos el evento a la escena para que haga algo
+                self.__actualscene.on_event(event)
+                ## TODO:
+                # Le pasamos el evento al dialogo para que haga algo
+                #self.__widgetmanager.on_event(event)
 
             # actualizamos la escena
             self.__actualscene.on_update()
@@ -72,6 +82,8 @@ class Director:
             self.__actualscene.on_draw(self.window)
             # TODO: crear un sistema de widgets personalizable
             #   con CSS.
+            # TODO: Dibujamos los widgets
+            # self.__widgetmanager.on_draw(self.window)
             self.window.display()
 
         ## GAME OVER!
