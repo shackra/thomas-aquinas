@@ -39,18 +39,28 @@ def loadmedia(mediafile, mediatype=None, toram=True):
 
     'toram' nos indica si debemos cargar los archivos de imagen a la memoria
     RAM o a la memoria de la tarjeta de video. Si es True, cargara a la RAM"""
-    mediapath = common.conf.fromrootfolderget(mediafile)
+    logging.info("Buscando por el audiovisual {0}".format(mediafile))
+    mediapath = common.settings.fromrootfolderget(mediafile)
     extension = os.path.splitext(mediapath)[-1]
+    logging.debug("Ubicacion absoulta del audiovisual: {0}".format(mediapath))
+    logging.debug("Extension del audiovisual: {0}".format(extension))
 
     # Tratamos de cargar el audiovisual segun
     # su tipo de archivo.
+    sfmlobject = None
 
     if extension in ["bmp", "png", "tga", "jpg", "gif", "psd", "hdr", "pic"]:
+        logging.debug("El archivo {0} es un"
+                      " archivo de imagen".format(mediapath))
         try:
             if toram:
                 sfmlobject = sfml.Image.load_from_file(mediapath)
+                logging.debug("Se a cargado el archivo {0} "
+                              "como una imagen manipulable".format(mediapath))
             else:
                 sfmlobject = sfml.Texture.load_from_file(mediapath)
+                logging.debug("Se a cargado el archivo {0} como"
+                              " una imagen no manipulable".format(mediapath))
         except IOError:
             logging.exception("El archivo {arch} tiene una "
                           "extension incorrecta".format(arch=mediapath))
@@ -60,12 +70,18 @@ def loadmedia(mediafile, mediatype=None, toram=True):
                               "{arch}, razón: {e}".format(arch=arch, e=e))
 
     elif extension in [".ogg", ".oga", ".mp3", ".flac", ".wav"]:
+        logging.debug("El archivo {0} es un"
+                      " archivo de audio".format(mediapath))
         try:
             if mediatype == "snd" or mediatype == None:
                 soundbuffer = sfml.SoundBuffer.load_from_file(mediapath)
                 sfmlobject = sfml.Sound(soundbuffer)
+                logging.debug("Se a cargado el archivo {0} como"
+                " un sonido".format(mediapath))
             elif mediatype == "msc":
                 sfmlobject = sfml.Music.open_from_file(mediapath)
+                logging.debug("Se a cargado el archivo {0} como"
+                " una cancion".format(mediapath))
         except IOError:
             logging.error("El archivo {arch} tiene una "
                           "extension incorrecta".format(arch=mediapath))
@@ -77,7 +93,7 @@ def loadmedia(mediafile, mediatype=None, toram=True):
     def loadsong(mediafile):
         """ Retorna un objeto SFML para la música dado un archivo.
         """
-        mediapath = common.conf.fromrootfolderget(mediafile)
+        mediapath = common.settings.fromrootfolderget(mediafile)
         try:
             sfmlobject = sfml.Music.open_from_file(mediapath)
             return sfmlobject
@@ -89,7 +105,7 @@ def loadmedia(mediafile, mediatype=None, toram=True):
     def loadsound(mediafile):
         """ Retorna un objeto SFML para el sonido dado un archivo.
         """
-        mediapath = common.conf.fromrootfolderget(mediafile)
+        mediapath = common.settings.fromrootfolderget(mediafile)
         try:
             soundbuffer = sfml.SoundBuffer.load_from_file(mediapath)
             sfmlobject = sfml.Sound(soundbuffer)

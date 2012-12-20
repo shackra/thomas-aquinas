@@ -19,9 +19,14 @@
 import logging
 import os
 import ConfigParser
+import chardet
+import codecs
 
 LOGGING_FORMAT = "%(levelname)s - #%(lineno)d - %(funcName)s: %(message)s"
 logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+
+class TAConfOptionException(Exception): pass
+class TAConfSectionException(Exception): pass
 
 class Conf:
     def __init__(self, gamefolder, configurationfiles):
@@ -52,6 +57,10 @@ class Conf:
         
         self.__USERFOLDER = self.__USERFOLDER.format(game=gamefolder)
         self.__ROOTFOLDER = self.__ROOTFOLDER.format(game=gamefolder)
+
+        # verificando que la carpeta del juego exista en la carpeta personal
+        # del usuario.
+        if not os.path.isdir(self.__USERFOLDER): os.mkdir(self.__USERFOLDER)
         
     def loadconf(self, configurationfiles=None):
         """ Carga la configuracion del juego y del usuario u otras.
@@ -122,15 +131,15 @@ class Conf:
                               "sitio, ¿Tiene el usuario espacio"
                               " en su disco duro?")
 
-    def fromuserfolderget(self, *args):
+    def fromuserfolderget(self, file):
         """ Retorna una direccion absoluta del directorio en la carpeta personal
         """
-        return self.joinpaths(self.getuserfolder(), args)
+        return self.joinpaths(self.getuserfolder(), file)
 
-    def fromrootfolderget(self, *args):
+    def fromrootfolderget(self, file):
         """ Retorna una direccion absoluta desde el directorio del juego.
         """
-        return self.joinpaths(self.getrootfolder(), args)
+        return self.joinpaths(self.getrootfolder(), file)
 
     def getuserfolder(self):
         """ Retorna el directorio personal del usuario.
@@ -142,18 +151,24 @@ class Conf:
         """
         return self.__convertpath(self.__ROOTFOLDER)
 
-    def joinpaths(self, *args):
+    def joinpaths(self, *args, **kwords):
         """ Retorna una direccion de archivo juntando todos los argumentos.
         """
-        argspath = ""
+        logging.debug("Se han de unir las siguientes carpetas {0}".format(args))
+        argspath = u""
         for arg in args:
             if arg == args[-1]:
-                argspath += str(arg)
+                argspath += arg
             else:
-                argspath += str(arg) + "/"
+                argspath += arg + u"/"
 
-        # saneamos la ruta, por aquello de los dobles "/"
-        argspath = argspath.replace("//", "/")
+            logging.debug("Resultado hasta el"
+                          " momento: {0}".format(argspath))
+            # saneamos la ruta, por aquello de los dobles "/"
+            argspath = argspath.replace("//", "/")
+            logging.debug("Retornando el resultado "
+                          "de la operacion: {0}".format(argspath))
+
         return self.__convertpath(argspath)
 
     def __convertpath(self, whichone):
@@ -166,25 +181,25 @@ class Conf:
         En caso de que whichone sea una lista, se iterara la lista y se
         devolvera el mismo tipo con las direcciones corregidas."""
 
-        if isinstance(whichone, str) or isinstance(whichone, unicode):
-            logging.debug("Hemos recibido una cadena de texto")
-            try:
-                unicodewhichone = whichone.decode("utf-8")
-                logging.debug("La cadena de texto fue decodificada "
-                              "de utf-8: %s" % unicodewhichone)
-            except:
-                logging.exception("La cadena no pudo ser decodificada,"
-                              " usandola tal y como la enviaron: %s" % whichone)
-                unicodewhichone = whichone
+        whichoneunicode = None
 
+        if isinstance(whichone, str) or isinstance(whichone, unicode):
+            guess = chardet.detect(whichone)
+            noconvertedstring = whichone
+            whichone = whichone.decode(guess["encoding"])
+            logging.debug("Cadena {0} tiene codificacion '{1}'".format(
+                noconvertedstring, guess["encoding"]))
+            
             if self.__os == "nt":
                 logging.debug("Convirtiendo '/' a '\\' "
                               "para compatibilidad con Windows")
-                return unicodewhichone.replace("/", "\\")
+                whichone = whichone.replace("/", "\\")
             else:
                 logging.debug("No hay nada que convertir, "
                               "no estamos en Windows")
-                return unicodewhichone
+                pass
+
+            return whichone
 
         elif isinstance(whichone, list):
             logging.debug("Hemos recibido una lista")
@@ -211,10 +226,11 @@ class Conf:
         if self.__parsed.has_section("DATA_PATH"):
             for opcion in ["root_path", "common_data"]:
                 if not self.__parsed.has_option("DATA_PATH", opcion):
-                    problem = (opcion, "option")
-                    break
+                    raise TAConfOptionException, ("{0} no existe en "
+                                                  "DATA_PATH".format(opcion))
         else:
-            problem = ("DATA_PATH", "section")
+            raise TAConfSectionException, ("La seccion DATA_PATH no existe"
+                                           " en la configuracion")
         
         # Variables que contienen la distribucion basica de los botones del
         # control del jugador.
@@ -223,23 +239,22 @@ class Conf:
                            "up_button", "down_button", "left_button", 
                            "right_button", "keyboard_or_joystick"]:
                 if not self.__parsed.has_option("CONTROLLER", opcion):
-                    problem = (opcion, "option")
-                    break
+                    raise TAConfOptionException, ("{0} no existe en "
+                                                  "CONTROLLER".format(opcion))
         else:
-            problem = ("CONTROLLER", "section")
+            raise TAConfSectionException, ("La seccion CONTROLLER no existe"
+                                           " en la configuracion")
 
         # Variables que contienen los valores de configuracion de visualizacion
         # del juego.
         if self.__parsed.has_section("DISPLAY"):
             for opcion in ["screen_size", "window_title"]:
                 if not self.__parsed.has_option("DISPLAY", opcion):
-                    problem = (opcion, "option")
-                    break
+                    raise TAConfOptionException, ("{0} no existe en "
+                                                  "DISPLAY".format(opcion))
         else:
-            problem = ("DISPLAY", "section")
-
-        # Finalmente disparamos una excepcion
-        if problem: raise Exception, problem
+            raise TAConfSectionException, ("La seccion DISPLAY no existe"
+                                           " en la configuracion")
             
     def getosname(self):
         """ Retorna el nombre del sistema operativo.
@@ -256,8 +271,8 @@ class Conf:
         # partimos la cadena, convertimos a entero y ponemos todo en una tupla
         # es de esperar que las dimensiones de la pantalla se expresen como
         # 320x240 por ejemplo.
-        size = (int(sizestring.split("x")[0]), int(sizestring.split("x")[1]))
-        return size
+        sizex, sizey = int(sizestring.split("x")[0]), int(sizestring.split("x")[1])
+        return sizex, sizey
 
     def setscreensize(self, (width, height)):
         """ Guarda el nuevo tamaño de la pantalla del juego.
@@ -326,4 +341,5 @@ class Conf:
 
 if __name__ != "__main__":
     # Esta linea a de cambiarse segun el proyecto en el que se use el modulo
-    settings = Conf("test game", "gameconf.ini")
+    CONFPATH = os.path.join(os.path.dirname(__file__), "gameconf.ini")
+    settings = Conf("thomas-aquinas-prueba", CONFPATH)

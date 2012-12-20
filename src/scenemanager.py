@@ -22,6 +22,7 @@ import sfml
 import media
 
 class TAGlobalVariableException(Exception): pass
+class TAAttrIsNotScene(Exception): pass
 
 class Director:
     """Objeto principal del juego.
@@ -35,9 +36,11 @@ class Director:
 
     def __init__(self, icon):
         self.window = sfml.RenderWindow(sfml.VideoMode(
-            common.settings.getscreensize()), common.settings.getscreentitle())
+            common.settings.getscreensize()[0], 
+            common.settings.getscreensize()[1]),
+                                        common.settings.getscreentitle())
         self.window.framerate_limit = 60
-        self.window.icon = media.loadmedia("icon.png")
+        self.window.icon = media.loadmedia(icon)
 
         self.__actualscene = None
         self.__fullscreenmode = False
@@ -45,17 +48,18 @@ class Director:
         # revisar si hay Joysticks conectados al PC.
         self.__globalvariables = {}
 
-    def __getitem__(self, item):
-        return self.__globalvariables[str(item)]
+    # def __getitem__(self, item):
+    #     return self.__globalvariables[str(item)]
 
-    def __iter__(self):
-        return self.__globalvariables.items()
+    # def __iter__(self):
+    #     return self.__globalvariables.items()
 
     def loop(self):
         "¡El juego se pone en marcha!"
 
-        timesleep = sfml.system.Time
-        timesleep.microseconds = 10000
+        # timesleep = sfml.system.Time
+        # timesleep.milliseconds = 1000
+        timesleep = 1000
 
         while not self.__exitgame:
             # propagacion de eventos
@@ -68,23 +72,40 @@ class Director:
                         self.alternatefullscreen()
 
                 # Le pasamos el evento a la escena para que haga algo
-                self.__actualscene.on_event(event)
+                try:
+                    self.__actualscene.on_event(event)
+                except AttributeError:
+                    raise TAAttrIsNotScene, ("Objecto {0} no es "
+                                             "instancia de SceneFactory".format(
+                                             type(self.__actualscene)))
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
 
             # actualizamos la escena
-            self.__actualscene.on_update()
-            sfml.sleep(timesleep)
-
+            try:
+                self.__actualscene.on_update()
+            except AttributeError:
+                raise TAAttrIsNotScene, ("Objecto {0} no es "
+                                         "instancia de SceneFactory".format(
+                                             type(self.__actualscene)))
+            
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
-            self.__actualscene.on_draw(self.window)
+            try:
+                self.__actualscene.on_draw(self.window)
+            except AttributeError:
+                raise TAAttrIsNotScene, ("Objecto {0} no es "
+                                         "instancia de SceneFactory".format(
+                                             type(self.__actualscene)))
             # TODO: crear un sistema de widgets personalizable
             #   con CSS.
             # TODO: Dibujamos los widgets
             # self.__widgetmanager.on_draw(self.window)
             self.window.display()
+
+            # dormimos la aplicacion unos milisegundos
+            sfml.sleep(timesleep)
 
         ## GAME OVER!
         common.conf.saveconf()
