@@ -29,11 +29,12 @@ class AbstractScene:
     Para poder hacer escenas funcionales, debe derivar de esta clase
     cualquier escena que necesite."""
 
-    def __init__(self, scenemanager):
-        self.scenemanager = scenemanager
+    def __init__(self):
+        # self.scenemanager = scenemanager
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
+        pass
 
     def on_update(self):
         "El manejador de escenas llamara este metodo para actualizar la logica."
@@ -48,12 +49,12 @@ class AbstractScene:
         raise NotImplemented("Implemente el metodo on_draw.")
 
     def loadmap(self, mapfilepath):
-        "Carga el mapa de la respectiva escena.
+        """Carga el mapa de la respectiva escena.
 
         No es necesario reimplementar éste metodo.
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
-        http://www.mapeditor.org/"
+        http://www.mapeditor.org/"""
         mapfilepath = common.conf.joinpaths(common.conf.getrootfolder(),
                                             "maps", mapfilepath)
         self.__tmxmapfile = mapfilepath

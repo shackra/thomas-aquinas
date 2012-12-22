@@ -27,55 +27,66 @@ class TAAttrIsNotScene(Exception): pass
 class Director:
     """Objeto principal del juego.
 
-    Aqui es donde sucede toda la magia. Dibujamos, actualizamos
+    Aquí es donde sucede toda la magia. Dibujamos, actualizamos
     y propagamos eventos entre clases derivadas de 
     la clase AbstractScene.
 
     El diseño de esta clase esta fuertemente basada en director.py
     del proyecto Asadetris desarrollado por Hugo de LosersJuegos"""
 
-    def __init__(self, icon):
+    def __init__(self, icon=None):
         self.window = sfml.RenderWindow(sfml.VideoMode(
             common.settings.getscreensize()[0], 
             common.settings.getscreensize()[1]),
                                         common.settings.getscreentitle())
         self.window.framerate_limit = 60
-        self.window.icon = media.loadmedia(icon)
+        if icon: 
+            self.window.icon = media.loadmedia(icon).pixels
 
         self.__actualscene = None
         self.__fullscreenmode = False
         self.__exitgame = False
         # revisar si hay Joysticks conectados al PC.
         self.__globalvariables = {}
+        
+        # Iniciamos algunas variables globales
+        self.setglobalvariable("game title",
+                               common.settings.getscreentitle())
 
-    # def __getitem__(self, item):
-    #     return self.__globalvariables[str(item)]
+    def __getitem__(self, item):
+        return self.__globalvariables[str(item)]
 
-    # def __iter__(self):
-    #     return self.__globalvariables.items()
+    def __iter__(self):
+        return self.__globalvariables.items()
 
     def loop(self):
         "¡El juego se pone en marcha!"
 
-        # timesleep = sfml.system.Time
-        # timesleep.milliseconds = 1000
-        timesleep = 1000
+        timesleep = sfml.milliseconds(10)
 
         while not self.__exitgame:
-            # propagacion de eventos
+            # propagación de eventos
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
+                    logging.info("Cerrando el programa...")
+                    logging.info("Salvando la configuracion...")
+                    common.settings.saveconf()
+                    logging.info("Configuracion del juego salvada!")
+                    # logging.info("Guardando las variables globales...")
+                    # pass
+                    # logging.info("Variables globales salvadas!")
+                    logging.info("¡Gracias por jugar!")
                 elif type(event) is sfml.KeyEvent and event.pressed:
                     if event.code is sfml.Keyboard.F3:
                         # alternamos entre modo pantalla completa y modo ventana
-                        self.alternatefullscreen()
+                        self.alternatefullscreenmode()
 
                 # Le pasamos el evento a la escena para que haga algo
                 try:
                     self.__actualscene.on_event(event)
                 except AttributeError:
-                    raise TAAttrIsNotScene, ("Objecto {0} no es "
+                    raise TAAttrIsNotScene, ("Objeto {0} no es "
                                              "instancia de SceneFactory".format(
                                              type(self.__actualscene)))
                 ## TODO:
@@ -86,7 +97,7 @@ class Director:
             try:
                 self.__actualscene.on_update()
             except AttributeError:
-                raise TAAttrIsNotScene, ("Objecto {0} no es "
+                raise TAAttrIsNotScene, ("Objeto {0} no es "
                                          "instancia de SceneFactory".format(
                                              type(self.__actualscene)))
             
@@ -95,20 +106,20 @@ class Director:
             try:
                 self.__actualscene.on_draw(self.window)
             except AttributeError:
-                raise TAAttrIsNotScene, ("Objecto {0} no es "
+                raise TAAttrIsNotScene, ("Objeto {0} no es "
                                          "instancia de SceneFactory".format(
                                              type(self.__actualscene)))
-            # TODO: crear un sistema de widgets personalizable
+            # TODO: crear un sistema de widgets personalisable
             #   con CSS.
             # TODO: Dibujamos los widgets
             # self.__widgetmanager.on_draw(self.window)
             self.window.display()
 
-            # dormimos la aplicacion unos milisegundos
+            # dormimos la aplicación unos milisegundos
             sfml.sleep(timesleep)
 
         ## GAME OVER!
-        common.conf.saveconf()
+        
         self.window.close()
 
     def changescene(self, scene):
@@ -118,23 +129,23 @@ class Director:
     def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
         if not self.__fullscreenmode:
-            self.window = self.window.recreate(
+            self.window.recreate(
                 sfml.VideoMode(self.window.width,
                                self.window.height), 
-                self.window.title,
+                self.getglobalvariable("game title"),
                 sfml.Style.FULLSCREEN)
             self.__fullscreenmode = True
         else:
-            self.window = self.window.recreate(
+            self.window.recreate(
                 sfml.VideoMode(self.window.width,
                                self.window.height), 
-                self.window.title)
+                self.getglobalvariable("game title"))
             self.__fullscreenmode = False
 
     def setglobalvariable(self, name, value):
         """ Crea una variable global a la cual cualquier escena puede acceder.
 
-        es algo dificil compartir datos entre escenas, por ello se usara la
+        es algo difícil compartir datos entre escenas, por ello se usara la
         clase Director para almacenar variables que luego puedan ser usadas
         por otras escenas.
         """
