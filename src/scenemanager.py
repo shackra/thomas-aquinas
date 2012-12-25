@@ -48,6 +48,10 @@ class Director:
         self.__exitgame = False
         # revisar si hay Joysticks conectados al PC.
         self.__globalvariables = {}
+        self.__camera = sfml.View()
+        # Reiniciamos la camara al tamaño de la pantalla.
+        self.__camera.reset(sfml.Rectangle((0, 0), 
+                                           common.settings.getscreensize()))
         
         # Iniciamos algunas variables globales
         self.setglobalvariable("game title",
@@ -58,6 +62,29 @@ class Director:
 
     def __iter__(self):
         return self.__globalvariables.items()
+
+    def movecamera(self, playerx, playery):
+        """ Mueve la cámara del juego.
+
+        Esta es la forma más sencilla de realizar la técnica del
+        'screen scrolling'. Nos hemos basado en los cálculos realizados
+        por CodingMadeEasy y en el uso de objetos sfml.View.
+
+        Para mover la cámara de acuerdo al movimiento del jugador
+        este método debe ser llamado en algún momento dentro de una
+        instancia de la clase AbstractScene con las coordenadas del
+        sprite del jugador.
+        """
+        screensizex, screensizey = common.settings.getscreensize()
+        camerax = -(screensizex / 2) + playerx
+        cameray = -(screensizey / 2) + playery
+
+        if camerax < 0: camerax = 0
+        if cameray < 0: cameray = 0
+
+        self.__camera.viewport = sfml.Rectangle((camerax, cameray),
+                                                (camerax + screensizex,
+                                                 cameray + screensizey))
 
     def loop(self):
         "¡El juego se pone en marcha!"
@@ -113,6 +140,7 @@ class Director:
             #   con CSS.
             # TODO: Dibujamos los widgets
             # self.__widgetmanager.on_draw(self.window)
+            self.window.view = self.__camera
             self.window.display()
 
             # dormimos la aplicación unos milisegundos

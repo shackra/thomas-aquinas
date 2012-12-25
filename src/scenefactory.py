@@ -62,13 +62,6 @@ class AbstractScene:
         ## TODO: Para saber más sobre scrolling de mapas enormes
         #   Buscar el proyecto lib2d de Bitcraft en pygame.org
 
-    def movecamera(self, x, y):
-        "Mueve la 'camara' del juego."
-        # TODO: implementar screen scrolling aquí, ver comentarios en
-        # el metodo loadmap().
-        # TODO: usar pytweener para suavizar el movimiento de la camara
-        pass
-
     def __str__(self):
         "Util para darle un nombre a tu escena."
         raise NotImplemented("Implemente el metodo __str__")
