@@ -57,16 +57,17 @@ class AbstractScene:
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
         http://www.mapeditor.org/"""
-        mapfilepath = common.settings.joinpaths(common.settings.getrootfolder(),
-                                                "maps", mapfilepath)
-        self.__tmxmapfile = mapfilepath
+        self.__tmxmapfile = common.settings.joinpaths(
+            common.settings.getrootfolder(),
+            "maps", mapfilepath)
         self.__tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
+
         logging.info("Cargando las baldosas del escenario...")
         # carga todas las baldosas del set de baldosas
         # basado en el código escrito por bitcraft, del proyecto
         # pytmx. Revisar el método load_images_pygame del archivo
         # pytmx/tmxloader.py. fragmento de código bajo LGPL 3.
-        self.__tmxmapdata.images = [0] * tmxdata.maxgid
+        self.__tmxmapdata.images = [0] * self.__tmxmapdata.maxgid
 
         for firstgid, tile in sorted((tile.firstgid, tile) for tile in \
                                   self.__tmxmapdata.tilesets):
