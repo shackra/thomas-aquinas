@@ -18,7 +18,7 @@
 
 import logging
 from thirdparty.pytmx import tmxloader
-import common
+from itertools import product
 import media
 import sfml
 import os
