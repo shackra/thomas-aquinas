@@ -21,6 +21,7 @@ from thirdparty.pytmx import tmxloader
 import common
 import media
 import sfml
+import os
 
 class AbstractScene:
     """Escena abstracta del juego.
