@@ -119,10 +119,13 @@ class AbstractScene:
                 # a partir de una imagen cargada de acuerdo a ciertas
                 # coordenadas. En esté caso, "extraeremos" una baldosa
                 # del set de imágenes de baldosas del respectivo mapa.
-                tileimg = Tile(sfml.Texture.load_from_image(tileset, 
-                                                            (x, y, 
-                                                             tile_size[0], 
-                                                             tile_size[1])))
+
+                # se usara sfml.Sprite como arreglo provisional
+                tileimg = sfml.Sprite(
+                    sfml.Texture.load_from_image(tileset, 
+                                                 (x, y, 
+                                                 tile_size[0], 
+                                                  tile_size[1])))
 
                 # No tengo ni la menor idea sobre que hace esté bucle for
                 for gid, flag in gids:
@@ -201,5 +204,6 @@ class Tile(sfml.TransformableDrawable):
                                          " recibido {0}".format(type(image)))
 
     def draw(self, target, states):
-        #states.transform = self.transform
-        target.draw(self.texture, states)
+        # states.transform = self.transform
+        states.texture = self.texture
+        target.draw(self.texture.copy_to_image(), states)
