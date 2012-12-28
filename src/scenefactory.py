@@ -105,6 +105,8 @@ class AbstractScene:
 
             for (y, x) in p:
                 real_gid += 1
+                # Puede que el llamado a ese metodo devuelva una tupla
+                # Sólo Dios sabe porqué...
                 gids = self.__tmxmapdata.mapGID(real_gid)
                 if gids == []: continue
 
@@ -119,7 +121,8 @@ class AbstractScene:
                                                          tile_size[1]))
 
                 # No tengo ni la menor idea sobre que hace esté bucle for
-                for gid in gids:
+                for gid, flag in gids:
+                    logging.debug("gid: {0}, flag: {1}".format(gid, flag))
                     self.__tmxmapdata.images[gid] = tileimg
 
         logging.info("Carga de baldosas exitosa!")
