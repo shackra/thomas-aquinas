@@ -198,5 +198,5 @@ class Tile(sfml.TransformableDrawable):
                                          " recibido {0}".format(type(image)))
 
     def draw(self, target, states):
-        states.transform = self.transform
+        #states.transform = self.transform
         target.draw(self.texture, states)
