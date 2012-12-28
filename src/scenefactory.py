@@ -19,6 +19,8 @@
 import logging
 from thirdparty.pytmx import tmxloader
 import common
+import media
+import sfml
 
 class AbstractScene:
     """Escena abstracta del juego.
@@ -51,16 +53,86 @@ class AbstractScene:
     def loadmap(self, mapfilepath):
         """Carga el mapa de la respectiva escena.
 
-        No es necesario reimplementar éste metodo.
+        No es necesario reimplementar éste método.
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
         http://www.mapeditor.org/"""
-        mapfilepath = common.conf.joinpaths(common.conf.getrootfolder(),
-                                            "maps", mapfilepath)
+        mapfilepath = common.settings.joinpaths(common.settings.getrootfolder(),
+                                                "maps", mapfilepath)
         self.__tmxmapfile = mapfilepath
         self.__tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
-        ## TODO: Para saber más sobre scrolling de mapas enormes
-        #   Buscar el proyecto lib2d de Bitcraft en pygame.org
+        logging.info("Cargando las baldosas del escenario...")
+        # carga todas las baldosas del set de baldosas
+        # basado en el código escrito por bitcraft, del proyecto
+        # pytmx. Revisar el método load_images_pygame del archivo
+        # pytmx/tmxloader.py. fragmento de código bajo LGPL 3.
+        self.__tmxmapdata.images = [0] * tmxdata.maxgid
+
+        for firstgid, tile in sorted((tile.firstgid, tile) for tile in \
+                                  self.__tmxmapdata.tilesets):
+            filename = os.path.basename(tile.source)
+            tilesetpath = common.settings.fromrootfolderget(
+                "maps/tilesets/{0}".format(filename))
+
+            tileset = media.loadimg(tilesetpath)
+
+            w, h = tileset.size
+            tile_size = (t.tilewidth, t.tileheight)
+            real_gid = t.firstgid - 1
+
+            # FIXME: sfml no convierte los valores hexadecimales a valores
+            # RGB de 0 a 255.
+            # colorkey = None
+            # if t.trans:
+            #     colorkey = pygame.Color("#{0}".format(t.trans))
+
+            # i dont agree with margins and spacing, but i'll support it anyway
+            # such is life. okay.jpg
+            tilewidth = tile.tilewidth + tile.spacing
+            tileheight = tile.tileheight + tile.spacing
+            
+            # some tileset images may be slightly larger than the tile area
+            # ie: may include a banner, copyright, ect. 
+            # this compensates for that
+            width = ((int((w-tile.margin*2) + tile.spacing) / tilewidth) \
+                     * tilewidth) - tile.spacing
+            height = ((int((h-tile.margin*2) + tile.spacing) / tileheight) \
+                      * tileheight) - tile.spacing
+            
+            # using product avoids the overhead of nested loops
+            p = product(xrange(tile.margin, height+tile.margin, tileheight),
+                        xrange(tile.margin, width+tile.margin, tilewidth))
+
+            for (y, x) in p:
+                real_gid += 1
+                gids = self.__tmxmapdata.mapGID(real_gid)
+                if gids == []: continue
+
+                # Esta operacion puede ser algo lenta...
+                # creamos una textura (imagen en memoria de vídeo)
+                # a partir de una imagen cargada de acuerdo a ciertas
+                # coordenadas. En esté caso, "extraeremos" una baldosa
+                # del set de imágenes de baldosas del respectivo mapa.
+                tileimg = sfml.Texture.load_from_image(tileset, 
+                                                        (x, y, 
+                                                         tile_size[0], 
+                                                         tile_size[1]))
+
+                # No tengo ni la menor idea sobre que hace esté bucle for
+                for gid in gids:
+                    self.__tmxmapdata.images[gid] = tileimg
+
+        logging.info("Carga de baldosas exitosa!")
+
+    def drawmap(self, *args):
+        """ Dibuja el mapa del escenario.
+
+        se usa el argumento *args para pasar grupos de sprites que deban
+        ser dibujados en encontrar la capa sprite. Éste grupo de sprites
+        deberá de tener un método on_draw que llamara al método on_draw
+        de cada uno de los sprites dentro del grupo.
+        """
+        pass
 
     def __str__(self):
         "Util para darle un nombre a tu escena."
