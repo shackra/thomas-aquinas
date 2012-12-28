@@ -24,6 +24,8 @@ import media
 import sfml
 import os
 
+class TATileImageException(Exception): pass
+
 class AbstractScene:
     """Escena abstracta del juego.
 
@@ -115,10 +117,10 @@ class AbstractScene:
                 # a partir de una imagen cargada de acuerdo a ciertas
                 # coordenadas. En esté caso, "extraeremos" una baldosa
                 # del set de imágenes de baldosas del respectivo mapa.
-                tileimg = sfml.Texture.load_from_image(tileset, 
-                                                        (x, y, 
-                                                         tile_size[0], 
-                                                         tile_size[1]))
+                tileimg = Tile(sfml.Texture.load_from_image(tileset, 
+                                                            (x, y, 
+                                                             tile_size[0], 
+                                                             tile_size[1])))
 
                 # No tengo ni la menor idea sobre que hace esté bucle for
                 for gid, flag in gids:
@@ -162,7 +164,19 @@ class AbstractScene:
             # Dibujamos el tile en pantalla,
             # TODO: detenerse a dibujar los sprites cuando se necesite.
             if image:
+                # Tenemos dos formas de dibujar la baldosa
+                # si es ortografica, entonces se coloca de
+                # la siguiente forma: (x * ancho, y * alto)
+                # Si es isometrica, entonces de la siguiente
+                # forma: ((x * ancho / 2) + (y * ancho / 2), 
+                # (y * alto / 2) - (x * alto /2))
                 # screen.blit(image, (x * w, y * h))
+                if self.__tmxmapdata.orientation == "isometric":
+                    image.position = ((x * ancho / 2) + (y * ancho / 2), 
+                                      (y * alto / 2) - (x * alto /2))
+                else:
+                    image.position = (x * ancho, y * alto)
+
                 self.scenemanager.window.draw(image)
 
     def __str__(self):
@@ -171,3 +185,18 @@ class AbstractScene:
         # por ejemplo:
         #  return "<Scene: Escena #1, File: {0}>".format(self.__tmxmapfile)
         # o como usted más prefiera :)
+
+
+class Tile(sfml.TransformableDrawable):
+    def __init__(self, image):
+        sfml.TransformableDrawable.__init__(self)
+        if isinstance(image, sfml.Texture):
+            self.texture = image
+        else:
+            raise TATileImageException, ("Se esperaba un objeto del tipo "
+                                         "sfml.Texture"
+                                         " recibido {0}".format(type(image)))
+
+    def draw(self, target, states):
+        states.transform = self.transform
+        target.draw(self.texture, states)
