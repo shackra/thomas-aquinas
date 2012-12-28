@@ -76,8 +76,8 @@ class AbstractScene:
             tileset = media.loadimg("maps/tilesets/{0}".format(filename))
 
             w, h = tileset.size
-            tile_size = (t.tilewidth, t.tileheight)
-            real_gid = t.firstgid - 1
+            tile_size = (tile.tilewidth, tile.tileheight)
+            real_gid = tile.firstgid - 1
 
             # FIXME: sfml no convierte los valores hexadecimales a valores
             # RGB de 0 a 255.
