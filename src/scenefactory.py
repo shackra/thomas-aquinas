@@ -73,10 +73,7 @@ class AbstractScene:
         for firstgid, tile in sorted((tile.firstgid, tile) for tile in \
                                   self.__tmxmapdata.tilesets):
             filename = os.path.basename(tile.source)
-            tilesetpath = common.settings.fromrootfolderget(
-                "maps/tilesets/{0}".format(filename))
-
-            tileset = media.loadimg(tilesetpath)
+            tileset = media.loadimg("maps/tilesets/{0}".format(filename))
 
             w, h = tileset.size
             tile_size = (t.tilewidth, t.tileheight)
