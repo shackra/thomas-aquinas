@@ -135,7 +135,35 @@ class AbstractScene:
         deberá de tener un método on_draw que llamara al método on_draw
         de cada uno de los sprites dentro del grupo.
         """
-        pass
+        # creamos una referencia al metodo getTileImage
+        getimage = self.__tmxmapdata.getTileImage
+        # altura y anchura de la baldosa
+        alto, ancho = self.__tmxmapdata.tileheight, self.__tmxmapdata.tilewidth
+        # Capas, (x) filas, (y) columnas
+        # extraido de http://stackoverflow.com/a/893063
+        # algoritmo para mapas isometricos:
+        #
+        # tile_map[][] = [[...],...]
+        # for (i = 0; i < tile_map.size; i++):
+        #     for (j = tile_map[i].size; j >= 0; j--):
+        #         draw(
+        #             tile_map[i][j],
+        #             x = (j * tile_width / 2) + (i * tile_width / 2)
+        #             y = (i * tile_height / 2) - (j * tile_height / 2)
+        #         )
+        # nos ahorramos el overhead de los bucles for anidados
+        p = product(xrange(self.__tmxmapdata.tilelayers),
+                    xrange(self.__tmxmapdata.width),
+                    xrange(self.__tmxmapdata.height, -1, -1) \
+                    if self.__tmxmapdata.orientation == "isometric" \
+                    else xrange(self.__tmxmapdata.height))
+        for layer, x, y in p:
+            image = getimage(x, y, layer)
+            # Dibujamos el tile en pantalla,
+            # TODO: detenerse a dibujar los sprites cuando se necesite.
+            if image:
+                # screen.blit(image, (x * w, y * h))
+                self.scenemanager.window.draw(image)
 
     def __str__(self):
         "Util para darle un nombre a tu escena."
