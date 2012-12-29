@@ -152,6 +152,7 @@ class Director:
 
     def changescene(self, scene):
         "Cambia la escena actual."
+        logging.info("Cambiando de escena: {0}".format(scene))
         self.__actualscene = scene
 
     def alternatefullscreenmode(self):
