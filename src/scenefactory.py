@@ -37,12 +37,11 @@ class AbstractScene:
     Para poder hacer escenas funcionales, debe derivar de esta clase
     cualquier escena que necesite."""
 
-    def __init__(self):
-        # self.scenemanager = scenemanager
+    def __init__(self, scenemanager):
+        self.scenemanager = scenemanager
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
-        pass
 
     def on_update(self):
         "El manejador de escenas llamara este metodo para actualizar la logica."
