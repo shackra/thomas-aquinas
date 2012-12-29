@@ -113,8 +113,8 @@ class Director:
                 try:
                     self.__actualscene.on_event(event)
                 except AttributeError:
-                    raise TAAttrIsNotScene, ("Objeto {0} no es "
-                                             "instancia de SceneFactory".format(
+                    raise TAAttrIsNotScene, ("Objeto {0} no tiene "
+                                             "atributo on_event".format(
                                              type(self.__actualscene)))
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
@@ -124,8 +124,8 @@ class Director:
             try:
                 self.__actualscene.on_update()
             except AttributeError:
-                raise TAAttrIsNotScene, ("Objeto {0} no es "
-                                         "instancia de SceneFactory".format(
+                raise TAAttrIsNotScene, ("Objeto {0} no tiene "
+                                         "atributo on_update".format(
                                              type(self.__actualscene)))
             
             # dibujamos la escena
@@ -152,8 +152,12 @@ class Director:
 
     def changescene(self, scene):
         "Cambia la escena actual."
-        logging.info("Cambiando de escena: {0}".format(scene))
-        self.__actualscene = scene
+        if isinstance(scene, SceneFactory):
+            logging.info("Cambiando de escena: {0}".format(scene))
+            self.__actualscene = scene
+        else:
+            raise TAAttrIsNotScene, ("El objeto {0} no es instancia "
+                                     "de SceneFactory".format(type(scene)))
 
     def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
