@@ -162,7 +162,7 @@ class AbstractScene:
         # nos ahorramos el overhead de los bucles for anidados
         p = product(xrange(len(self.__tmxmapdata.tilelayers)),
                     xrange(self.__tmxmapdata.width),
-                    xrange(self.__tmxmapdata.height, -1, -1) \
+                    xrange(self.__tmxmapdata.height - 1, -1, -1) \
                     if self.__tmxmapdata.orientation == "isometric" \
                     else xrange(self.__tmxmapdata.height))
         for layer, x, y in p:
