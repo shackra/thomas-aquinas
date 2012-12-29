@@ -24,7 +24,7 @@ import media
 import sfml
 import os
 # debbuging!
-import pdb
+#import pdb
 
 class TATileImageException(Exception): pass
 
@@ -142,7 +142,7 @@ class AbstractScene:
         deberá de tener un método on_draw que llamara al método on_draw
         de cada uno de los sprites dentro del grupo.
         """
-        pdb.set_trace()
+        #pdb.set_trace()
         # creamos una referencia al metodo getTileImage
         getimage = self.__tmxmapdata.getTileImage
         # altura y anchura de la baldosa
