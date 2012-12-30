@@ -20,6 +20,7 @@ import logging
 import common
 import sfml
 import media
+import pdb
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
@@ -152,7 +153,12 @@ class Director:
 
     def changescene(self, scene):
         "Cambia la escena actual."
+        if isinstance(scene, SceneFactory):
+        logging.info("Cambiando de escena: {0}".format(scene))
         self.__actualscene = scene
+        else:
+            raise TAAttrIsNotScene, ("El objeto {0} no es instancia "
+                                     "de SceneFactory".format(type(scene)))
 
     def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
