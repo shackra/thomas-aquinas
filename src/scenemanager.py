@@ -153,8 +153,8 @@ class Director:
     def changescene(self, scene):
         "Cambia la escena actual."
         if isinstance(scene, SceneFactory):
-        logging.info("Cambiando de escena: {0}".format(scene))
-        self.__actualscene = scene
+            logging.info("Cambiando de escena: {0}".format(scene))
+            self.__actualscene = scene
         else:
             raise TAAttrIsNotScene, ("El objeto {0} no es instancia "
                                      "de SceneFactory".format(type(scene)))
