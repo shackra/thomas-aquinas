@@ -20,7 +20,6 @@ import logging
 import common
 import sfml
 import media
-import pdb
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
