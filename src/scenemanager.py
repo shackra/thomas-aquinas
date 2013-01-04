@@ -22,6 +22,7 @@ import sfml
 import media
 import scenefactory
 from thirdparty.pytweener import pytweener
+import pdb
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
@@ -79,6 +80,8 @@ class Director:
         en algún momento dentro de una instancia de la clase AbstractScene
         con las coordenadas del sprite del jugador.
         """
+        
+        logging.info("Moviendo la camara a {0}x{1}".format(playerx, playery))
         screensizex, screensizey = common.settings.getscreensize()
         if withplayer:
             camerax = -(screensizex / 2) + playerx
@@ -91,10 +94,10 @@ class Director:
                                                  cameray + screensizey))
         else:
             # Creamos un par de tweeners para la camara.
-            self.tweener.addTweener(self, _movecamerax=playerx,
-                                    tweenTime=10, tweenType=self.defaulteasing)
-            self.tweener.addTweener(self, _movecameray=playery,
-                                    tweenTime=10, tweenType=self.defaulteasing)
+            self.tweener.addTween(self, _movecamerax=playerx,
+                                  tweenTime=60, tweenType=self.defaulteasing)
+            self.tweener.addTween(self, _movecameray=playery,
+                                  tweenTime=60, tweenType=self.defaulteasing)
             
     def _movecamerax(self, playerx):
         """Mueve la camara solamente hacia el eje X.
@@ -153,7 +156,7 @@ class Director:
                 except AttributeError:
                     raise TAAttrIsNotScene, ("Objeto {0} no es "
                                              "instancia de SceneFactory".format(
-                                             type(self.__actualscene)))
+                            type(self.__actualscene)))
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
@@ -186,7 +189,7 @@ class Director:
             
         ## GAME OVER!
         self.window.close()
-    
+        
     def changescene(self, scene):
         "Cambia la escena actual."
         
