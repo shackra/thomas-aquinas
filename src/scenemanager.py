@@ -26,14 +26,14 @@ class TAAttrIsNotScene(Exception): pass
 
 class Director:
     """Objeto principal del juego.
-
+    
     Aquí es donde sucede toda la magia. Dibujamos, actualizamos
     y propagamos eventos entre clases derivadas de 
     la clase AbstractScene.
-
+    
     El diseño de esta clase esta fuertemente basada en director.py
     del proyecto Asadetris desarrollado por Hugo de LosersJuegos"""
-
+    
     def __init__(self, icon=None):
         self.window = sfml.RenderWindow(sfml.VideoMode(
             common.settings.getscreensize()[0], 
@@ -42,7 +42,7 @@ class Director:
         self.window.framerate_limit = 60
         if icon: 
             self.window.icon = media.loadmedia(icon).pixels
-
+            
         self.__actualscene = None
         self.__fullscreenmode = False
         self.__exitgame = False
@@ -56,20 +56,20 @@ class Director:
         # Iniciamos algunas variables globales
         self.setglobalvariable("game title",
                                common.settings.getscreentitle())
-
+        
     def __getitem__(self, item):
         return self.__globalvariables[str(item)]
-
+    
     def __iter__(self):
         return self.__globalvariables.items()
-
+    
     def movecamera(self, playerx, playery):
         """ Mueve la cámara del juego.
-
+        
         Esta es la forma más sencilla de realizar la técnica del
         'screen scrolling'. Nos hemos basado en los cálculos realizados
         por CodingMadeEasy y en el uso de objetos sfml.View.
-
+        
         Para mover la cámara de acuerdo al movimiento del jugador
         este método debe ser llamado en algún momento dentro de una
         instancia de la clase AbstractScene con las coordenadas del
@@ -78,19 +78,19 @@ class Director:
         screensizex, screensizey = common.settings.getscreensize()
         camerax = -(screensizex / 2) + playerx
         cameray = -(screensizey / 2) + playery
-
+        
         if camerax < 0: camerax = 0
         if cameray < 0: cameray = 0
-
+        
         self.__camera.viewport = sfml.Rectangle((camerax, cameray),
                                                 (camerax + screensizex,
                                                  cameray + screensizey))
-
+        
     def loop(self):
         "¡El juego se pone en marcha!"
-
+        
         timesleep = sfml.milliseconds(10)
-
+        
         while not self.__exitgame:
             # propagación de eventos
             for event in self.window.events:
@@ -108,7 +108,7 @@ class Director:
                     if event.code is sfml.Keyboard.F3:
                         # alternamos entre modo pantalla completa y modo ventana
                         self.alternatefullscreenmode()
-
+                        
                 # Le pasamos el evento a la escena para que haga algo
                 try:
                     self.__actualscene.on_event(event)
@@ -119,7 +119,7 @@ class Director:
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
-
+                
             # actualizamos la escena
             try:
                 self.__actualscene.on_update()
@@ -142,23 +142,23 @@ class Director:
             # self.__widgetmanager.on_draw(self.window)
             self.window.view = self.__camera
             self.window.display()
-
+            
             # dormimos la aplicación unos milisegundos
             sfml.sleep(timesleep)
-
+            
         ## GAME OVER!
-        
+            
         self.window.close()
-
+        
     def changescene(self, scene):
         "Cambia la escena actual."
         if isinstance(scene, SceneFactory):
-        logging.info("Cambiando de escena: {0}".format(scene))
-        self.__actualscene = scene
+            logging.info("Cambiando de escena: {0}".format(scene))
+            self.__actualscene = scene
         else:
             raise TAAttrIsNotScene, ("El objeto {0} no es instancia "
                                      "de SceneFactory".format(type(scene)))
-
+        
     def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
         if not self.__fullscreenmode:
@@ -174,16 +174,16 @@ class Director:
                                self.window.height), 
                 self.getglobalvariable("game title"))
             self.__fullscreenmode = False
-
+            
     def setglobalvariable(self, name, value):
         """ Crea una variable global a la cual cualquier escena puede acceder.
-
+        
         es algo difícil compartir datos entre escenas, por ello se usara la
         clase Director para almacenar variables que luego puedan ser usadas
         por otras escenas.
         """
         self.__globalvariables[str(name)] = value
-
+        
     def getglobalvariable(self, name):
         """ Retorna alguna el valor de alguna variable global.
         """
@@ -192,9 +192,10 @@ class Director:
         else:
             raise TAGlobalVariableException, "{0} variable no definida".format(
                 name)
-
+        
     def delglobalvariable(self, name):
         """ Borra una variable global previamente definida.
         """
         if self.__globalvariables.has_key(str(name)):
             self.__globalvariables.pop(str(name))
+            
