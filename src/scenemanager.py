@@ -1,6 +1,6 @@
 # coding: utf-8
 # This file is part of Thomas Aquinas.
-#    
+#
 # Thomas Aquinas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -154,7 +154,7 @@ class Director:
             
         self.window.close()
         
-        def changescene(self, scene):
+    def changescene(self, scene):
         "Cambia la escena actual."
         if isinstance(scene, SceneFactory):
             logging.info("Cambiando de escena: {0}".format(scene))
@@ -202,5 +202,6 @@ class Director:
         """
         if self.__globalvariables.has_key(str(name)):
             self.__globalvariables.pop(str(name))
+            
             
             
