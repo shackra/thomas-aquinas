@@ -153,7 +153,7 @@ class Director:
         ## GAME OVER!
             
         self.window.close()
-        
+    
     def changescene(self, scene):
         "Cambia la escena actual."
         if isinstance(scene, SceneFactory):
