@@ -20,6 +20,8 @@ import logging
 import common
 import sfml
 import media
+import scenefactory
+from src.thirdparty.pytweener import pytweener
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
@@ -39,6 +41,8 @@ class Director:
             common.settings.getscreensize()[0], 
             common.settings.getscreensize()[1]),
                                         common.settings.getscreentitle())
+        self.tweener = pytweener.Tweener()
+        self.defaulteasing = pytweener.Easing.Quad.easeOut
         self.window.framerate_limit = 60
         if icon: 
             self.window.icon = media.loadmedia(icon).pixels
@@ -82,21 +86,51 @@ class Director:
             
             if camerax < 0: camerax = 0
             if cameray < 0: cameray = 0
+            self.__camera.viewport = sfml.Rectangle((camerax, cameray),
+                                                    (camerax + screensizex,
+                                                     cameray + screensizey))
         else:
-            camerax = playerx
-            cameray = playery
+            # Creamos un par de tweeners para la camara.
+            self.tweener.addTweener(self, _movecamerax=playerx,
+                                    tweenTime=10, tweenType=self.defaulteasing)
+            self.tweener.addTweener(self, _movecameray=playery,
+                                    tweenTime=10, tweenType=self.defaulteasing)
             
-        self.__camera.viewport = sfml.Rectangle((camerax, cameray),
-                                                (camerax + screensizex,
-                                                 cameray + screensizey))
+    def _movecamerax(self, playerx):
+        """Mueve la camara solamente hacia el eje X.
+        
+        Se espera que éste metodo sea usado por pyTweener para
+        actualizar la posición de la camara."""
+        
+        screensizex, screensizey = common.settings.getscreensize()
+        viewport = self.__camera.viewport
+        self.__camera.viewport = sfml.Rectangle((playerx, viewport.top),
+                                                (playerx + screensizex,
+                                                 viewport.top + screensizey))
+        
+    def _movecameray(self, playery):
+        """Mueve la camara solamente hacia el eje Y.
+        
+        Se espera que éste metodo sea usado por pyTweener para
+        actualizar la posición de la camara."""
+        
+        screensizex, screensizey = common.settings.getscreensize()
+        viewport = self.__camera.viewport
+        self.__camera.viewport = sfml.Rectangle((viewport.left, playery),
+                                                (viewport.left + screensizex,
+                                                 playery + screensizey))
         
     def loop(self):
         "¡El juego se pone en marcha!"
         
-        timesleep = sfml.milliseconds(10)
+        clock = sfml.Clock()
         
         while not self.__exitgame:
             # propagación de eventos
+            if clock.elapse_time.seconds > 1.0:
+                self.tweener.update(1.0)
+                clock.restart()
+                
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
@@ -146,25 +180,29 @@ class Director:
             # self.__widgetmanager.on_draw(self.window)
             self.window.view = self.__camera
             self.window.display()
-            
-            # dormimos la aplicación unos milisegundos
-            sfml.sleep(timesleep)
+            # La aplicacion ya es dormida en cada llamada a 
+            # window.display(), de ahí que no necesitemos más
+            # llamadas a sfml.sleep()
             
         ## GAME OVER!
-            
         self.window.close()
-    
+        
     def changescene(self, scene):
         "Cambia la escena actual."
-        if isinstance(scene, SceneFactory):
+        
+        if isinstance(scene, scenefactory.AbstractScene):
             logging.info("Cambiando de escena: {0}".format(scene))
             self.__actualscene = scene
         else:
             raise TAAttrIsNotScene, ("El objeto {0} no es instancia "
-                                     "de SceneFactory".format(type(scene)))
+                                     "de scenefactory."
+                                     "AbstractScene".format(type(scene)))
         
     def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
+        
+        # FIXME: existe un error al cambiar a modo pantalla
+        # completa con una resolución de pantalla pequeña.
         if not self.__fullscreenmode:
             self.window.recreate(
                 sfml.VideoMode(self.window.width,
