@@ -21,7 +21,7 @@ import common
 import sfml
 import media
 import scenefactory
-from src.thirdparty.pytweener import pytweener
+from thirdparty.pytweener import pytweener
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
@@ -87,8 +87,8 @@ class Director:
             if camerax < 0: camerax = 0
             if cameray < 0: cameray = 0
             self.__camera.viewport = sfml.Rectangle((camerax, cameray),
-                                                    (camerax + screensizex,
-                                                     cameray + screensizey))
+                                                (camerax + screensizex,
+                                                 cameray + screensizey))
         else:
             # Creamos un par de tweeners para la camara.
             self.tweener.addTweener(self, _movecamerax=playerx,
@@ -127,7 +127,7 @@ class Director:
         
         while not self.__exitgame:
             # propagación de eventos
-            if clock.elapse_time.seconds > 1.0:
+            if clock.elapsed_time.seconds > 1.0:
                 self.tweener.update(1.0)
                 clock.restart()
                 
@@ -186,7 +186,7 @@ class Director:
             
         ## GAME OVER!
         self.window.close()
-        
+    
     def changescene(self, scene):
         "Cambia la escena actual."
         
@@ -240,6 +240,7 @@ class Director:
         """
         if self.__globalvariables.has_key(str(name)):
             self.__globalvariables.pop(str(name))
+            
             
             
             
