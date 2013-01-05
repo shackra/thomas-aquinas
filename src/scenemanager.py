@@ -21,8 +21,7 @@ import common
 import sfml
 import media
 import scenefactory
-from thirdparty.pytweener import pytweener
-import pdb
+from src.thirdparty.pytweener import pytweener
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
@@ -53,8 +52,8 @@ class Director:
         self.__exitgame = False
         # revisar si hay Joysticks conectados al PC.
         self.__globalvariables = {}
-        self.__camera = sfml.View()
-        # Reiniciamos la camara al tamaño de la pantalla.
+        self.__camera = customView()
+        # Reiniciamos la cámara al tamaño de la pantalla.
         self.__camera.reset(sfml.Rectangle((0, 0), 
                                            common.settings.getscreensize()))
         
@@ -90,39 +89,15 @@ class Director:
             if camerax < 0: camerax = 0
             if cameray < 0: cameray = 0
             self.__camera.viewport = sfml.Rectangle((camerax, cameray),
-                                                (camerax + screensizex,
-                                                 cameray + screensizey))
+                                                    (camerax + screensizex,
+                                                     cameray + screensizey))
         else:
             # Creamos un par de tweeners para la camara.
-            self.tweener.addTween(self, _movecamerax=playerx,
-                                  tweenTime=60, tweenType=self.defaulteasing)
-            self.tweener.addTween(self, _movecameray=playery,
-                                  tweenTime=60, tweenType=self.defaulteasing)
+            self.tweener.addTweener(self.__camera, setcenterx=playerx,
+                                    tweenTime=10, tweenType=self.defaulteasing)
+            self.tweener.addTweener(self.__camera, setcentery=playery,
+                                    tweenTime=10, tweenType=self.defaulteasing)
             
-    def _movecamerax(self, playerx):
-        """Mueve la camara solamente hacia el eje X.
-        
-        Se espera que éste metodo sea usado por pyTweener para
-        actualizar la posición de la camara."""
-        
-        screensizex, screensizey = common.settings.getscreensize()
-        viewport = self.__camera.viewport
-        self.__camera.viewport = sfml.Rectangle((playerx, viewport.top),
-                                                (playerx + screensizex,
-                                                 viewport.top + screensizey))
-        
-    def _movecameray(self, playery):
-        """Mueve la camara solamente hacia el eje Y.
-        
-        Se espera que éste metodo sea usado por pyTweener para
-        actualizar la posición de la camara."""
-        
-        screensizex, screensizey = common.settings.getscreensize()
-        viewport = self.__camera.viewport
-        self.__camera.viewport = sfml.Rectangle((viewport.left, playery),
-                                                (viewport.left + screensizex,
-                                                 playery + screensizey))
-        
     def loop(self):
         "¡El juego se pone en marcha!"
         
@@ -138,9 +113,9 @@ class Director:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
                     logging.info("Cerrando el programa...")
-                    logging.info("Salvando la configuracion...")
+                    logging.info("Salvando la configuración...")
                     common.settings.saveconf()
-                    logging.info("Configuracion del juego salvada!")
+                    logging.info("Configuración del juego salvada!")
                     # logging.info("Guardando las variables globales...")
                     # pass
                     # logging.info("Variables globales salvadas!")
@@ -153,10 +128,10 @@ class Director:
                 # Le pasamos el evento a la escena para que haga algo
                 try:
                     self.__actualscene.on_event(event)
-                except AttributeError:
-                    raise TAAttrIsNotScene, ("Objeto {0} no es "
-                                             "instancia de SceneFactory".format(
-                            type(self.__actualscene)))
+                except AttributeError as e:
+                    raise TAAttrIsNotScene, ("Sucedió un error en "
+                                             "alguna parte del bucle:"
+                                             " {e}".format(e))
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
@@ -164,26 +139,33 @@ class Director:
             # actualizamos la escena
             try:
                 self.__actualscene.on_update()
-            except AttributeError:
-                raise TAAttrIsNotScene, ("Objeto {0} no es "
-                                         "instancia de SceneFactory".format(
-                                             type(self.__actualscene)))
+            except AttributeError as e:
+                raise TAAttrIsNotScene, ("Sucedió un error en "
+                                         "alguna parte del bucle:"
+                                         " {e}".format(e))
             
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
             try:
                 self.__actualscene.on_draw(self.window)
             except AttributeError:
-                raise TAAttrIsNotScene, ("Objeto {0} no es "
-                                         "instancia de SceneFactory".format(
-                                             type(self.__actualscene)))
+                raise TAAttrIsNotScene, ("Sucedió un error en "
+                                         "alguna parte del bucle:"
+                                         " {e}".format(e))
+            
+            # Cambiamos el view de nuestra ventana por el que esta por defecto
+            # Para dibujar los elementos de la UI. Puede que algunos elementos
+            # de la UI necesiten ser dibujados dentro de
+            # nuestro sfml.View regular
+            self.window.view = self.window.default_view
             # TODO: crear un sistema de widgets personalisable
             #   con CSS.
             # TODO: Dibujamos los widgets
             # self.__widgetmanager.on_draw(self.window)
-            self.window.view = self.__camera
             self.window.display()
-            # La aplicacion ya es dormida en cada llamada a 
+            # Restablecemos el view de nuestra ventana al sfml.View regular
+            self.window.view = self.__camera
+            # La aplicación ya es dormida en cada llamada a 
             # window.display(), de ahí que no necesitemos más
             # llamadas a sfml.sleep()
             
@@ -246,4 +228,32 @@ class Director:
             
             
             
+class customView(sfml.View):
+    """"Clase personalizada para el manejo de una cámara. La inexistencia
+    de setters/getters en esta clase la hace difícil de usar en conjunto
+    con pytweener, de ahí la necesidad de escribir esta clase.
+    """
+    
+    def __init__(self):
+        sfml.View.__init__(None)
+        
+    def setcenterx(self, x):
+        """Establece el valor del centro de la cámara en el eje X.
+        """
+        self.center = sfml.Vector2(x, self.center.y)
+        
+    def setcentery(self, y):
+        """Establece el valor del centro de la cámara en el eje Y.
+        """
+        self.center = sfml.Vector2(self.center.x, y)
+        
+    def getcenterx(self):
+        """Retorna el valor del centro de la cámara en el eje X.
+        """
+        return self.center.x
+    
+    def getcentery(self):
+        """Retorna el valor del centro de la cámara en el eje X.
+        """
+        return self.center.y
             
