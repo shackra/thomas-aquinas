@@ -91,9 +91,9 @@ class Director:
                                                      cameray + screensizey))
         else:
             # Creamos un par de tweeners para la camara.
-            self.tweener.addTweener(self.__camera, setcenterx=playerx,
+            self.tweener.addTween(self.__camera, setcenterx=playerx,
                                     tweenTime=10, tweenType=self.defaulteasing)
-            self.tweener.addTweener(self.__camera, setcentery=playery,
+            self.tweener.addTween(self.__camera, setcentery=playery,
                                     tweenTime=10, tweenType=self.defaulteasing)
             
     def loop(self):
@@ -103,10 +103,11 @@ class Director:
         
         while not self.__exitgame:
             # propagación de eventos
-            if clock.elapsed_time.seconds > 1.0:
-                self.tweener.update(1.0)
-                clock.restart()
-                
+            # if clock.elapsed_time.seconds > 1.0:
+            #     self.tweener.update(1.0)
+            #     clock.restart()
+            
+            self.tweener.update(60 / 1000.0)
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
