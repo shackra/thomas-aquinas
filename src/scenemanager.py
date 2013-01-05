@@ -103,7 +103,7 @@ class Director:
         
         while not self.__exitgame:
             # propagación de eventos
-            if clock.elapse_time.seconds > 1.0:
+            if clock.elapsed_time.seconds > 1.0:
                 self.tweener.update(1.0)
                 clock.restart()
                 
