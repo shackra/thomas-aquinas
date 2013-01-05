@@ -77,10 +77,8 @@ class Director:
         Para mover la cámara de acuerdo al movimiento del jugador
         Siendo que 'withplayer' sea True, este método debe ser llamado
         en algún momento dentro de una instancia de la clase AbstractScene
-        con las coordenadas del sprite del jugador.
+        con las coordenadas del sprite origen.
         """
-        
-        logging.info("Moviendo la camara a {0}x{1}".format(playerx, playery))
         screensizex, screensizey = common.settings.getscreensize()
         if withplayer:
             camerax = -(screensizex / 2) + playerx
@@ -93,10 +91,10 @@ class Director:
                                                      cameray + screensizey))
         else:
             # Creamos un par de tweeners para la camara.
-            self.tweener.addTweener(self.__camera, setcenterx=playerx,
-                                    tweenTime=10, tweenType=self.defaulteasing)
-            self.tweener.addTweener(self.__camera, setcentery=playery,
-                                    tweenTime=10, tweenType=self.defaulteasing)
+            self.tweener.addTween(self.__camera, setcenterx=playerx,
+                                    tweenTime=5, tweenType=self.defaulteasing)
+            self.tweener.addTween(self.__camera, setcentery=playery,
+                                    tweenTime=5, tweenType=self.defaulteasing)
             
     def loop(self):
         "¡El juego se pone en marcha!"
@@ -105,10 +103,17 @@ class Director:
         
         while not self.__exitgame:
             # propagación de eventos
-            if clock.elapsed_time.seconds > 1.0:
-                self.tweener.update(1.0)
-                clock.restart()
-                
+            # if clock.elapsed_time.seconds > 1.0:
+            #     self.tweener.update(1.0)
+            #     clock.restart()
+            
+            # pySFML no provee un metodo para saber la cantidad
+            # de cuadros por segundos. clock.restart().seconds
+            # es poco parejo, por lo tanto, es mejor usar el valor
+            # de self.window.framerate_limit y dividirlo entre 1000.0
+            # para utilizar el producto en la actualizacion del tweener.
+            self.tweener.update(60 / 1000.0)
+            
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
@@ -131,7 +136,7 @@ class Director:
                 except AttributeError as e:
                     raise TAAttrIsNotScene, ("Sucedió un error en "
                                              "alguna parte del bucle:"
-                                             " {e}".format(e))
+                                             " {0}".format(e))
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
@@ -142,7 +147,7 @@ class Director:
             except AttributeError as e:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
-                                         " {e}".format(e))
+                                         " {0}".format(e))
             
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
@@ -151,7 +156,7 @@ class Director:
             except AttributeError:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
-                                         " {e}".format(e))
+                                         " {0}".format(e))
             
             # Cambiamos el view de nuestra ventana por el que esta por defecto
             # Para dibujar los elementos de la UI. Puede que algunos elementos
@@ -226,8 +231,11 @@ class Director:
         if self.__globalvariables.has_key(str(name)):
             self.__globalvariables.pop(str(name))
             
-            
-            
+    def getcameraposition(self):
+        """Retorna la posicion de la camara.
+        """
+        return self.__camera.getcenterxy()
+    
 class customView(sfml.View):
     """"Clase personalizada para el manejo de una cámara. La inexistencia
     de setters/getters en esta clase la hace difícil de usar en conjunto
@@ -235,17 +243,23 @@ class customView(sfml.View):
     """
     
     def __init__(self):
-        sfml.View.__init__(None)
+        sfml.View.__init__(self)
         
     def setcenterx(self, x):
         """Establece el valor del centro de la cámara en el eje X.
         """
+        #logging.debug("Moviendo el centro de la camara...")
+        #logging.debug("Posicion X actual: {0}".format(self.center.x))
         self.center = sfml.Vector2(x, self.center.y)
+        #logging.debug("Posicion X nueva: {0}".format(self.center.x))
         
     def setcentery(self, y):
         """Establece el valor del centro de la cámara en el eje Y.
         """
+        #logging.debug("Moviendo el centro de la camara...")
+        #logging.debug("Posicion Y actual: {0}".format(self.center.y))
         self.center = sfml.Vector2(self.center.x, y)
+        #logging.debug("Posicion Y nueva: {0}".format(self.center.y))
         
     def getcenterx(self):
         """Retorna el valor del centro de la cámara en el eje X.
@@ -256,4 +270,8 @@ class customView(sfml.View):
         """Retorna el valor del centro de la cámara en el eje X.
         """
         return self.center.y
-            
+    
+    def getcenterxy(self):
+        """Retorna las coordenadas X y Y del centro de la camara.
+        """
+        return self.center
