@@ -98,7 +98,7 @@ class Conf:
                     raise TAConfFailException, ("La configuración no pudo ser"
                                                 " cargada de manera exitosa")
                 
-                def saveconf(self, onuserfolder=True, filepath=None):
+    def saveconf(self, onuserfolder=True, filepath=None):
         """ Salva la configuración actual en un archivo ini.
         
         Si onuserfolder es verdadero, se guardara toda la configuración
@@ -372,3 +372,4 @@ if __name__ != "__main__":
     # Si algo, comparado con la configuración original, debe modificarse
     # el orden del procesamiento de las configuraciones hará el trabajo.
     settings.loadconf([ROOTCONFPATH, USERCONFPATH])
+    

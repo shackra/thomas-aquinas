@@ -77,7 +77,7 @@ class Director:
         Para mover la cámara de acuerdo al movimiento del jugador
         Siendo que 'withplayer' sea True, este método debe ser llamado
         en algún momento dentro de una instancia de la clase AbstractScene
-        con las coordenadas del sprite del jugador.
+        con las coordenadas del sprite origen.
         """
         screensizex, screensizey = common.settings.getscreensize()
         if withplayer:
@@ -92,9 +92,9 @@ class Director:
         else:
             # Creamos un par de tweeners para la camara.
             self.tweener.addTween(self.__camera, setcenterx=playerx,
-                                    tweenTime=10, tweenType=self.defaulteasing)
+(??)                                    tweenTime=10, tweenType=self.defaulteasing)
             self.tweener.addTween(self.__camera, setcentery=playery,
-                                    tweenTime=10, tweenType=self.defaulteasing)
+(??)                                    tweenTime=10, tweenType=self.defaulteasing)
             
     def loop(self):
         "¡El juego se pone en marcha!"
@@ -102,12 +102,10 @@ class Director:
         clock = sfml.Clock()
         
         while not self.__exitgame:
-            # propagación de eventos
-            # if clock.elapsed_time.seconds > 1.0:
-            #     self.tweener.update(1.0)
-            #     clock.restart()
-            
+            # actualizamos el tweener
             self.tweener.update(60 / 1000.0)
+            
+            # propagación de eventos
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
@@ -130,7 +128,7 @@ class Director:
                 except AttributeError as e:
                     raise TAAttrIsNotScene, ("Sucedió un error en "
                                              "alguna parte del bucle:"
-                                             " {e}".format(e))
+                                             " {0}".format(e))
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
@@ -141,7 +139,7 @@ class Director:
             except AttributeError as e:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
-                                         " {e}".format(e))
+                                         " {0}".format(e))
             
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
@@ -150,7 +148,7 @@ class Director:
             except AttributeError:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
-                                         " {e}".format(e))
+                                         " {0}".format(e))
             
             # Cambiamos el view de nuestra ventana por el que esta por defecto
             # Para dibujar los elementos de la UI. Puede que algunos elementos
@@ -225,6 +223,10 @@ class Director:
         if self.__globalvariables.has_key(str(name)):
             self.__globalvariables.pop(str(name))
             
+    def getcameraposition(self):
+        """Retorna la posicion de la camara.
+        """
+        return self.__camera.getcenterxy()
             
 class customView(sfml.View):
     """"Clase personalizada para el manejo de una cámara. La inexistencia
@@ -233,7 +235,7 @@ class customView(sfml.View):
     """
     
     def __init__(self):
-        sfml.View.__init__(None)
+        sfml.View.__init__(self)
         
     def setcenterx(self, x):
         """Establece el valor del centro de la cámara en el eje X.
@@ -255,3 +257,7 @@ class customView(sfml.View):
         """
         return self.center.y
     
+    def getcenterxy(self):
+        """Retorna las coordenadas X y Y del centro de la camara.
+        """
+        return self.center
