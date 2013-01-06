@@ -92,9 +92,9 @@ class Director:
         else:
             # Creamos un par de tweeners para la camara.
             self.tweener.addTween(self.__camera, setcenterx=playerx,
-(??)                                    tweenTime=10, tweenType=self.defaulteasing)
+                                  tweenTime=10, tweenType=self.defaulteasing)
             self.tweener.addTween(self.__camera, setcentery=playery,
-(??)                                    tweenTime=10, tweenType=self.defaulteasing)
+                                  tweenTime=10, tweenType=self.defaulteasing)
             
     def loop(self):
         "¡El juego se pone en marcha!"
@@ -261,3 +261,4 @@ class customView(sfml.View):
         """Retorna las coordenadas X y Y del centro de la camara.
         """
         return self.center
+    
