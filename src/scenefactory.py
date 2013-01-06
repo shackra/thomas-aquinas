@@ -105,7 +105,7 @@ class AbstractScene:
             # using product avoids the overhead of nested loops
             p = product(xrange(tile.margin, height+tile.margin, tileheight),
                         xrange(tile.margin, width+tile.margin, tilewidth))
-
+            
             for (y, x) in p:
                 real_gid += 1
                 # Puede que el llamado a ese metodo devuelva una tupla
@@ -125,17 +125,17 @@ class AbstractScene:
                                                  (x, y, 
                                                  tile_size[0], 
                                                   tile_size[1])))
-
+                
                 # No tengo ni la menor idea sobre que hace esté bucle for
                 for gid, flag in gids:
                     logging.debug("gid: {0}, flag: {1}".format(gid, flag))
                     self.__tmxmapdata.images[gid] = tileimg
-
+                    
         logging.info("Carga de baldosas exitosa!")
 
     def drawmap(self, *args):
         """ Dibuja el mapa del escenario.
-
+        
         se usa el argumento *args para pasar grupos de sprites que deban
         ser dibujados en encontrar la capa sprite. Éste grupo de sprites
         deberá de tener un método on_draw que llamara al método on_draw
@@ -181,18 +181,56 @@ class AbstractScene:
                                       (y * alto / 2) - (x * alto /2))
                 else:
                     image.position = (x * ancho, y * alto)
-
-                self.scenemanager.window.draw(image)
-
+                    
+                    self.scenemanager.window.draw(image)
+                    
+    def getmappixelsize(self):
+        """Retorna las dimensiones del mapa en pixeles.
+        """
+        width = self.__tmxmapdata.width * self.__tmxmapdata.tilewidth
+        height = self.__tmxmapdata.height * self.__tmxmapdata.tileheight
+        return (width, height)
+    
+    def getmaptilesize(self):
+        """Retorna las dimensiones del mapa en baldosas.
+        """
+        return (self.__tmxmapdata.width, self.__tmxmapdata.height)
+    
+    def gettilesize(self):
+        """Retorna las dimensiones en pixeles de un baldosa.
+        """
+        return (self.__tmxmapdata.tilewidth, self.__tmxmapdata.tileheight)
+    
+    def getmappixelwidth(self):
+        """Retorna el ancho del mapa en pixeles.
+        """
+        return self.getmappixelsize()[0]
+    
+    def getmappixelheight(self):
+        """Retorna la altura del mapa en pixeles.
+        """
+        return self.getmappixelsize()[1]
+    
+    def getmaptilewidth(self):
+        """Retorna el ancho del mapa en baldosas.
+        """
+        return self.getmaptilesize()[0]
+    
+    def getmaptileheight(self):
+        """Retorna la altura del mapa en baldosas.
+        """
+        return self.getmaptilesize()[1]
+    
     def __str__(self):
         "Util para darle un nombre a tu escena."
         raise NotImplemented("Implemente el metodo __str__")
         # por ejemplo:
         #  return "<Scene: Escena #1, File: {0}>".format(self.__tmxmapfile)
         # o como usted más prefiera :)
-
-
+    
+    
 class Tile(sfml.TransformableDrawable):
+    # FIXME: no sirve.
     def __init__(self, image):
         sfml.TransformableDrawable.__init__(self)
         if isinstance(image, sfml.Texture):
