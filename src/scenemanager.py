@@ -95,7 +95,13 @@ class Director:
                                   tweenTime=10, tweenType=self.defaulteasing)
             self.tweener.addTween(self.__camera, setcentery=playery,
                                   tweenTime=10, tweenType=self.defaulteasing)
-            
+
+    def convertcoords(self, coords):
+        """Retorna las coordenadas de un punto relativo a la camara.
+        """
+        # FIXME: retorna None
+        return self.window.convert_coords(coords)
+        
     def loop(self):
         "¡El juego se pone en marcha!"
         

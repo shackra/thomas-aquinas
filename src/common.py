@@ -362,7 +362,7 @@ class Conf:
         
 if __name__ != "__main__":
     # Esta linea a de cambiarse según el proyecto en el que se use el modulo
-    settings = Conf("thomas-aquinas-prueba", None)
+    settings = Conf("thomas-aquinas", None)
     ### NO MODIFICAR ###
     ROOTCONFPATH = os.path.join(os.path.dirname(__file__), "gameconf.ini")
     USERCONFPATH = settings.joinpaths(settings.getuserfolder(), "gameconf.ini")
@@ -372,4 +372,5 @@ if __name__ != "__main__":
     # Si algo, comparado con la configuración original, debe modificarse
     # el orden del procesamiento de las configuraciones hará el trabajo.
     settings.loadconf([ROOTCONFPATH, USERCONFPATH])
+    
     
