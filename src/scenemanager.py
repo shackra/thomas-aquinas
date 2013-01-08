@@ -44,6 +44,7 @@ class Director:
         self.tweener = pytweener.Tweener()
         self.defaulteasing = pytweener.Easing.Quad.easeOut
         self.window.framerate_limit = 60
+        self.window.vertical_synchronization = True
         if icon: 
             self.window.icon = media.loadmedia(icon).pixels
             
@@ -92,15 +93,34 @@ class Director:
         else:
             # Creamos un par de tweeners para la camara.
             self.tweener.addTween(self.__camera, setcenterx=playerx,
-                                  tweenTime=10, tweenType=self.defaulteasing)
+                                  tweenTime=5, tweenType=self.defaulteasing)
             self.tweener.addTween(self.__camera, setcentery=playery,
-                                  tweenTime=10, tweenType=self.defaulteasing)
-
-    def convertcoords(self, coords):
+                                  tweenTime=5, tweenType=self.defaulteasing)
+            
+    def convertcoords(self, coords, view=None):
         """Retorna las coordenadas de un punto relativo a la camara.
         """
+        if not isinstance(view, sfml.View):
+            view = self.window.view
+            
         # FIXME: retorna None
-        return self.window.convert_coords(coords)
+        result = self.window.convert_coords(coords, view)
+        if not result:
+            # Usando el algoritmo originalmente escrito en C++
+            # del proyecto SFML
+            # Esto es un arreglo rapido hasta que el metodo
+            # original funcione. por eso usamos self.window
+            # en lugar de incluir al objeto en cuestion
+            # y llamar desde él a get_viewport
+            viewport = self.window.get_viewport(view)
+            normalized = (-1.0 + 2.0 * (coords.x or coords[0] - viewport.left) \
+                               / viewport.width,
+                           1.0 - 2.0 * (coords.y or coords[1] - viewport.top) \
+                               / viewport.height)
+            return view.inverse_transform.transform_point(normalized)
+        else:
+            # No retorna None!
+            return result
         
     def loop(self):
         "¡El juego se pone en marcha!"
@@ -233,7 +253,7 @@ class Director:
         """Retorna la posicion de la camara.
         """
         return self.__camera.getcenterxy()
-            
+    
 class customView(sfml.View):
     """"Clase personalizada para el manejo de una cámara. La inexistencia
     de setters/getters en esta clase la hace difícil de usar en conjunto
@@ -267,4 +287,5 @@ class customView(sfml.View):
         """Retorna las coordenadas X y Y del centro de la camara.
         """
         return self.center
+    
     

@@ -34,5 +34,3 @@ class Helloworld(AbstractScene):
         
     def __str__(self):
         return "<Scene: HelloWorld, file: {0}>".format(__file__)
-    
-    
