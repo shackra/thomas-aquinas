@@ -19,9 +19,10 @@
 import logging
 import common
 import media
-from sfml import Sprite
+import json
+import sfml
 
-class AbstractSprite(Sprite):
+class AbstractSprite(sfml.Sprite):
     """ Clase extendida para crear sprites.
     
     Esta clase debe contener un numero razonable de características
@@ -30,27 +31,66 @@ class AbstractSprite(Sprite):
     incrementar, de cualquier forma, es preferible revisar los cambios
     en la tarea reportada acá:
         https://bitbucket.org/shackra/thomas-aquinas/issue/9
-    """
-    def __init__(self, xmlspritefile):
+        """
+    def __init__(self, window, jsonfile):
         Sprite.__init__(self)
         self.__machinestate = None
+        self.__property = {}
+        self.__window = window
+        self.__spritedatafile = open(common.settings.joinpaths(
+                common.settings.fromrootget("sprites"), jsonfile))
+        self.__spritedata = load(self__spritedatafile)
+        self.__spritedatafile.close()
+        self.__near = sfml.Rectangle((0,0), (1, 1))
+        self.area = sfml.Rectangle()
+
+    def isnear(self, sprite):
+        """ Retorna la distancia entre un sprite y otro.
+        """
+        if self.__near.contains(sprite.area):
+            # FIXME: calculo mal hecho
+            return sfml.Vector2(sprite.position - self.position)
+        else:
+            return False
         
+    def setproperty(self, name, value):
+        """ Asigna una propiedad al sprite.
+        """
+        self.__property[str(name)] = value
         
+    def getproperty(self, name):
+        """ Retorna el valor de una propiedad asignado al sprite
+        """
+        return self.__property[str(name)]
+    
     def on_update(self):
         "Actualiza la lógica del sprite, por ejemplo, su IA"
         raise NotImplemented("Implemente el método on_update.")
     
     def on_draw(self):
         "Dibuja al sprite"
-        pass
-    
-    def changestate(self):
+        self.__window.draw(self)
+        
+    def setstate(self, state):
         """cambia el estado del sprite.
         
         Con estado, nos referimos a una maquina de estados finito.
         esta técnica es muy útil para definir ciertos comportamientos
         para nuestro Sprite
         """
-        pass
+        if isinstance(state, int):
+            self.__machinestate = state
+        else:
+            raise TypeError, "se esperaba un tipo int, recibido %s" % \
+                type(state) 
+        
+    def getstate(self):
+        """retorna el estado del sprite.
+        
+        Con estado, nos referimos a una maquina de estados finito.
+        esta técnica es muy útil para definir ciertos comportamientos
+        para nuestro Sprite
+        """
+        return self.__machinestate
     
     
