@@ -21,6 +21,7 @@ import common
 import media
 import json
 import sfml
+from math import sqrt
 
 class AbstractSprite(sfml.Sprite):
     """ Clase extendida para crear sprites.
@@ -43,13 +44,13 @@ class AbstractSprite(sfml.Sprite):
         self.__spritedatafile.close()
         self.__near = sfml.Rectangle((0,0), (1, 1))
         self.area = sfml.Rectangle()
-
+        
     def isnear(self, sprite):
         """ Retorna la distancia entre un sprite y otro.
         """
         if self.__near.contains(sprite.area):
-            # FIXME: calculo mal hecho
-            return sfml.Vector2(sprite.position - self.position)
+            return sqrt((sprite.position.x - self.position.x) ** 2 - \
+                            (sprite.position.y - self.position.y) ** 2)
         else:
             return False
         
