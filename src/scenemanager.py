@@ -103,24 +103,7 @@ class Director:
         if not isinstance(view, sfml.View):
             view = self.window.view
             
-        # FIXME: retorna None
-        result = self.window.convert_coords(coords, view)
-        if not result:
-            # Usando el algoritmo originalmente escrito en C++
-            # del proyecto SFML
-            # Esto es un arreglo rapido hasta que el metodo
-            # original funcione. por eso usamos self.window
-            # en lugar de incluir al objeto en cuestion
-            # y llamar desde él a get_viewport
-            viewport = self.window.get_viewport(view)
-            normalized = (-1.0 + 2.0 * (coords.x or coords[0] - viewport.left) \
-                               / viewport.width,
-                           1.0 - 2.0 * (coords.y or coords[1] - viewport.top) \
-                               / viewport.height)
-            return view.inverse_transform.transform_point(normalized)
-        else:
-            # No retorna None!
-            return result
+        return self.window.convert_coords(coords, view)
         
     def loop(self):
         "¡El juego se pone en marcha!"

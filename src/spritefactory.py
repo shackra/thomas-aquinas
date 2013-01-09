@@ -33,7 +33,7 @@ class AbstractSprite(sfml.Sprite):
     en la tarea reportada acá:
         https://bitbucket.org/shackra/thomas-aquinas/issue/9
         """
-    def __init__(self, window, jsonfile):
+    def __init__(self, id, near, window, jsonfile):
         Sprite.__init__(self)
         self.__machinestate = None
         self.__property = {}
@@ -42,17 +42,28 @@ class AbstractSprite(sfml.Sprite):
                 common.settings.fromrootget("sprites"), jsonfile))
         self.__spritedata = load(self__spritedatafile)
         self.__spritedatafile.close()
-        self.__near = sfml.Rectangle((0,0), (1, 1))
-        self.area = sfml.Rectangle()
+        self.__detectnearat = near
+        self.areas = [customRectangle("all", ((0, 0), (1,1)))]
         
     def isnear(self, sprite):
         """ Retorna la distancia entre un sprite y otro.
         """
-        if self.__near.contains(sprite.area):
-            return sqrt((sprite.position.x - self.position.x) ** 2 - \
+        distance = sqrt((sprite.position.x - self.position.x) ** 2 - \
                             (sprite.position.y - self.position.y) ** 2)
+        if distance <= self.__detectnearat:
+            return distance
         else:
             return False
+        
+    def setnear(self, distance):
+        """ Asigna la distancia maxima de busqueda.
+        """
+        self.__detectnearat = float(distance)
+        
+    def getnear(self):
+        """ Retorna la distancia maxima de busqueda.
+        """
+        return self.__detectnearat
         
     def setproperty(self, name, value):
         """ Asigna una propiedad al sprite.
@@ -95,3 +106,24 @@ class AbstractSprite(sfml.Sprite):
         return self.__machinestate
     
     
+class customRectangle(sfml.Rectangle):
+    """ Clase heredada para detectar colisiones e intersecciones.
+
+    Agregamos unicamente un identificador para la instancia de cualquier
+    rectangulo. Así sera más facil hacer uso de listas de rectangulos y
+    poder identificarlos de forma individual.
+    """
+    def __init__(self, name, area):
+        sfml.Rectangle.__init__(area)
+        self.__id = str(name)
+        
+    def getid(self):
+        """ Retorna el nombre del rectangulo.
+        """
+        return self.__id
+    
+    def setid(self, name):
+        """Asigna un nuevo nombre al rectangulo.
+        """
+        self.__id = str(name)
+        
