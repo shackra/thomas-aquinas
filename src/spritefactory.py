@@ -31,11 +31,31 @@ class AbstractSprite(sfml.Sprite):
     a los sprites. El numero de características puede decrecer o
     incrementar, de cualquier forma, es preferible revisar los cambios
     en la tarea reportada acá:
-        https://bitbucket.org/shackra/thomas-aquinas/issue/9
+    https://bitbucket.org/shackra/thomas-aquinas/issue/9
+    
+    Cada sprite debe poseer un archivo de configuración que defina
+    sus propiedades. Las dos más importantes, hasta el momento, son
+    'animation' y 'rectangles'. Ambas son diccionarios.
+
+    Animation DEBE poseer una animación para cada estado finito, enumarado
+    desde el 0 hasta donde el programador lo necesite. Cada uno de estos
+    estados finitos deben a su vez tener enumerado del 0 hasta donde
+    necesiten cada uno de los rectángulos que indican que parte de la textura
+    mostrar en el sprite.
+    
+    Rectangles posee dentro de sí una serie de diccionarios. El "key" de cada
+    diccionario indica el nombre del rectángulo y su valor es las coordenadas y
+    dimensiones de susodicho rectángulo. La palabra clave rectangle DEBE ser
+    incluida en la definición de las propiedades del sprite
+    incluso si no existen rectángulos que definir.
+    
+    FIXME: En la comprobasion de coliciones/contacto puede que el uso de bucles
+    ```for``` no sea para nada conveniente por el overhead que puede producir.
+    ¿Debemos usar un sistema de señales y slots alà Qt? ¿Que tal
+    itertools de python?
         """
-    def __init__(self, id, texture, near, window, spritedatafile):
-        Sprite.__init__(self)
-        self.id = id
+    def __init__(self, texture, near, window, spritedatafile):
+        Sprite.__init__(texture)
         self.clock = sfml.Clock()
         self.__machinestate = None
         self.__actualanimmachinestate = None
@@ -47,9 +67,8 @@ class AbstractSprite(sfml.Sprite):
         self.__spritedata = load(self__spritedatafile)
         self.__spritedatafile.close()
         self.__detectnearat = near
-        self.__areas = {}
         
-    def anim(self):
+    def __animate(self):
         """ Anima al sprite.
         
         self.__spritedata debe de poseer un subdiccionario
@@ -64,22 +83,33 @@ class AbstractSprite(sfml.Sprite):
         Para simplicar, cada estado del sprite tendra una animacion
         asociada.
         """
-        if self.clock.restart_time().milliseconds <= 60.0:
+        if self.clock.restart().milliseconds <= 60.0:
             # FIXME: la cantidad de cuadros por seguno
             # debe ser especificada en la configuracion del
-            # juego. Para efectos de animacion, deberia de contrase
+            # juego. Para efectos de animacion, deberia de contarse
             # con un offset que agregue o quite milisegundo de temporizado
             # para hacer lucir la animación más lenta o más veloz.
+            
+            # TODO: soportar tipos de ciclos de animacion, como linear
+            # ciclico, ping pong.
+            # Linear: al finalizar, la animacion se queda en el ultimo cuadro.
+            # Ciclico: La animacion al finalizar vuelve a comenzar
+            #          desde el primer cuadro.
+            # Ping pong: La animacion va de un lado al otro de los extremos
+            #            de la animacion pasando por todos
+            #            los cuadros intermedios.
             
             # el estado del sprite a cambiado?
             if self.__actualmachinestate != self.__machinestate:
                 self.__actualmachinestate = self.__machinestate
+                self.__actualframe = 0
                 
             self.settexture(None,
                             self.__spritedata["animation"][\
                     self.__actualmachinestate][self.__actualframe])
             
             self.__actualframe += 1
+            
             if not self.__spritedata["animation"][\
                 self.__actualmachinestate].has_key(self.__actualframe):
                 # Ese frame no existe!
@@ -99,7 +129,7 @@ class AbstractSprite(sfml.Sprite):
     
     def on_draw(self):
         "Dibuja al sprite"
-        self.anim()
+        self.__animate() # Es correcto colocar la llamada al metodo acá?
         self.__window.draw(self)
         
     def addrectangle(self, name, size, position):
@@ -112,27 +142,29 @@ class AbstractSprite(sfml.Sprite):
         posicion. para evitar modificar uno de los dos, se puede usar argumentos
         del tipo None.
         """
-        if self.__areas.has_key(name):
+        if self.__spritedata["rectangles"].has_key(name):
             # Si este rectangulo ya existe, cambiamos sus atributos.
             if position:
-                self.__areas[str(name)].position = position
+                self.__spritedata["rectangles"][str(name)].position = position
             if size:
-                self.__areas[str(name)].size = size
+                self.__spritedata["rectangles"][str(name)].size = size
         elif:
             # de lo contrario, lo creamos.
             if position:
-                self.__areas[str(name)] = sfml.Rectangle(position, size)
+                self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
+                    position, size)
             else:
                 # sin posicion? entonces colocamos el rectangulo en donde
                 # se encuentre el sprite
-                self.__areas[str(name)] = sfml.Rectangle(self.position, size)
+                self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
+                    self.position, size)
                 
                 
     def delrectangle(self, name):
         """ Remueve un rectanguo del sprite.
         """
-        if self.__areas.has_key(str(name)):
-            del(self.__areas[str(name)])
+        if self.__spritedata["rectangles"].has_key(str(name)):
+            del(self.__spritedata["rectangles"][str(name)])
             
     def _moverectangles(self, offset):
         """ Mueve todos los rectangulos del sprite.
@@ -141,8 +173,8 @@ class AbstractSprite(sfml.Sprite):
         el sprite a cambiado su posicion.
         """
         # FIXME: posible area de overhead
-        for rect in self.__areas:
-            self.__areas[rect].position += offset
+        for rect in self.__spritedata["rectangles"]:
+            self.__spritedata["rectangles"][rect].position += (offset, offset)
             
     def __distance(self, sprite):
         """ Calcula la distancia entre dos pares de puntos.
