@@ -33,23 +33,127 @@ class AbstractSprite(sfml.Sprite):
     en la tarea reportada acá:
         https://bitbucket.org/shackra/thomas-aquinas/issue/9
         """
-    def __init__(self, id, near, window, jsonfile):
+    def __init__(self, id, texture, near, window, spritedatafile):
         Sprite.__init__(self)
+        self.id = id
+        self.clock = sfml.Clock()
         self.__machinestate = None
+        self.__actualanimmachinestate = None
+        self.__actualframe = 0
         self.__property = {}
         self.__window = window
         self.__spritedatafile = open(common.settings.joinpaths(
-                common.settings.fromrootget("sprites"), jsonfile))
+                common.settings.fromrootget("sprites"), spritedatafile))
         self.__spritedata = load(self__spritedatafile)
         self.__spritedatafile.close()
         self.__detectnearat = near
-        self.areas = [customRectangle("all", ((0, 0), (1,1)))]
+        self.__areas = {}
         
+    def anim(self):
+        """ Anima al sprite.
+        
+        self.__spritedata debe de poseer un subdiccionario
+        llamado 'animation' con los rectangulos que representan
+        cada fotograma de animacion. Los rectangulos indican
+        que fragmento del spritesheet mostrar.
+        
+        Este metodo queda subornidado al atributo de la maquina de
+        estados del sprite, para cambiar la animacion, se debe cambiar
+        el estado del sprite. Excelente idea ¿no lo cree?
+        
+        Para simplicar, cada estado del sprite tendra una animacion
+        asociada.
+        """
+        if self.clock.restart_time().milliseconds <= 60.0:
+            # FIXME: la cantidad de cuadros por seguno
+            # debe ser especificada en la configuracion del
+            # juego. Para efectos de animacion, deberia de contrase
+            # con un offset que agregue o quite milisegundo de temporizado
+            # para hacer lucir la animación más lenta o más veloz.
+            
+            # el estado del sprite a cambiado?
+            if self.__actualmachinestate != self.__machinestate:
+                self.__actualmachinestate = self.__machinestate
+                
+            self.settexture(None,
+                            self.__spritedata["animation"][\
+                    self.__actualmachinestate][self.__actualframe])
+            
+            self.__actualframe += 1
+            if not self.__spritedata["animation"][\
+                self.__actualmachinestate].has_key(self.__actualframe):
+                # Ese frame no existe!
+                self.__actualframe = 0
+                
+    def settexture(self, texture, texture_rectangle):
+        """ Asigna que textura usar para el sprite.
+        """
+        if texture:
+            self.texture = texture
+        if texture_rectangle:
+            self.texture_rectangle = texture_rectangle
+            
+    def on_update(self):
+        "Actualiza la lógica del sprite, por ejemplo, su IA"
+        raise NotImplemented("Implemente el método on_update.")
+    
+    def on_draw(self):
+        "Dibuja al sprite"
+        self.anim()
+        self.__window.draw(self)
+        
+    def addrectangle(self, name, size, position):
+        """ Agrega un rectangulo en determinada posicion.
+        
+        La posicion es relativa a las dimensiones del sprite.
+        util para definir pequeñas areas del sprite que el desarrollador
+        quizas desee saber si chocan o interactuan con elementos del juego.
+        Si un rectangulo ya existia, se modificara sus parametros de area y
+        posicion. para evitar modificar uno de los dos, se puede usar argumentos
+        del tipo None.
+        """
+        if self.__areas.has_key(name):
+            # Si este rectangulo ya existe, cambiamos sus atributos.
+            if position:
+                self.__areas[str(name)].position = position
+            if size:
+                self.__areas[str(name)].size = size
+        elif:
+            # de lo contrario, lo creamos.
+            if position:
+                self.__areas[str(name)] = sfml.Rectangle(position, size)
+            else:
+                # sin posicion? entonces colocamos el rectangulo en donde
+                # se encuentre el sprite
+                self.__areas[str(name)] = sfml.Rectangle(self.position, size)
+                
+                
+    def delrectangle(self, name):
+        """ Remueve un rectanguo del sprite.
+        """
+        if self.__areas.has_key(str(name)):
+            del(self.__areas[str(name)])
+            
+    def _moverectangles(self, offset):
+        """ Mueve todos los rectangulos del sprite.
+        
+        Este metodo deberia de usarse unicamente si
+        el sprite a cambiado su posicion.
+        """
+        # FIXME: posible area de overhead
+        for rect in self.__areas:
+            self.__areas[rect].position += offset
+            
+    def __distance(self, sprite):
+        """ Calcula la distancia entre dos pares de puntos.
+        """
+        return float(sqrt((sprite.position.x - self.position.x) ** 2 - \
+                        (sprite.position.y - self.position.y) ** 2))
+    
     def isnear(self, sprite):
         """ Retorna la distancia entre un sprite y otro.
         """
-        distance = sqrt((sprite.position.x - self.position.x) ** 2 - \
-                            (sprite.position.y - self.position.y) ** 2)
+        distance = self.__distance()
         if distance <= self.__detectnearat:
             return distance
         else:
@@ -64,7 +168,7 @@ class AbstractSprite(sfml.Sprite):
         """ Retorna la distancia maxima de busqueda.
         """
         return self.__detectnearat
-        
+    
     def setproperty(self, name, value):
         """ Asigna una propiedad al sprite.
         """
@@ -75,14 +179,6 @@ class AbstractSprite(sfml.Sprite):
         """
         return self.__property[str(name)]
     
-    def on_update(self):
-        "Actualiza la lógica del sprite, por ejemplo, su IA"
-        raise NotImplemented("Implemente el método on_update.")
-    
-    def on_draw(self):
-        "Dibuja al sprite"
-        self.__window.draw(self)
-        
     def setstate(self, state):
         """cambia el estado del sprite.
         
@@ -104,26 +200,3 @@ class AbstractSprite(sfml.Sprite):
         para nuestro Sprite
         """
         return self.__machinestate
-    
-    
-class customRectangle(sfml.Rectangle):
-    """ Clase heredada para detectar colisiones e intersecciones.
-
-    Agregamos unicamente un identificador para la instancia de cualquier
-    rectangulo. Así sera más facil hacer uso de listas de rectangulos y
-    poder identificarlos de forma individual.
-    """
-    def __init__(self, name, area):
-        sfml.Rectangle.__init__(area)
-        self.__id = str(name)
-        
-    def getid(self):
-        """ Retorna el nombre del rectangulo.
-        """
-        return self.__id
-    
-    def setid(self, name):
-        """Asigna un nuevo nombre al rectangulo.
-        """
-        self.__id = str(name)
-        
