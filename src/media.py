@@ -108,4 +108,3 @@ def loadimg(mediafile, toram=True):
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
         raise
-    

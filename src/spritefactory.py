@@ -36,7 +36,7 @@ class AbstractSprite(sfml.Sprite):
     Cada sprite debe poseer un archivo de configuración que defina
     sus propiedades. Las dos más importantes, hasta el momento, son
     'animation' y 'rectangles'. Ambas son diccionarios.
-
+    
     Animation DEBE poseer una animación para cada estado finito, enumarado
     desde el 0 hasta donde el programador lo necesite. Cada uno de estos
     estados finitos deben a su vez tener enumerado del 0 hasta donde

@@ -41,8 +41,8 @@ class Director:
             common.settings.getscreensize()[0], 
             common.settings.getscreensize()[1]),
                                         common.settings.getscreentitle())
-        self.tweener = pytweener.Tweener()
         self.defaulteasing = pytweener.Easing.Quad.easeOut
+        self.tweener = pytweener.Tweener(tweenType=self.defaulteasing)
         self.window.framerate_limit = 60
         self.window.vertical_synchronization = True
         if icon: 
