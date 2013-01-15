@@ -8,7 +8,7 @@ import logging
 
 class Mai(AbstractSprite):
     def __init__(self, texture, near, window, spritedatafile):
-        AbstractSprite.__init__(texture, near, window, spritedatafile)
+        super(Mai, self).__init__(texture, near, window, spritedatafile)
         self.setstate(0) # dejamos a Mai en el estado 0 por ahora.
         
 class Maitest(AbstractScene):
@@ -18,7 +18,7 @@ class Maitest(AbstractScene):
         self.spritesize = 0
         self.maitext = media.loadimg("sprites/others/Mai Shiranui "
                                      "basic spritesheet.png", False)
-        self.__sprites = {"mai": Mai(self.maitext, 0, self.scenemanager.window,
+        self.__sprite = {"mai": Mai(self.maitext, 0, self.scenemanager.window,
                                      "sprites/others/Mai Shiranui "
                                      "basic spritesheet.json")}
         screensize = common.settings.getscreensize()
