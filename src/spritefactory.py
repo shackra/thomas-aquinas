@@ -19,9 +19,10 @@
 import logging
 import common
 import media
-import json
 import sfml
 from math import sqrt
+import cjson as json
+
 
 class AbstractSprite(sfml.Sprite):
     """ Clase extendida para crear sprites.
@@ -62,12 +63,29 @@ class AbstractSprite(sfml.Sprite):
         self.__actualframe = 0
         self.__property = {}
         self.__window = window
-        self.__spritedatafile = open(common.settings.joinpaths(
-                common.settings.fromrootget("sprites"), spritedatafile))
-        self.__spritedata = load(self__spritedatafile)
+        self.__spritedata = self.__loadspritedata(spritedatafile)
         self.__spritedatafile.close()
         self.__detectnearat = near
         
+    def __loadspritedata(self, filepath):
+        """ Carga los datos del sprite desde un archivo con formato JSON.
+        
+        Este metodo devuelve un diccionario con todos los objetos python
+        correspondientes.
+        """
+        with open(common.settings.fromrootfolderget(filepath)) as fileopen:
+            tmpdict = json.decode(fileopen.read())
+            finaldict = {"animation": {}}
+            for key in tmpdict["animation"].keys():
+                finaldict["animation"][int(key)] = {}
+                
+                for frame in tmpdict["animation"][key].keys():
+                    jsonframe = tmpdict["animation"][key][frame]
+                    tupleframe = tuple(jsonframe[0]), tuple(jsonframe[1]) 
+                    finaldict["animation"][int(key)][int(frame)] = tupleframe
+                    
+            return finaldict
+                
     def __animate(self):
         """ Anima al sprite.
         
@@ -148,16 +166,16 @@ class AbstractSprite(sfml.Sprite):
                 self.__spritedata["rectangles"][str(name)].position = position
             if size:
                 self.__spritedata["rectangles"][str(name)].size = size
-        elif:
-            # de lo contrario, lo creamos.
-            if position:
-                self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
-                    position, size)
             else:
-                # sin posicion? entonces colocamos el rectangulo en donde
-                # se encuentre el sprite
-                self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
-                    self.position, size)
+                # de lo contrario, lo creamos.
+                if position:
+                    self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
+                        position, size)
+                else:
+                    # sin posicion? entonces colocamos el rectangulo en donde
+                    # se encuentre el sprite
+                    self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
+                        self.position, size)
                 
                 
     def delrectangle(self, name):
@@ -232,3 +250,4 @@ class AbstractSprite(sfml.Sprite):
         para nuestro Sprite
         """
         return self.__machinestate
+    

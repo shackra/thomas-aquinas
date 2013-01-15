@@ -42,7 +42,7 @@ class AbstractScene:
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
-
+        
     def on_update(self):
         "El manejador de escenas llamara este metodo para actualizar la logica."
         raise NotImplemented("Implemente el metodo on_update.")
@@ -54,7 +54,7 @@ class AbstractScene:
     def on_draw(self, window):
         "El manejador de escenas llamara este metodo para dibujar la escena."
         raise NotImplemented("Implemente el metodo on_draw.")
-
+    
     def loadmap(self, mapfilepath):
         """Carga el mapa de la respectiva escena.
 
@@ -239,8 +239,9 @@ class Tile(sfml.TransformableDrawable):
             raise TATileImageException, ("Se esperaba un objeto del tipo "
                                          "sfml.Texture"
                                          " recibido {0}".format(type(image)))
-
+        
     def draw(self, target, states):
         # states.transform = self.transform
         states.texture = self.texture
         target.draw(self.texture.copy_to_image(), states)
+        

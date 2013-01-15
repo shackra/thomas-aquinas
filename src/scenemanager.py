@@ -42,12 +42,12 @@ class Director:
             common.settings.getscreensize()[1]),
                                         common.settings.getscreentitle())
         self.defaulteasing = pytweener.Easing.Quad.easeOut
-        self.tweener = pytweener.Tweener(tweenType=self.defaulteasing)
+        self.tweener = pytweener.Tweener()
         self.window.framerate_limit = 60
         self.window.vertical_synchronization = True
         if icon: 
             self.window.icon = media.loadmedia(icon).pixels
-            
+
         self.__actualscene = None
         self.__fullscreenmode = False
         self.__exitgame = False
