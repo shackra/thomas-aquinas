@@ -24,8 +24,10 @@ from math import sqrt
 import cjson as json
 
 
-class AbstractSprite(sfml.Sprite):
-    """ Clase extendida para crear sprites.
+class AbstractSprite:
+    """ Clase compuesta para crear sprites.
+    
+    Esta clase sigue la regla de composicion sobre herencia.
     
     Esta clase debe contener un numero razonable de características
     que hagan más fácil ciertas tareas de programación con respecto
@@ -55,18 +57,74 @@ class AbstractSprite(sfml.Sprite):
     ¿Debemos usar un sistema de señales y slots alà Qt? ¿Que tal
     itertools de python?
         """
-    def __init__(self, texture, near, window, spritedatafile):
-        Sprite.__init__(texture)
+    def __init__(self, texture, near, solid,
+                 movable, window, spritedatafile, rectangle):
+        if rectangle and not isinstance(rectangle, sfml.Rectangle):
+            rectangle = self.__tupletorect(rectangle)
+            self.sprite = sfml.Sprite(texture, rectangle)
+        else:
+            self.sprite = sfml.Sprite(texture)
+            
         self.clock = sfml.Clock()
+        self.__deltatime = 0
         self.__machinestate = None
-        self.__actualanimmachinestate = None
+        self.__actualmachinestate = None
         self.__actualframe = 0
         self.__property = {}
         self.__window = window
         self.__spritedata = self.__loadspritedata(spritedatafile)
-        self.__spritedatafile.close()
+        self.__solid = solid
+        self.__movable = movable
         self.__detectnearat = near
         
+    def __tupletorect(self, tupla):
+        """ Devuelve una sfml.Rectangle a partir de una tupla.
+        """
+        if isinstance(tupla, tuple) and len(tupla) >= 2:
+            rect = sfml.Rectangle(sfml.Vector2(float(tupla[0][0]),
+                                               float(tupla[0][1])),
+                                  sfml.Vector2(float(tupla[1][0]),
+                                               float(tupla[1][1])))
+            return rect
+        elif isinstance(tupla, tuple) and len(tupla) == 1:
+            rect = sfml.Rectangle(sfml.Vector2(float(tupla[0])),
+                                  sfml.Vector2(float(tupla[1])))
+            return rect
+        else:
+            # retorna el objeto tal y como estaba
+            return tupla
+        
+    def issolid(self):
+        """ Es solido el sprite.
+        
+        Sí el sprite es solido, devuelve True. Util para manejar colisiones.
+        """
+        return self.__solid
+    
+    def ismovable(self):
+        """ Es movible el sprite.
+        
+        Sí el sprite es movible, devuelve True.
+        Util para combinar con colisiones.
+        """
+        return self.__movable
+    
+    def switchsolid(self):
+        """ Cambia la propiedad del estado 'solido' del sprite.
+        """
+        if self.issolid():
+            self.__solid = False
+        else:
+            self.__solid = True
+            
+    def switchmovable(self):
+        """ Cambia la propiedad del estado 'movible' del sprite.
+        """
+        if self.ismovable():
+            self.__movable = False
+        else:
+            self.__movable = True
+            
     def __loadspritedata(self, filepath):
         """ Carga los datos del sprite desde un archivo con formato JSON.
         
@@ -75,17 +133,17 @@ class AbstractSprite(sfml.Sprite):
         """
         with open(common.settings.fromrootfolderget(filepath)) as fileopen:
             tmpdict = json.decode(fileopen.read())
-            finaldict = {"animation": {}}
-            for key in tmpdict["animation"].keys():
-                finaldict["animation"][int(key)] = {}
+            parsedata = {"animation": []}
+            for state in tmpdict["animation"]:
+                newstate = []
+                for frame in state:
+                    vector1 = sfml.Vector2(float(frame[0]), float(frame[1]))
+                    vector2 = sfml.Vector2(float(frame[2]), float(frame[3]))
+                    newstate.append(sfml.Rectangle(vector1, vector2))
+                parsedata["animation"].append(newstate)
                 
-                for frame in tmpdict["animation"][key].keys():
-                    jsonframe = tmpdict["animation"][key][frame]
-                    tupleframe = tuple(jsonframe[0]), tuple(jsonframe[1]) 
-                    finaldict["animation"][int(key)][int(frame)] = tupleframe
-                    
-            return finaldict
-                
+            return parsedata
+        
     def __animate(self):
         """ Anima al sprite.
         
@@ -101,7 +159,9 @@ class AbstractSprite(sfml.Sprite):
         Para simplicar, cada estado del sprite tendra una animacion
         asociada.
         """
-        if self.clock.restart().milliseconds <= 60.0:
+        self.__deltatime += self.clock.restart().milliseconds
+        
+        if self.__deltatime >= 60.0:
             # FIXME: la cantidad de cuadros por seguno
             # debe ser especificada en la configuracion del
             # juego. Para efectos de animacion, deberia de contarse
@@ -117,19 +177,24 @@ class AbstractSprite(sfml.Sprite):
             #            de la animacion pasando por todos
             #            los cuadros intermedios.
             
+            # reiniciamos un atributo del sprite
+            self.__deltatime = 0
+            
             # el estado del sprite a cambiado?
             if self.__actualmachinestate != self.__machinestate:
+                logging.debug("El estado finito del sprite cambió: {0}".format(
+                        self.__machinestate))
                 self.__actualmachinestate = self.__machinestate
                 self.__actualframe = 0
                 
-            self.settexture(None,
-                            self.__spritedata["animation"][\
-                    self.__actualmachinestate][self.__actualframe])
+            rectframe = self.__spritedata["animation"][\
+                self.__actualmachinestate][self.__actualframe]
+            self.sprite.texture_rectangle = rectframe
             
             self.__actualframe += 1
             
-            if not self.__spritedata["animation"][\
-                self.__actualmachinestate].has_key(self.__actualframe):
+            if self.__actualframe >= len(
+                self.__spritedata["animation"][self.__actualmachinestate]):
                 # Ese frame no existe!
                 self.__actualframe = 0
                 
@@ -137,9 +202,9 @@ class AbstractSprite(sfml.Sprite):
         """ Asigna que textura usar para el sprite.
         """
         if texture:
-            self.texture = texture
+            self.sprite.texture = texture
         if texture_rectangle:
-            self.texture_rectangle = texture_rectangle
+            self.sprite.texture_rectangle = texture_rectangle
             
     def on_update(self):
         "Actualiza la lógica del sprite, por ejemplo, su IA"
@@ -147,8 +212,10 @@ class AbstractSprite(sfml.Sprite):
     
     def on_draw(self):
         "Dibuja al sprite"
+        logging.debug("Animando al sprite...")
         self.__animate() # Es correcto colocar la llamada al metodo acá?
-        self.__window.draw(self)
+        logging.debug("Dibujando el sprite...")
+        self.__window.draw(self.sprite)
         
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
@@ -176,8 +243,8 @@ class AbstractSprite(sfml.Sprite):
                     # se encuentre el sprite
                     self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
                         self.position, size)
-                
-                
+                    
+                    
     def delrectangle(self, name):
         """ Remueve un rectanguo del sprite.
         """
@@ -192,13 +259,14 @@ class AbstractSprite(sfml.Sprite):
         """
         # FIXME: posible area de overhead
         for rect in self.__spritedata["rectangles"]:
+            # FIXME: Actualmente esto no sirve así como esta...
             self.__spritedata["rectangles"][rect].position += (offset, offset)
             
     def __distance(self, sprite):
         """ Calcula la distancia entre dos pares de puntos.
         """
-        return float(sqrt((sprite.position.x - self.position.x) ** 2 - \
-                        (sprite.position.y - self.position.y) ** 2))
+        return float(sqrt((sprite.position.x - self.sprite.position.x) ** 2 - \
+                        (sprite.position.y - self.sprite.position.y) ** 2))
     
     def isnear(self, sprite):
         """ Retorna la distancia entre un sprite y otro.
@@ -237,7 +305,10 @@ class AbstractSprite(sfml.Sprite):
         para nuestro Sprite
         """
         if isinstance(state, int):
-            self.__machinestate = state
+            if 0 <= state <= len(self.__spritedata["animation"]):
+                self.__machinestate = state
+            else:
+                self.__machinestate = 0
         else:
             raise TypeError, "se esperaba un tipo int, recibido %s" % \
                 type(state) 

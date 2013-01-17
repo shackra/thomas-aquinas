@@ -104,7 +104,7 @@ class Director:
             view = self.window.view
             
         return self.window.convert_coords(coords, view)
-        
+    
     def loop(self):
         "¡El juego se pone en marcha!"
         
@@ -154,7 +154,7 @@ class Director:
             self.window.clear(sfml.Color.BLACK)
             try:
                 self.__actualscene.on_draw(self.window)
-            except AttributeError:
+            except AttributeError as e:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
                                          " {0}".format(e))
@@ -270,5 +270,3 @@ class customView(sfml.View):
         """Retorna las coordenadas X y Y del centro de la camara.
         """
         return self.center
-    
-    
