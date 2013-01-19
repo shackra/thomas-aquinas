@@ -41,9 +41,12 @@ class Director:
             common.settings.getscreensize()[0], 
             common.settings.getscreensize()[1]),
                                         common.settings.getscreentitle())
-        self.tweener = pytweener.Tweener()
         self.defaulteasing = pytweener.Easing.Quad.easeOut
+        self.tweener = pytweener.Tweener()
         self.window.framerate_limit = 60
+        self.__framecount = 0
+        self.framerate = 0
+        self.__deltatime = 0
         self.window.vertical_synchronization = True
         if icon: 
             self.window.icon = media.loadmedia(icon).pixels
@@ -61,6 +64,12 @@ class Director:
         # Iniciamos algunas variables globales
         self.setglobalvariable("game title",
                                common.settings.getscreentitle())
+        self.__text = sfml.Text()
+        self.__text.font = sfml.Font.get_default_font()
+        self.__text.color = sfml.Color.WHITE
+        self.__text.style = sfml.Text.BOLD
+        self.__text.character_size = 30
+        self.__text.string = "{0} fps".format(self.framerate)
         
     def __getitem__(self, item):
         return self.__globalvariables[str(item)]
@@ -103,34 +112,23 @@ class Director:
         if not isinstance(view, sfml.View):
             view = self.window.view
             
-        # FIXME: retorna None
-        result = self.window.convert_coords(coords, view)
-        if not result:
-            # Usando el algoritmo originalmente escrito en C++
-            # del proyecto SFML
-            # Esto es un arreglo rapido hasta que el metodo
-            # original funcione. por eso usamos self.window
-            # en lugar de incluir al objeto en cuestion
-            # y llamar desde él a get_viewport
-            viewport = self.window.get_viewport(view)
-            normalized = (-1.0 + 2.0 * (coords.x or coords[0] - viewport.left) \
-                               / viewport.width,
-                           1.0 - 2.0 * (coords.y or coords[1] - viewport.top) \
-                               / viewport.height)
-            return view.inverse_transform.transform_point(normalized)
-        else:
-            # No retorna None!
-            return result
-        
+        return self.window.convert_coords(coords, view)
+    
     def loop(self):
         "¡El juego se pone en marcha!"
         
-        clock = sfml.Clock()
+        self.clock = sfml.Clock()
         
         while not self.__exitgame:
             # actualizamos el tweener
             self.tweener.update(60 / 1000.0)
-            
+            self.__deltatime += self.clock.restart().milliseconds
+            if self.__deltatime >= 1000.0:
+                self.__deltatime = 0
+                self.framerate = self.__framecount
+                self.__text.string = "{0} fps".format(self.framerate)
+                self.__framecount = 0
+                
             # propagación de eventos
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
@@ -171,7 +169,7 @@ class Director:
             self.window.clear(sfml.Color.BLACK)
             try:
                 self.__actualscene.on_draw(self.window)
-            except AttributeError:
+            except AttributeError as e:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
                                          " {0}".format(e))
@@ -181,11 +179,13 @@ class Director:
             # de la UI necesiten ser dibujados dentro de
             # nuestro sfml.View regular
             self.window.view = self.window.default_view
+            self.window.draw(self.__text)
             # TODO: crear un sistema de widgets personalisable
             #   con CSS.
             # TODO: Dibujamos los widgets
             # self.__widgetmanager.on_draw(self.window)
             self.window.display()
+            self.__framecount += 1
             # Restablecemos el view de nuestra ventana al sfml.View regular
             self.window.view = self.__camera
             # La aplicación ya es dormida en cada llamada a 
@@ -287,5 +287,3 @@ class customView(sfml.View):
         """Retorna las coordenadas X y Y del centro de la camara.
         """
         return self.center
-    
-    

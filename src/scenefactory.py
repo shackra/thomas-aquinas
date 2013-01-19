@@ -42,11 +42,11 @@ class AbstractScene:
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
-
+        
     def on_update(self):
         "El manejador de escenas llamara este metodo para actualizar la logica."
         raise NotImplemented("Implemente el metodo on_update.")
-
+    
     def on_event(self, event):
         "El manejador de escenas llamara este metodo cuando aya eventos."
         raise NotImplemented("Implemente el metodo on_event.")
@@ -54,7 +54,7 @@ class AbstractScene:
     def on_draw(self, window):
         "El manejador de escenas llamara este metodo para dibujar la escena."
         raise NotImplemented("Implemente el metodo on_draw.")
-
+    
     def loadmap(self, mapfilepath):
         """Carga el mapa de la respectiva escena.
 
@@ -66,7 +66,7 @@ class AbstractScene:
             common.settings.getrootfolder(),
             "maps", mapfilepath)
         self.__tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
-
+        
         logging.info("Cargando las baldosas del escenario...")
         # carga todas las baldosas del set de baldosas
         # basado en el código escrito por bitcraft, del proyecto
@@ -239,8 +239,9 @@ class Tile(sfml.TransformableDrawable):
             raise TATileImageException, ("Se esperaba un objeto del tipo "
                                          "sfml.Texture"
                                          " recibido {0}".format(type(image)))
-
+        
     def draw(self, target, states):
         # states.transform = self.transform
         states.texture = self.texture
         target.draw(self.texture.copy_to_image(), states)
+        

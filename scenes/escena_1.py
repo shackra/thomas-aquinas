@@ -2,7 +2,6 @@
 from src.scenefactory import AbstractScene
 import sfml
 from src import common
-import escena_1
 import logging
 import pdb
 

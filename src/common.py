@@ -23,7 +23,7 @@ import chardet
 import codecs
 
 LOGGING_FORMAT = "%(levelname)s - #%(lineno)d - %(funcName)s: %(message)s"
-logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)
 
 class TAConfOptionException(Exception): pass
 class TAConfSectionException(Exception): pass
