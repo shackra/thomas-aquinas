@@ -44,10 +44,13 @@ class Director:
         self.defaulteasing = pytweener.Easing.Quad.easeOut
         self.tweener = pytweener.Tweener()
         self.window.framerate_limit = 60
+        self.__framecount = 0
+        self.framerate = 0
+        self.__deltatime = 0
         self.window.vertical_synchronization = True
         if icon: 
             self.window.icon = media.loadmedia(icon).pixels
-
+            
         self.__actualscene = None
         self.__fullscreenmode = False
         self.__exitgame = False
@@ -61,6 +64,12 @@ class Director:
         # Iniciamos algunas variables globales
         self.setglobalvariable("game title",
                                common.settings.getscreentitle())
+        self.__text = sfml.Text()
+        self.__text.font = sfml.Font.get_default_font()
+        self.__text.color = sfml.Color.WHITE
+        self.__text.style = sfml.Text.BOLD
+        self.__text.character_size = 30
+        self.__text.string = "{0} fps".format(self.framerate)
         
     def __getitem__(self, item):
         return self.__globalvariables[str(item)]
@@ -108,12 +117,18 @@ class Director:
     def loop(self):
         "¡El juego se pone en marcha!"
         
-        clock = sfml.Clock()
+        self.clock = sfml.Clock()
         
         while not self.__exitgame:
             # actualizamos el tweener
             self.tweener.update(60 / 1000.0)
-            
+            self.__deltatime += self.clock.restart().milliseconds
+            if self.__deltatime >= 1000.0:
+                self.__deltatime = 0
+                self.framerate = self.__framecount
+                self.__text.string = "{0} fps".format(self.framerate)
+                self.__framecount = 0
+                
             # propagación de eventos
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
@@ -164,11 +179,13 @@ class Director:
             # de la UI necesiten ser dibujados dentro de
             # nuestro sfml.View regular
             self.window.view = self.window.default_view
+            self.window.draw(self.__text)
             # TODO: crear un sistema de widgets personalisable
             #   con CSS.
             # TODO: Dibujamos los widgets
             # self.__widgetmanager.on_draw(self.window)
             self.window.display()
+            self.__framecount += 1
             # Restablecemos el view de nuestra ventana al sfml.View regular
             self.window.view = self.__camera
             # La aplicación ya es dormida en cada llamada a 

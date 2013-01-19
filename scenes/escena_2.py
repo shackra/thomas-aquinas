@@ -36,12 +36,12 @@ class Maitest(AbstractScene):
                 self.__sprite["mai"].setstate(actual - 1)
             else:
                 self.__sprite["mai"].setstate(actual + 1)
-            
+                
     def on_update(self):
         # escalamos a Mai si fuera necesario
         #self.__sprite["mai"].sprite.scale(self.spritesize)
         pass
-        
+    
     def on_draw(self, window):
         logging.debug("Dibujando el mapa")
         self.drawmap() # aun no esta implementado

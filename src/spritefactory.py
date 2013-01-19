@@ -22,7 +22,7 @@ import media
 import sfml
 from math import sqrt
 import cjson as json
-
+import itertools
 
 class AbstractSprite:
     """ Clase compuesta para crear sprites.
@@ -76,6 +76,8 @@ class AbstractSprite:
         self.__solid = solid
         self.__movable = movable
         self.__detectnearat = near
+        # mantiene una instancia de itertools.cycle
+        self.__actualoop = None
         
     def __tupletorect(self, tupla):
         """ Devuelve una sfml.Rectangle a partir de una tupla.
@@ -185,19 +187,22 @@ class AbstractSprite:
                 logging.debug("El estado finito del sprite cambió: {0}".format(
                         self.__machinestate))
                 self.__actualmachinestate = self.__machinestate
-                self.__actualframe = 0
+                # recuperamos la lista de frames pertinente al estado actual.
+                frames = self.__spritedata["animation"][self.__actualmachinestate]
+                self.__actualoop = itertools.cycle(frames)
                 
-            rectframe = self.__spritedata["animation"][\
-                self.__actualmachinestate][self.__actualframe]
-            self.sprite.texture_rectangle = rectframe
+            # retornamos el siguiente frame en la animacion
+            self.sprite.texture_rectangle = self.__actualoop.next()
             
-            self.__actualframe += 1
+            # TODO: itertools.cycle puede ser una gran herramienta, aun así
+            # necesitamos un control más fino sobre la animacion, en especial
+            # con animacion lineales, que no pueden ser ciclicas y deben
+            # finalizar en el ultimo frame de la animacion.
+            # También necesitamos saber donde acaba una animacion, para hacer
+            # algo, por ejemplo, con los estados de transicion es requerido
+            # saber donde acaba para cambiar el estado finito del sprite.
+            # Con itertools.cycle esto no es sencillo del todo
             
-            if self.__actualframe >= len(
-                self.__spritedata["animation"][self.__actualmachinestate]):
-                # Ese frame no existe!
-                self.__actualframe = 0
-                
     def settexture(self, texture, texture_rectangle):
         """ Asigna que textura usar para el sprite.
         """
