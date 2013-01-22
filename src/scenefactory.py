@@ -30,15 +30,17 @@ class TATileImageException(Exception): pass
 
 class AbstractScene:
     """Escena abstracta del juego.
-
+    
     Las escenas representan partes visibles del juego, ya sea una
     pantalla de introduccion, creditos, o un campo de batalla.
-
+    
     Para poder hacer escenas funcionales, debe derivar de esta clase
     cualquier escena que necesite."""
-
+    
     def __init__(self, scenemanager):
         self.scenemanager = scenemanager
+        self.tilesets = []
+        self.vertexarrays = sfml.VertexArray()
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
@@ -50,14 +52,14 @@ class AbstractScene:
     def on_event(self, event):
         "El manejador de escenas llamara este metodo cuando aya eventos."
         raise NotImplemented("Implemente el metodo on_event.")
-
+    
     def on_draw(self, window):
         "El manejador de escenas llamara este metodo para dibujar la escena."
         raise NotImplemented("Implemente el metodo on_draw.")
     
     def loadmap(self, mapfilepath):
         """Carga el mapa de la respectiva escena.
-
+        
         No es necesario reimplementar éste método.
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
@@ -73,22 +75,23 @@ class AbstractScene:
         # pytmx. Revisar el método load_images_pygame del archivo
         # pytmx/tmxloader.py. fragmento de código bajo LGPL 3.
         self.__tmxmapdata.images = [0] * self.__tmxmapdata.maxgid
-
+        
         for firstgid, tile in sorted((tile.firstgid, tile) for tile in \
                                   self.__tmxmapdata.tilesets):
             filename = os.path.basename(tile.source)
-            tileset = media.loadimg("maps/tilesets/{0}".format(filename))
-
-            w, h = tileset.size
+            self.tilesets.append(
+                media.loadimg("maps/tilesets/{0}".format(filename)))
+            
+            w, h = self.tilesets[-1].size
             tile_size = (tile.tilewidth, tile.tileheight)
             real_gid = tile.firstgid - 1
-
+            
             # FIXME: sfml no convierte los valores hexadecimales a valores
             # RGB de 0 a 255.
             # colorkey = None
             # if t.trans:
             #     colorkey = pygame.Color("#{0}".format(t.trans))
-
+            
             # i dont agree with margins and spacing, but i'll support it anyway
             # such is life. okay.jpg
             tilewidth = tile.tilewidth + tile.spacing
@@ -97,9 +100,9 @@ class AbstractScene:
             # some tileset images may be slightly larger than the tile area
             # ie: may include a banner, copyright, ect. 
             # this compensates for that
-            width = ((int((w-tile.margin*2) + tile.spacing) / tilewidth) \
+            width = ((int((w - tile.margin * 2) + tile.spacing) / tilewidth) \
                      * tilewidth) - tile.spacing
-            height = ((int((h-tile.margin*2) + tile.spacing) / tileheight) \
+            height = ((int((h - tile.margin * 2) + tile.spacing) / tileheight) \
                       * tileheight) - tile.spacing
             
             # using product avoids the overhead of nested loops
@@ -112,13 +115,13 @@ class AbstractScene:
                 # Sólo Dios sabe porqué...
                 gids = self.__tmxmapdata.mapGID(real_gid)
                 if gids == []: continue
-
+                
                 # Esta operacion puede ser algo lenta...
                 # creamos una textura (imagen en memoria de vídeo)
                 # a partir de una imagen cargada de acuerdo a ciertas
                 # coordenadas. En esté caso, "extraeremos" una baldosa
                 # del set de imágenes de baldosas del respectivo mapa.
-
+                
                 # se usara sfml.Sprite como arreglo provisional
                 tileimg = sfml.Sprite(
                     sfml.Texture.load_from_image(tileset, 
