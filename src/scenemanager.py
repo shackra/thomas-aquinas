@@ -66,7 +66,7 @@ class Director:
                                common.settings.getscreentitle())
         self.__text = sfml.Text()
         self.__text.font = sfml.Font.get_default_font()
-        self.__text.color = sfml.Color.WHITE
+        self.__text.color = sfml.Color.BLUE
         self.__text.style = sfml.Text.BOLD
         self.__text.character_size = 30
         self.__text.string = "{0} fps".format(self.framerate)
