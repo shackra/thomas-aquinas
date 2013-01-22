@@ -57,7 +57,7 @@ class AbstractSprite:
     ¿Debemos usar un sistema de señales y slots alà Qt? ¿Que tal
     itertools de python?
         """
-    def __init__(self, texture, near, solid,
+    def __init__(self, id, texture, near, solid,
                  movable, window, spritedatafile, rectangle):
         if rectangle and not isinstance(rectangle, sfml.Rectangle):
             rectangle = self.__tupletorect(rectangle)
@@ -65,6 +65,7 @@ class AbstractSprite:
         else:
             self.sprite = sfml.Sprite(texture)
             
+        self.id = id
         self.clock = sfml.Clock()
         self.__deltatime = 0
         self.__machinestate = None
@@ -217,9 +218,7 @@ class AbstractSprite:
     
     def on_draw(self):
         "Dibuja al sprite"
-        logging.debug("Animando al sprite...")
         self.__animate() # Es correcto colocar la llamada al metodo acá?
-        logging.debug("Dibujando el sprite...")
         self.__window.draw(self.sprite)
         
     def addrectangle(self, name, size, position):
@@ -310,7 +309,7 @@ class AbstractSprite:
         para nuestro Sprite
         """
         if isinstance(state, int):
-            if 0 <= state <= len(self.__spritedata["animation"]):
+            if 0 <= state <= len(self.__spritedata["animation"]) - 1:
                 self.__machinestate = state
             else:
                 self.__machinestate = 0
