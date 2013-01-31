@@ -16,7 +16,8 @@ class Mai(AbstractSprite):
         
 class Maitest(AbstractScene):
     def __init__(self, scenemanager):
-        AbstractScene.__init__(self, scenemanager)
+        super(AbstractScene, self).__init__(self)
+        self.scenemanager = scenemanager
         self.loadmap("tmx/mai.tmx")
         self.spritesize = 0
         self.maitext = media.loadimg("sprites/others/Mai Shiranui "
@@ -42,9 +43,7 @@ class Maitest(AbstractScene):
         pass
     
     def on_draw(self, window):
-        self.drawmap() # aun no esta implementado
-        self.__sprite[0].on_draw() #el bucle de dibujado de sprites, duh!
+        self.draw()
         
     def __str__(self):
-        return "Escena donde se prueba la animacion de sprites."
-    
+        return "Escena donde se prueba la animacion de sprites."    

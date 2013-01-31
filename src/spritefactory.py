@@ -219,7 +219,6 @@ class AbstractSprite:
     def on_draw(self):
         "Dibuja al sprite"
         self.__animate() # Es correcto colocar la llamada al metodo acá?
-        self.__window.draw(self.sprite)
         
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
@@ -270,7 +269,7 @@ class AbstractSprite:
         """ Calcula la distancia entre dos pares de puntos.
         """
         return float(sqrt((sprite.position.x - self.sprite.position.x) ** 2 - \
-                        (sprite.position.y - self.sprite.position.y) ** 2))
+                              (sprite.position.y - self.sprite.position.y) ** 2))
     
     def isnear(self, sprite):
         """ Retorna la distancia entre un sprite y otro.

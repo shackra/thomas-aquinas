@@ -18,29 +18,35 @@
 
 import logging
 from thirdparty.pytmx import tmxloader
-from itertools import product
+from itertools import product, chain
 import common
 import media
 import sfml
 import os
-# debbuging!
-#import pdb
 
 class TATileImageException(Exception): pass
 
-class AbstractScene:
+# Extiende tu mente a esto
+#  https://github.com/LaurentGomila/SFML/wiki/Source:-TileMap-Render
+
+class AbstractScene(sfml.Drawable):
     """Escena abstracta del juego.
     
     Las escenas representan partes visibles del juego, ya sea una
     pantalla de introduccion, creditos, o un campo de batalla.
     
     Para poder hacer escenas funcionales, debe derivar de esta clase
-    cualquier escena que necesite."""
+    cualquier escena que necesite.
+
+    Esta clase usa Super para inicializar a sfml.Drawable. Use super
+    en sus subclases!
+    """
     
     def __init__(self, scenemanager):
+        super(sfml.Drawable, self).__init__()
         self.scenemanager = scenemanager
         self.tilesets = []
-        self.vertexarrays = sfml.VertexArray()
+        self.vertexarray = sfml.VertexArray(sfml.PrimitiveType.QUADS)
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
@@ -53,8 +59,8 @@ class AbstractScene:
         "El manejador de escenas llamara este metodo cuando aya eventos."
         raise NotImplemented("Implemente el metodo on_event.")
     
-    def on_draw(self, window):
-        "El manejador de escenas llamara este metodo para dibujar la escena."
+    def on_draw(self):
+        "El manejador de escenas llamara este metodo cuando aya que dibujar algo."
         raise NotImplemented("Implemente el metodo on_draw.")
     
     def loadmap(self, mapfilepath):
@@ -70,6 +76,10 @@ class AbstractScene:
                 "maps", mapfilepath)
             self.__tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
             
+            totalheight = 0
+            totalwidth = []
+            tilesetindex = -1
+            
             logging.info("Cargando las baldosas del escenario...")
             # carga todas las baldosas del set de baldosas
             # basado en el código escrito por bitcraft, del proyecto
@@ -82,9 +92,12 @@ class AbstractScene:
                 filename = os.path.basename(tile.source)
                 self.tilesets.append(
                     media.loadimg("maps/tilesets/{0}".format(filename)))
-
+                
                 w, h = self.tilesets[-1].size
+                totalwidth.append(w)
                 tile_size = (tile.tilewidth, tile.tileheight)
+                if tilesetindex > 0:
+                    totalheight += h
                 real_gid = tile.firstgid - 1
                 
                 # FIXME: sfml no convierte los valores hexadecimales a valores
@@ -92,12 +105,13 @@ class AbstractScene:
                 # colorkey = None
                 # if t.trans:
                 #     colorkey = pygame.Color("#{0}".format(t.trans))
-
-                # i dont agree with margins and spacing, but i'll support it anyway
+                
+                # i dont agree with margins and spacing, but i'll
+                # support it anyway
                 # such is life. okay.jpg
                 tilewidth = tile.tilewidth + tile.spacing
                 tileheight = tile.tileheight + tile.spacing
-
+                
                 # some tileset images may be slightly larger than the tile area
                 # ie: may include a banner, copyright, ect. 
                 # this compensates for that
@@ -105,7 +119,7 @@ class AbstractScene:
                          * tilewidth) - tile.spacing
                 height = ((int((h - tile.margin * 2) + tile.spacing) / tileheight) \
                           * tileheight) - tile.spacing
-
+                
                 # using product avoids the overhead of nested loops
                 p = product(xrange(tile.margin, height+tile.margin, tileheight),
                             xrange(tile.margin, width+tile.margin, tilewidth))
@@ -122,84 +136,136 @@ class AbstractScene:
                     # a partir de una imagen cargada de acuerdo a ciertas
                     # coordenadas. En esté caso, "extraeremos" una baldosa
                     # del set de imágenes de baldosas del respectivo mapa.
-
-                    # se usara sfml.Sprite como arreglo provisional
-                    tileimg = sfml.Sprite(
-                        sfml.Texture.load_from_image(tileset, 
-                                                     (x, y, 
-                                                     tile_size[0], 
-                                                      tile_size[1])))
                     
+                    # se usan cuadro Vertexs, uno como cada esquina de un plano
+                    # orden de coordenadas: X, Y
+                    v1 = sfml.Vertex(tex_coods=sfml.Vector2(
+                            float(x), float(y + totalheight)))
+                    v2 = sfml.Vertex(tex_coords=sfml.Vector2(
+                            v1.tex_coords.x + tile_size[0],
+                            v1.tex_coords.y))
+                    v3 = sfml.Vertex(tex_coords=sfml.Vector2(
+                            v1.tex_coords.x + tile_size[0],
+                            v1.tex_coords.y + tile_size[1]))
+                    v4 = sfml.Vertex(tex_coords=sfml.Vector2(
+                            v1.tex_coords.x,
+                            v1.tex_coords.y + tile_size[1]))
+                    quad = (v1, v2, v3, v4,)
                     # No tengo ni la menor idea sobre que hace esté bucle for
                     for gid, flag in gids:
                         logging.debug("gid: {0}, flag: {1}".format(gid, flag))
-                        self.__tmxmapdata.images[gid] = tileimg
-                # creamos una referencia al metodo getTileImage
-                getimage = self.__tmxmapdata.getTileImage
-                # altura y anchura de la baldosa
-                alto, ancho = self.__tmxmapdata.tileheight, self.__tmxmapdata.tilewidth
-                # Capas, (x) filas, (y) columnas
-                # extraido de http://stackoverflow.com/a/893063
-                # algoritmo para mapas isometricos:
-                #
-                # tile_map[][] = [[...],...]
-                # for (i = 0; i < tile_map.size; i++):
-                #     for (j = tile_map[i].size; j >= 0; j--):
-                #         draw(
-                #             tile_map[i][j],
-                #             x = (j * tile_width / 2) + (i * tile_width / 2)
-                #             y = (i * tile_height / 2) - (j * tile_height / 2)
-                #         )
-                # nos ahorramos el overhead de los bucles for anidados
-                p = product(xrange(len(self.__tmxmapdata.tilelayers)),
-                            xrange(self.__tmxmapdata.width),
-                            xrange(self.__tmxmapdata.height - 1, -1, -1) \
-                                if self.__tmxmapdata.orientation == "isometric" \
-                                else xrange(self.__tmxmapdata.height))
-                for layer, x, y in p:
-                    image = getimage(x, y, layer)
-                    if image:
-                        # Tenemos dos formas de dibujar la baldosa
-                        # si es ortografica, entonces se coloca de
-                        # la siguiente forma: (x * ancho, y * alto)
-                        # Si es isometrica, entonces de la siguiente
-                        # forma: ((x * ancho / 2) + (y * ancho / 2), 
-                        # (y * alto / 2) - (x * alto /2))
-                        # screen.blit(image, (x * w, y * h))
-                        if self.__tmxmapdata.orientation == "isometric":
-                            image.position = ((x * ancho / 2) + (y * ancho / 2), 
-                                              (y * alto / 2) - (x * alto /2))
-                        else:
-                            image.position = (x * ancho, y * alto)
-                        self.__tmxmapdata.tilelayers[layer].data[y][x] = image
+                        self.__tmxmapdata.images[gid] = quad
+                        
+            # Unimos todos los tiles sets en una sola imagen
+            ## creamos una imagen del tamaño adecuado
+            totalwidth.sort()
+            alltilesimg = sfml.Image.create(totalwidth[-1], totalheight)
+            previousimg = sfml.Rectangle(sfml.Vector2(0.0, 0.0),
+                                         sfml.Vector2(0.0, 0.0))
+            for tileset in self.tilesets:
+                alltilesimg.blit(tileset, (0, previousimg.height))
+                previousimg = tileset
+                
+            # Finalmente, creamos la textura con todos los tilesets    
+            self.scenetileset = sfml.Texture.from_image(alltilesimg)
+            
+            # POSICONANDO LOS TILES #
+            # creamos una referencia al metodo getTileImage
+            getimage = self.__tmxmapdata.getTileImage
+            # altura y anchura de la baldosa
+            alto, ancho = (self.__tmxmapdata.tileheight,
+                           self.__tmxmapdata.tilewidth)
+            # Capas, (x) filas, (y) columnas
+            # extraido de http://stackoverflow.com/a/893063
+            # algoritmo para mapas isometricos:
+            #
+            # tile_map[][] = [[...],...]
+            # for (i = 0; i < tile_map.size; i++):
+            #     for (j = tile_map[i].size; j >= 0; j--):
+            #         draw(
+            #             tile_map[i][j],
+            #             x = (j * tile_width / 2) + (i * tile_width / 2)
+            #             y = (i * tile_height / 2) - (j * tile_height / 2)
+            #         )
+            # nos ahorramos el overhead de los bucles for anidados
+            p = product(xrange(len(self.__tmxmapdata.tilelayers)),
+                        xrange(self.__tmxmapdata.width),
+                        xrange(self.__tmxmapdata.height - 1, -1, -1) \
+                            if self.__tmxmapdata.orientation == "isometric"\
+                            else xrange(self.__tmxmapdata.height))
+            for layer, x, y in p:
+                quad = getimage(x, y, layer)
+                if image:
+                    # Tenemos dos formas de dibujar la baldosa
+                    # si es ortografica, entonces se coloca de
+                    # la siguiente forma: (x * ancho, y * alto)
+                    # Si es isometrica, entonces de la siguiente
+                    # forma: ((x * ancho / 2) + (y * ancho / 2), 
+                    # (y * alto / 2) - (x * alto /2))
+                    
+                    # Desempacamos los Vertexs
+                    v1, v2, v3, v4 = quad
+                    if self.__tmxmapdata.orientation == "isometric":
+                        v1.position = sfml.Vector2(
+                            float((x * ancho / 2) + (y * ancho / 2)),
+                            float((y * alto / 2) - (y * alto / 2)))
+                        v2.position = sfml.Vector2(
+                            v1.position.x + ancho, v1.position.y)
+                        v3.position = sfml.Vector2(
+                            v1.position.x + ancho, v1.position.y + alto)
+                        v4.position = sfml.Vector2(
+                            v1.position.x, v1.position.y + alto)
+                    else:
+                        v1.position = sfml.Vector2(
+                            float(x * ancho), f(y * alto))
+                        v2.position = sfml.Vector2(v1.position.x + ancho,
+                                                   v1.position.y)
+                        v3.position = sfml.Vector2(v1.position.x + ancho,
+                                                   v1.position.y + alto)
+                        v4.position = sfml.Vector2(v1.position.x,
+                                                   v1.position.y + alto)
+                        
+                    self.__tmxmapdata.tilelayers[layer].data[y][x] = \
+                        (v1, v2, v3, v4,)
+                    ## TODO: llamar a un metodo que refresque los vertexs
+                    # a mostrar en pantalla.
+                    ## Ponemos todos los vertexs dentro del array
+                    for v in [v1, v2, v3, v4]:
+                        self.vertexarray.append(v)
             logging.info("Carga de baldosas exitosa!")
         else:
             self.__tmxmapfile = None
             
-    def drawmap(self, *args):
+    def draw(self, target, states, *sprites):
         """ Dibuja el mapa del escenario.
         
-        se usa el argumento *args para pasar grupos de sprites que deban
+        se usa el argumento *sprites para pasar grupos de sprites que deban
         ser dibujados en encontrar la capa sprite. Éste grupo de sprites
         deberá de tener un método on_draw que llamara al método on_draw
         de cada uno de los sprites dentro del grupo.
         """
         if self.__tmxmapfile:
-            getimage = self.__tmxmapdata.getTileImage
-            p = product(xrange(len(self.__tmxmapdata.tilelayers)),
-                        xrange(self.__tmxmapdata.width),
-                        xrange(self.__tmxmapdata.height - 1, -1, -1) \
-                            if self.__tmxmapdata.orientation == "isometric" \
-                            else xrange(self.__tmxmapdata.height))
-            for layer, x, y in p:
-                image = getimage(x, y, layer)
-                # Dibujamos el tile en pantalla,
-                # TODO: detenerse a dibujar los sprites cuando se necesite.
-                if image:
-                    self.scenemanager.window.draw(image)
+            states.texture = self.scenetileset
+            target.draw(self.vertexarray, states)
         else:
-            self.scenemanager.window.clear(sfml.Color.WHITE)
+            self.target.clear(sfml.Color.WHITE)
             
+        # Dibujamos los sprites que nos pasen
+        ## Nos pasaron una lista o una tupla con sprites?
+        if isinstance(sprites, list) or isinstance(sprites, tuple):
+            # Desempaquetamos los sprites
+            sprites = chain.from_iterable(sprites)
+            
+        for sprite in sprites:
+            try:
+                # Si es un sprite instancia de AbstractSprite
+                # llamamos a su metodo on_draw antes de dibujarlo
+                sprite.on_draw()
+                target.draw(sprite.sprite, states)
+            except AttributeError:
+                # Fallback para usar con sprites derivados de sfml.Sprite
+                target.draw(sprite, states)
+                
     def getmappixelsize(self):
         """Retorna las dimensiones del mapa en pixeles.
         """
