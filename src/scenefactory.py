@@ -76,9 +76,8 @@ class AbstractScene(sfml.Drawable):
                 "maps", mapfilepath)
             self.__tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
             
-            totalheight = 0
-            totalwidth = []
-            tilesetindex = -1
+            heightlist = []
+            widthlist = []
             tilesets = []
             
             logging.info("Cargando las baldosas del escenario...")
@@ -95,10 +94,10 @@ class AbstractScene(sfml.Drawable):
                     media.loadimg("maps/tilesets/{0}".format(filename)))
                 
                 w, h = tilesets[-1].size
-                totalwidth.append(w)
+                widthlist.append(w)
+                heightlist.append(h)
                 tile_size = (tile.tilewidth, tile.tileheight)
-                if tilesetindex > 0:
-                    totalheight += h
+                totalheight = sum(heightlist[1:], 0)
                 real_gid = tile.firstgid - 1
                 
                 # FIXME: sfml no convierte los valores hexadecimales a valores
@@ -152,24 +151,31 @@ class AbstractScene(sfml.Drawable):
                             v1.tex_coords.x,
                             v1.tex_coords.y + tile_size[1]))
                     quad = (v1, v2, v3, v4,)
+                    logging.debug("Quad mapeado en: ({0}),"
+                                  " ({1}), ({2}), ({3})".format(
+                            v1.tex_coords, v2.tex_coords,
+                            v3.tex_coords, v4.tex_coords))
                     # No tengo ni la menor idea sobre que hace esté bucle for
                     for gid, flag in gids:
                         logging.debug("gid: {0}, flag: {1}".format(gid, flag))
                         self.__tmxmapdata.images[gid] = quad
-                tilesetindex += 1
-                
+                        
             # Unimos todos los tiles sets en una sola imagen
             ## creamos una imagen del tamaño adecuado
-            totalwidth.sort()
-            logging.info("Creando imagen de {0}x{1}".format(totalwidth[-1], totalheight))
-            alltilesimg = sfml.Image.create(totalwidth[-1], totalheight)
+                        widthlist.sort()
+            logging.info("Creando imagen de {0}x{1}".format(widthlist[-1],
+                                                            sum(heightlist)))
+            alltilesimg = sfml.Image.create(widthlist[-1],
+                                            sum(heightlist))
             previousimg = sfml.Rectangle(sfml.Vector2(0.0, 0.0),
                                          sfml.Vector2(0.0, 0.0))
             for tileset in tilesets:
+                logging.debug("Bliteando imagen a una altura de {0}".format(
+                        previousimg.height))
                 alltilesimg.blit(tileset, (0, previousimg.height))
-                previousimg = tileset
+                previousimg.height += tileset.height
                 
-            # Finalmente, creamos la textura con todos los tilesets    
+            # Finalmente, creamos la textura con todos los tilesets
             self.scenetileset = sfml.Texture.from_image(alltilesimg)
             
             # POSICONANDO LOS TILES #
