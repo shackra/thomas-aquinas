@@ -43,7 +43,8 @@ class Maitest(AbstractScene):
         pass
     
     def on_draw(self, window):
-        self.draw()
+        self.sprites = self.__sprite
+        window.draw(self)
         
     def __str__(self):
         return "Escena donde se prueba la animacion de sprites."    

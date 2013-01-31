@@ -210,7 +210,7 @@ class AbstractSprite:
         if texture:
             self.sprite.texture = texture
         if texture_rectangle:
-            self.sprite.texture_rectangle = texture_rectangle
+                self.sprite.texture_rectangle = texture_rectangle
             
     def on_update(self):
         "Actualiza la lógica del sprite, por ejemplo, su IA"

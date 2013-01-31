@@ -37,16 +37,16 @@ class AbstractScene(sfml.Drawable):
     
     Para poder hacer escenas funcionales, debe derivar de esta clase
     cualquier escena que necesite.
-
+    
     Esta clase usa Super para inicializar a sfml.Drawable. Use super
     en sus subclases!
     """
     
     def __init__(self, scenemanager):
-        super(sfml.Drawable, self).__init__()
+        sfml.Drawable.__init__(self)
         self.scenemanager = scenemanager
-        self.tilesets = []
         self.vertexarray = sfml.VertexArray(sfml.PrimitiveType.QUADS)
+        self.sprites = []
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
@@ -63,14 +63,14 @@ class AbstractScene(sfml.Drawable):
         "El manejador de escenas llamara este metodo cuando aya que dibujar algo."
         raise NotImplemented("Implemente el metodo on_draw.")
     
-    def loadmap(self, mapfilepath):
+    def loadmap(self, mapfilepath=None):
         """Carga el mapa de la respectiva escena.
         
         No es necesario reimplementar éste método.
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
         http://www.mapeditor.org/"""
-        if not mapfilepath:
+        if mapfilepath:
             self.__tmxmapfile = common.settings.joinpaths(
                 common.settings.getrootfolder(),
                 "maps", mapfilepath)
@@ -79,6 +79,7 @@ class AbstractScene(sfml.Drawable):
             totalheight = 0
             totalwidth = []
             tilesetindex = -1
+            tilesets = []
             
             logging.info("Cargando las baldosas del escenario...")
             # carga todas las baldosas del set de baldosas
@@ -90,10 +91,10 @@ class AbstractScene(sfml.Drawable):
             for firstgid, tile in sorted((tile.firstgid, tile) for tile in \
                                       self.__tmxmapdata.tilesets):
                 filename = os.path.basename(tile.source)
-                self.tilesets.append(
+                tilesets.append(
                     media.loadimg("maps/tilesets/{0}".format(filename)))
                 
-                w, h = self.tilesets[-1].size
+                w, h = tilesets[-1].size
                 totalwidth.append(w)
                 tile_size = (tile.tilewidth, tile.tileheight)
                 if tilesetindex > 0:
@@ -139,15 +140,15 @@ class AbstractScene(sfml.Drawable):
                     
                     # se usan cuadro Vertexs, uno como cada esquina de un plano
                     # orden de coordenadas: X, Y
-                    v1 = sfml.Vertex(tex_coods=sfml.Vector2(
+                    v1 = sfml.Vertex((0, 0), None, sfml.Vector2(
                             float(x), float(y + totalheight)))
-                    v2 = sfml.Vertex(tex_coords=sfml.Vector2(
+                    v2 = sfml.Vertex((0, 0), None, sfml.Vector2(
                             v1.tex_coords.x + tile_size[0],
                             v1.tex_coords.y))
-                    v3 = sfml.Vertex(tex_coords=sfml.Vector2(
+                    v3 = sfml.Vertex((0, 0), None, sfml.Vector2(
                             v1.tex_coords.x + tile_size[0],
                             v1.tex_coords.y + tile_size[1]))
-                    v4 = sfml.Vertex(tex_coords=sfml.Vector2(
+                    v4 = sfml.Vertex((0, 0), None, sfml.Vector2(
                             v1.tex_coords.x,
                             v1.tex_coords.y + tile_size[1]))
                     quad = (v1, v2, v3, v4,)
@@ -155,14 +156,16 @@ class AbstractScene(sfml.Drawable):
                     for gid, flag in gids:
                         logging.debug("gid: {0}, flag: {1}".format(gid, flag))
                         self.__tmxmapdata.images[gid] = quad
-                        
+                tilesetindex += 1
+                
             # Unimos todos los tiles sets en una sola imagen
             ## creamos una imagen del tamaño adecuado
             totalwidth.sort()
+            logging.info("Creando imagen de {0}x{1}".format(totalwidth[-1], totalheight))
             alltilesimg = sfml.Image.create(totalwidth[-1], totalheight)
             previousimg = sfml.Rectangle(sfml.Vector2(0.0, 0.0),
                                          sfml.Vector2(0.0, 0.0))
-            for tileset in self.tilesets:
+            for tileset in tilesets:
                 alltilesimg.blit(tileset, (0, previousimg.height))
                 previousimg = tileset
                 
@@ -195,7 +198,7 @@ class AbstractScene(sfml.Drawable):
                             else xrange(self.__tmxmapdata.height))
             for layer, x, y in p:
                 quad = getimage(x, y, layer)
-                if image:
+                if quad:
                     # Tenemos dos formas de dibujar la baldosa
                     # si es ortografica, entonces se coloca de
                     # la siguiente forma: (x * ancho, y * alto)
@@ -217,7 +220,7 @@ class AbstractScene(sfml.Drawable):
                             v1.position.x, v1.position.y + alto)
                     else:
                         v1.position = sfml.Vector2(
-                            float(x * ancho), f(y * alto))
+                            float(x * ancho), float(y * alto))
                         v2.position = sfml.Vector2(v1.position.x + ancho,
                                                    v1.position.y)
                         v3.position = sfml.Vector2(v1.position.x + ancho,
@@ -225,8 +228,8 @@ class AbstractScene(sfml.Drawable):
                         v4.position = sfml.Vector2(v1.position.x,
                                                    v1.position.y + alto)
                         
-                    self.__tmxmapdata.tilelayers[layer].data[y][x] = \
-                        (v1, v2, v3, v4,)
+                    # self.__tmxmapdata.tilelayers[layer].data[y][x] = \
+                        #     (v1, v2, v3, v4,)
                     ## TODO: llamar a un metodo que refresque los vertexs
                     # a mostrar en pantalla.
                     ## Ponemos todos los vertexs dentro del array
@@ -236,7 +239,7 @@ class AbstractScene(sfml.Drawable):
         else:
             self.__tmxmapfile = None
             
-    def draw(self, target, states, *sprites):
+    def draw(self, target, states):
         """ Dibuja el mapa del escenario.
         
         se usa el argumento *sprites para pasar grupos de sprites que deban
@@ -248,15 +251,10 @@ class AbstractScene(sfml.Drawable):
             states.texture = self.scenetileset
             target.draw(self.vertexarray, states)
         else:
-            self.target.clear(sfml.Color.WHITE)
+            target.clear(sfml.Color.WHITE)
             
         # Dibujamos los sprites que nos pasen
-        ## Nos pasaron una lista o una tupla con sprites?
-        if isinstance(sprites, list) or isinstance(sprites, tuple):
-            # Desempaquetamos los sprites
-            sprites = chain.from_iterable(sprites)
-            
-        for sprite in sprites:
+        for sprite in self.sprites:
             try:
                 # Si es un sprite instancia de AbstractSprite
                 # llamamos a su metodo on_draw antes de dibujarlo

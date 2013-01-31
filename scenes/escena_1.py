@@ -3,12 +3,12 @@ from src.scenefactory import AbstractScene
 import sfml
 from src import common
 import logging
-import pdb
 
 class Helloworld(AbstractScene):
     def __init__(self, scenemanager):
         AbstractScene.__init__(self, scenemanager)
         self.loadmap("tmx/mapa prueba.tmx")
+        self.sprites = []
         
     def on_event(self, event):
         if type(event) is sfml.MouseButtonEvent and event.pressed:
@@ -29,7 +29,7 @@ class Helloworld(AbstractScene):
         pass
     
     def on_draw(self, window):
-        self.drawmap()
+        window.draw(self)
         
     def __str__(self):
         return "<Scene: HelloWorld, file: {0}>".format(__file__)
