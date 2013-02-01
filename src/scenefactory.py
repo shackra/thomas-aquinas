@@ -105,10 +105,6 @@ class AbstractScene(sfml.Drawable):
                 # colorkey = None
                 # if t.trans:
                 #     colorkey = pygame.Color("#{0}".format(t.trans))
-                
-                # i dont agree with margins and spacing, but i'll
-                # support it anyway
-                # such is life. okay.jpg
                 tilewidth = tile.tilewidth + tile.spacing
                 tileheight = tile.tileheight + tile.spacing
                 

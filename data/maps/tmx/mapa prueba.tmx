@@ -10025,4 +10025,25 @@
    <tile gid="0"/>
   </data>
  </layer>
+ <objectgroup name="control" width="50" height="50">
+  <object x="1094" y="766" width="114" height="92"/>
+  <object x="529" y="459" width="480" height="486"/>
+  <object x="1235" y="822" width="42" height="21"/>
+  <object x="305" y="404" width="31" height="25"/>
+  <object x="241" y="468" width="31" height="25"/>
+  <object x="336" y="532" width="31" height="25"/>
+  <object x="401" y="436" width="31" height="25"/>
+  <object x="484" y="388" width="55" height="23"/>
+  <object x="608" y="319" width="31" height="25"/>
+  <object x="769" y="382" width="31" height="25"/>
+  <object x="705" y="251" width="31" height="25"/>
+  <object x="864" y="251" width="31" height="25"/>
+  <object x="769" y="188" width="31" height="25"/>
+  <object x="928" y="155" width="31" height="25"/>
+  <object x="672" y="154" width="31" height="25"/>
+  <object x="608" y="218" width="31" height="25"/>
+  <object x="536" y="239" width="11" height="14"/>
+  <object x="608" y="1247" width="32" height="34"/>
+  <object x="804" y="1263" width="24" height="12"/>
+ </objectgroup>
 </map>

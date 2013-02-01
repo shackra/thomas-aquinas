@@ -176,21 +176,10 @@ class Conf:
         """ Retorna una dirección de archivo juntando todos los argumentos.
         """
         logging.debug("Se han de unir las siguientes carpetas {0}".format(args))
-        argspath = u""
-        for arg in args:
-            if arg == args[-1]:
-                argspath += arg
-            else:
-                argspath += arg + u"/"
-                
-            logging.debug("Resultado hasta el"
-                          " momento: {0}".format(argspath))
-            # saneamos la ruta, por aquello de los dobles "/"
-            argspath = argspath.replace("//", "/")
-            logging.debug("Retornando el resultado "
-                          "de la operación: {0}".format(argspath))
-            
-        return self.__convertpath(argspath)
+        path = "/".join(args)
+        path = path.replace("//", "/")
+        
+        return self.__convertpath(path)
     
     def __convertpath(self, whichone):
         """ Convierte y retorna direcciones de archivos de forma adecuada.
