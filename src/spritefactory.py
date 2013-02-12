@@ -24,7 +24,7 @@ from math import sqrt
 import cjson as json
 import itertools
 
-class AbstractSprite:
+class Entity:
     """ Clase compuesta para crear sprites.
 
     Esta clase sigue la regla de composición sobre herencia,

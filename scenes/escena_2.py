@@ -1,33 +1,27 @@
 # coding: utf-8
 from src.scenefactory import AbstractScene
-from src.spritefactory import AbstractSprite
+from src.spritefactory import Entity
 import sfml
 from src import common
 from src import media
 import logging
 
-class Mai(AbstractSprite):
-    def __init__(self, id, texture, near, solid,
-                 movable, window, spritedatafile, rectangle=None):
-        AbstractSprite.__init__(self, id, texture, near, solid,
-                                movable, window, spritedatafile, rectangle)
-        self.sprite.origin = sfml.Vector2(171 / 2.0, 155 / 2.0)
-        self.setstate(0)
-        
+
 class Maitest(AbstractScene):
     def __init__(self, scenemanager):
         super(AbstractScene, self).__init__(self)
         self.scenemanager = scenemanager
-        self.loadmap("tmx/mai.tmx")
-        self.spritesize = 0
-        self.maitext = media.loadimg("sprites/others/Mai Shiranui "
+        self.loadmap()
+        maitext = media.loadimg("sprites/others/Mai Shiranui "
                                      "basic spritesheet.png", False)
-        mai = Mai("mai", self.maitext, 0, True, False, self.scenemanager.window,
-                  "sprites/others/Mai Shiranui basic spritesheet.json")
-        self.__sprite = [mai]
+        mai = Entity("mai", maitext, self.scenemanager.window,
+                     "sprites/others/Mai Shiranui basic spritesheet.json")
+        mai.sprite.origin = sfml.Vector2(171 / 2.0, 155 / 2.0)
+        mai.setstate(0)
         screensize = common.settings.getscreensize()
         newposition = (screensize[0] / 2, screensize[1] / 1.5)
-        self.__sprite[0].sprite.position = newposition
+        mai.sprite.position = newposition
+        self.__sprite = [mai]
         
     def on_event(self, event):
         if isinstance(event, sfml.MouseWheelEvent):
