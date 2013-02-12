@@ -1,6 +1,6 @@
 # coding: utf-8
 # This file is part of Thomas Aquinas.
-#    
+#
 # Thomas Aquinas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -26,60 +26,83 @@ import itertools
 
 class AbstractSprite:
     """ Clase compuesta para crear sprites.
-    
-    Esta clase sigue la regla de composicion sobre herencia.
-    
-    Esta clase debe contener un numero razonable de características
-    que hagan más fácil ciertas tareas de programación con respecto
-    a los sprites. El numero de características puede decrecer o
-    incrementar, de cualquier forma, es preferible revisar los cambios
-    en la tarea reportada acá:
-    https://bitbucket.org/shackra/thomas-aquinas/issue/9
+
+    Esta clase sigue la regla de composición sobre herencia,
+    pero basado en la idea de entidades - controles - propiedades.
+
+    Una entidad puede tener un numero 'ilimitado' de propiedades.
+    Para añadir una propiedad a su instancia de AbstractSprite
+    solamente use la función `setattr`. Para saber si una propiedad
+    existe o no en determinada entidad, use `hasattr`, Si desea borrar
+    Una propiedad de la entidad, use del(entidad.propiedad).
+    así de fácil. De ahí que `AbstractSprite` carezca de interfaces
+    para agregar o eliminar propiedades. Python ya las provee.
     
     Cada sprite debe poseer un archivo de configuración que defina
     sus propiedades. Las dos más importantes, hasta el momento, son
     'animation' y 'rectangles'. Ambas son diccionarios.
-    
-    Animation DEBE poseer una animación para cada estado finito, enumarado
+
+    Animation DEBE poseer una animación para cada estado finito, enumerado
     desde el 0 hasta donde el programador lo necesite. Cada uno de estos
     estados finitos deben a su vez tener enumerado del 0 hasta donde
     necesiten cada uno de los rectángulos que indican que parte de la textura
     mostrar en el sprite.
-    
+
     Rectangles posee dentro de sí una serie de diccionarios. El "key" de cada
     diccionario indica el nombre del rectángulo y su valor es las coordenadas y
     dimensiones de susodicho rectángulo. La palabra clave rectangle DEBE ser
     incluida en la definición de las propiedades del sprite
     incluso si no existen rectángulos que definir.
-    
-    FIXME: En la comprobasion de coliciones/contacto puede que el uso de bucles
+
+    FIXME: En la comprobación de colisiones/contacto puede que el uso de bucles
     ```for``` no sea para nada conveniente por el overhead que puede producir.
     ¿Debemos usar un sistema de señales y slots alà Qt? ¿Que tal
     itertools de python?
-        """
-    def __init__(self, id, texture, near, solid,
-                 movable, window, spritedatafile, rectangle):
+    """
+    def __init__(self, id, texture, window, spritedatafile, rectangle):
         if rectangle and not isinstance(rectangle, sfml.Rectangle):
             rectangle = self.__tupletorect(rectangle)
             self.sprite = sfml.Sprite(texture, rectangle)
         else:
             self.sprite = sfml.Sprite(texture)
-            
+
         self.id = id
         self.clock = sfml.Clock()
         self.__deltatime = 0
         self.__machinestate = None
         self.__actualmachinestate = None
         self.__actualframe = 0
-        self.__property = {}
         self.__window = window
         self.__spritedata = self.__loadspritedata(spritedatafile)
-        self.__solid = solid
-        self.__movable = movable
-        self.__detectnearat = near
         # mantiene una instancia de itertools.cycle
         self.__actualoop = None
-        
+        self.zindex = None
+        self.__controllers = {}
+
+    def addcontroller(self, func):
+        """ Agrega un controlador para la entidad.
+        """
+        self.__controllers[func.func_name] = func
+
+    def delcontroller(self, funcname):
+        """ Borra un controlador para la entidad.
+        """
+        try:
+            del(self.__controllers[funcname])
+        except KeyError:
+            raise KeyError, ("Controlador '{0}' no existe "
+                             "para entidad {1}".format(funcname, self.id))
+
+    def setzindex(self, neworder):
+        """Cambia el nivel z del sprite.
+        """
+        self.zindex = int(neworder)
+
+    def getzindex(self):
+        """Retorna el nivel z del sprite.
+        """
+        return self.zindex
+
     def __tupletorect(self, tupla):
         """ Devuelve una sfml.Rectangle a partir de una tupla.
         """
@@ -96,41 +119,10 @@ class AbstractSprite:
         else:
             # retorna el objeto tal y como estaba
             return tupla
-        
-    def issolid(self):
-        """ Es solido el sprite.
-        
-        Sí el sprite es solido, devuelve True. Util para manejar colisiones.
-        """
-        return self.__solid
-    
-    def ismovable(self):
-        """ Es movible el sprite.
-        
-        Sí el sprite es movible, devuelve True.
-        Util para combinar con colisiones.
-        """
-        return self.__movable
-    
-    def switchsolid(self):
-        """ Cambia la propiedad del estado 'solido' del sprite.
-        """
-        if self.issolid():
-            self.__solid = False
-        else:
-            self.__solid = True
-            
-    def switchmovable(self):
-        """ Cambia la propiedad del estado 'movible' del sprite.
-        """
-        if self.ismovable():
-            self.__movable = False
-        else:
-            self.__movable = True
-            
+
     def __loadspritedata(self, filepath):
         """ Carga los datos del sprite desde un archivo con formato JSON.
-        
+
         Este metodo devuelve un diccionario con todos los objetos python
         correspondientes.
         """
@@ -144,33 +136,33 @@ class AbstractSprite:
                     vector2 = sfml.Vector2(float(frame[2]), float(frame[3]))
                     newstate.append(sfml.Rectangle(vector1, vector2))
                 parsedata["animation"].append(newstate)
-                
+
             return parsedata
-        
+
     def __animate(self):
         """ Anima al sprite.
-        
+
         self.__spritedata debe de poseer un subdiccionario
         llamado 'animation' con los rectangulos que representan
         cada fotograma de animacion. Los rectangulos indican
         que fragmento del spritesheet mostrar.
-        
+
         Este metodo queda subornidado al atributo de la maquina de
         estados del sprite, para cambiar la animacion, se debe cambiar
         el estado del sprite. Excelente idea ¿no lo cree?
-        
+
         Para simplicar, cada estado del sprite tendra una animacion
         asociada.
         """
         self.__deltatime += self.clock.restart().milliseconds
-        
+
         if self.__deltatime >= 60.0:
             # FIXME: la cantidad de cuadros por seguno
             # debe ser especificada en la configuracion del
             # juego. Para efectos de animacion, deberia de contarse
             # con un offset que agregue o quite milisegundo de temporizado
             # para hacer lucir la animación más lenta o más veloz.
-            
+
             # TODO: soportar tipos de ciclos de animacion, como linear
             # ciclico, ping pong.
             # Linear: al finalizar, la animacion se queda en el ultimo cuadro.
@@ -179,10 +171,10 @@ class AbstractSprite:
             # Ping pong: La animacion va de un lado al otro de los extremos
             #            de la animacion pasando por todos
             #            los cuadros intermedios.
-            
+
             # reiniciamos un atributo del sprite
             self.__deltatime = 0
-            
+
             # el estado del sprite a cambiado?
             if self.__actualmachinestate != self.__machinestate:
                 logging.debug("El estado finito del sprite cambió: {0}".format(
@@ -191,10 +183,10 @@ class AbstractSprite:
                 # recuperamos la lista de frames pertinente al estado actual.
                 frames = self.__spritedata["animation"][self.__actualmachinestate]
                 self.__actualoop = itertools.cycle(frames)
-                
+
             # retornamos el siguiente frame en la animacion
             self.sprite.texture_rectangle = self.__actualoop.next()
-            
+
             # TODO: itertools.cycle puede ser una gran herramienta, aun así
             # necesitamos un control más fino sobre la animacion, en especial
             # con animacion lineales, que no pueden ser ciclicas y deben
@@ -203,7 +195,7 @@ class AbstractSprite:
             # algo, por ejemplo, con los estados de transicion es requerido
             # saber donde acaba para cambiar el estado finito del sprite.
             # Con itertools.cycle esto no es sencillo del todo
-            
+
     def settexture(self, texture, texture_rectangle):
         """ Asigna que textura usar para el sprite.
         """
@@ -211,18 +203,24 @@ class AbstractSprite:
             self.sprite.texture = texture
         if texture_rectangle:
             self.sprite.texture_rectangle = texture_rectangle
-            
+
     def on_update(self):
-        "Actualiza la lógica del sprite, por ejemplo, su IA"
-        raise NotImplemented("Implemente el método on_update.")
-    
+        """Hace funcionar todos los controladores de la entidad.
+        """
+        for func in self.__controllers.itervalues():
+            # Le damos la propia entidad a cada controlador.
+            # Por que en realidad cada controlador sabe qué
+            # propiedad acceder y manipular. Y a nosotros eso
+            # no nos deberia importar!
+            func(self)
+
     def on_draw(self):
         "Dibuja al sprite"
         self.__animate() # Es correcto colocar la llamada al metodo acá?
-        
+
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
-        
+
         La posicion es relativa a las dimensiones del sprite.
         util para definir pequeñas areas del sprite que el desarrollador
         quizas desee saber si chocan o interactuan con elementos del juego.
@@ -246,17 +244,16 @@ class AbstractSprite:
                     # se encuentre el sprite
                     self.__spritedata["rectangles"][str(name)] = sfml.Rectangle(
                         self.position, size)
-                    
-                    
+
     def delrectangle(self, name):
         """ Remueve un rectanguo del sprite.
         """
         if self.__spritedata["rectangles"].has_key(str(name)):
             del(self.__spritedata["rectangles"][str(name)])
-            
+
     def _moverectangles(self, offset):
         """ Mueve todos los rectangulos del sprite.
-        
+
         Este metodo deberia de usarse unicamente si
         el sprite a cambiado su posicion.
         """
@@ -264,45 +261,16 @@ class AbstractSprite:
         for rect in self.__spritedata["rectangles"]:
             # FIXME: Actualmente esto no sirve así como esta...
             self.__spritedata["rectangles"][rect].position += (offset, offset)
-            
+
     def __distance(self, sprite):
         """ Calcula la distancia entre dos pares de puntos.
         """
         return float(sqrt((sprite.position.x - self.sprite.position.x) ** 2 - \
                               (sprite.position.y - self.sprite.position.y) ** 2))
-    
-    def isnear(self, sprite):
-        """ Retorna la distancia entre un sprite y otro.
-        """
-        distance = self.__distance()
-        if distance <= self.__detectnearat:
-            return distance
-        else:
-            return False
-        
-    def setnear(self, distance):
-        """ Asigna la distancia maxima de busqueda.
-        """
-        self.__detectnearat = float(distance)
-        
-    def getnear(self):
-        """ Retorna la distancia maxima de busqueda.
-        """
-        return self.__detectnearat
-    
-    def setproperty(self, name, value):
-        """ Asigna una propiedad al sprite.
-        """
-        self.__property[str(name)] = value
-        
-    def getproperty(self, name):
-        """ Retorna el valor de una propiedad asignado al sprite
-        """
-        return self.__property[str(name)]
-    
+
     def setstate(self, state):
         """cambia el estado del sprite.
-        
+
         Con estado, nos referimos a una maquina de estados finito.
         esta técnica es muy útil para definir ciertos comportamientos
         para nuestro Sprite
@@ -314,14 +282,13 @@ class AbstractSprite:
                 self.__machinestate = 0
         else:
             raise TypeError, "se esperaba un tipo int, recibido %s" % \
-                type(state) 
-        
+                type(state)
+
     def getstate(self):
         """retorna el estado del sprite.
-        
+
         Con estado, nos referimos a una maquina de estados finito.
         esta técnica es muy útil para definir ciertos comportamientos
         para nuestro Sprite
         """
         return self.__machinestate
-    
