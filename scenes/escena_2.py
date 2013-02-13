@@ -15,21 +15,17 @@ class Maitest(AbstractScene):
         maitext = media.loadimg("sprites/others/Mai Shiranui "
                                      "basic spritesheet.png", False)
         mai = Entity("mai", maitext, self.scenemanager.window,
-                     "sprites/others/Mai Shiranui basic spritesheet.json")
+                     "sprites/others/Mai Shiranui basic spritesheet.json", None)
         mai.sprite.origin = sfml.Vector2(171 / 2.0, 155 / 2.0)
         mai.setstate(0)
         screensize = common.settings.getscreensize()
         newposition = (screensize[0] / 2, screensize[1] / 1.5)
         mai.sprite.position = newposition
-        self.__sprite = [mai]
+        self.addsprite(mai)
         
     def on_event(self, event):
         if isinstance(event, sfml.MouseWheelEvent):
-            actual = self.__sprite[0].getstate()
-            if event.delta <= 0.0:
-                self.__sprite[0].setstate(actual - 1)
-            else:
-                self.__sprite[0].setstate(actual + 1)
+            pass
                 
     def on_update(self):
         # escalamos a Mai si fuera necesario
@@ -37,8 +33,8 @@ class Maitest(AbstractScene):
         pass
     
     def on_draw(self, window):
-        self.sprites = self.__sprite
         window.draw(self)
         
     def __str__(self):
         return "Escena donde se prueba la animacion de sprites."    
+    

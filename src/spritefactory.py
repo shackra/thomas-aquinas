@@ -204,7 +204,7 @@ class Entity:
         if texture_rectangle:
             self.sprite.texture_rectangle = texture_rectangle
 
-    def on_update(self):
+    def on_update(self, event):
         """Hace funcionar todos los controladores de la entidad.
         """
         for func in self.__controllers.itervalues():
@@ -212,12 +212,12 @@ class Entity:
             # Por que en realidad cada controlador sabe qué
             # propiedad acceder y manipular. Y a nosotros eso
             # no nos deberia importar!
-            func(self)
+            func(self, event)
 
     def on_draw(self):
         "Dibuja al sprite"
         self.__animate() # Es correcto colocar la llamada al metodo acá?
-
+        
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
 
@@ -280,6 +280,8 @@ class Entity:
                 self.__machinestate = state
             else:
                 self.__machinestate = 0
+
+            self.__animate()
         else:
             raise TypeError, "se esperaba un tipo int, recibido %s" % \
                 type(state)
