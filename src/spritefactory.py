@@ -83,7 +83,7 @@ class Entity:
         """ Agrega un controlador para la entidad.
         """
         self.__controllers[func.func_name] = func
-
+        
     def delcontroller(self, funcname):
         """ Borra un controlador para la entidad.
         """

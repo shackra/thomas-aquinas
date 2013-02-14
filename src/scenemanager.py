@@ -58,7 +58,7 @@ class Director:
         self.__globalvariables = {}
         self.__camera = customView()
         # Reiniciamos la cámara al tamaño de la pantalla.
-        self.__camera.reset(sfml.Rectangle((0, 0), 
+        self.__camera.reset(sfml.Rectangle((0, 0),
                                            common.settings.getscreensize()))
         
         # Iniciamos algunas variables globales
@@ -158,13 +158,13 @@ class Director:
                 #self.__widgetmanager.on_event(event)
                 
             # actualizamos la escena
-            try:
-                self.__actualscene.on_update()
-            except AttributeError as e:
-                raise TAAttrIsNotScene, ("Sucedió un error en "
-                                         "alguna parte del bucle:"
-                                         " {0}".format(e))
-            
+            # try:
+            #     self.__actualscene.on_update(event)
+            # except AttributeError as e:
+            #     raise TAAttrIsNotScene, ("Sucedió un error en "
+            #                              "alguna parte del bucle:"
+            #                              " {0}".format(e))
+                
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
             try:
