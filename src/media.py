@@ -38,20 +38,20 @@ def loadmedia(mediafile, mediatype=None, toram=True):
     Si dicho argumento esta en None, la función tratara de cargar el audio-
     visual de forma automática (no recomendado para archivos de sonido y/o
     musicales. Por defecto tratara de devolver un objeto de sonido).
-
+    
     'toram' nos indica si debemos cargar los archivos de imagen a la memoria
     RAM o a la memoria de la tarjeta de vídeo. Si es True, cargara a la RAM"""
-
+    
     logging.info("Buscando por el audiovisual {0}".format(mediafile))
     extension = os.path.splitext(mediafile)[-1]
     logging.debug("Extensión del audiovisual: {0}".format(extension))
-
+    
     if extension in [".bmp", ".png", ".tga", ".jpg",
                      ".gif", ".psd", ".hdr", ".pic"]:
         logging.debug("El archivo {0} es un"
                       " archivo de imagen".format(mediafile))
         return loadimg(mediafile, toram)
-
+    
     elif extension in [".ogg", ".oga", ".mp3", ".flac", ".wav"]:
         logging.debug("El archivo {0} es un"
                       " archivo de audio".format(mediafile))
@@ -63,26 +63,26 @@ def loadmedia(mediafile, mediatype=None, toram=True):
         raise TAUnknownFileFormatException, ("formato de archivo "
                                              "{0} desconocido".format(
                                                  extension))
-
+    
 def loadsong(mediafile):
     """ Retorna un objeto SFML para la música dado un archivo.
     """
     mediapath = common.settings.fromrootfolderget(mediafile)
     try:
-        sfmlobject = sfml.Music.open_from_file(mediapath)
+        sfmlobject = sfml.Music.from_file(mediapath)
         logging.info("Cargado el archivo de musica {0}".format(mediapath))
         return sfmlobject
     except IOError:
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
         raise
-
+    
 def loadsound(mediafile):
     """ Retorna un objeto SFML para el sonido dado un archivo.
     """
     mediapath = common.settings.fromrootfolderget(mediafile)
     try:
-        soundbuffer = sfml.SoundBuffer.load_from_file(mediapath)
+        soundbuffer = sfml.SoundBuffer.from_file(mediapath)
         sfmlobject = sfml.Sound(soundbuffer)
         logging.info("Cargado el archivo de sonido {0}".format(mediapath))
         return sfmlobject
@@ -90,20 +90,20 @@ def loadsound(mediafile):
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
         raise
-        
+    
 def loadimg(mediafile, toram=True):
     """ Retorna un objeto imagen SFML dado un archivo.
     """
     mediapath = common.settings.fromrootfolderget(mediafile)
     try:
-        img = sfml.Image.load_from_file(mediapath)
+        img = sfml.Image.from_file(mediapath)
         if toram:
             logging.info("Cargado el archivo de imagen {0}".format(mediapath))
             return img
         else:
             logging.info("Cargado el archivo de imagen a"
                          " memoria de vídeo {0}".format(mediapath))
-            return sfml.Texture.load_from_image(img)
+            return sfml.Texture.from_image(img)
     except IOError:
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))

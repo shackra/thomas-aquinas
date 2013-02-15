@@ -33,43 +33,55 @@ class TATileImageException(Exception): pass
 
 class AbstractScene(sfml.Drawable):
     """Escena abstracta del juego.
-    
+
     Las escenas representan partes visibles del juego, ya sea una
     pantalla de introduccion, creditos, o un campo de batalla.
-    
+
     Para poder hacer escenas funcionales, debe derivar de esta clase
     cualquier escena que necesite.
+
+    Esta clase usa Super para inicializar a sfml.Drawable. Use super
+    en sus subclases!
+    """
     
-    def __init__(self):
-        # self.scenemanager = scenemanager
+    def __init__(self, scenemanager):
+        sfml.Drawable.__init__(self)
+        self.scenemanager = scenemanager
+        self.__vertexarraylist = []
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
-        pass
+
+    def updatesprites(self, event):
+        """ Se actualiza el estado de todos los sprites.
         
-    def on_update(self):
-        "El manejador de escenas llamara este metodo para actualizar la logica."
-        raise NotImplemented("Implemente el metodo on_update.")
+        Aqui se actualizara todaas las entidades pertenecientes a la escena.
+        Cada una recibe el mismo evento sacado de windw.events para hacer
+        algo con su controlador que quizas quiera algo más que las propiedades
+        de la entidad.
+        """
+        for entity in chain.from_iterable(self.sprites):
+            entity.on_update(event)
 
     def on_event(self, event):
         "El manejador de escenas llamara este metodo cuando aya eventos."
         raise NotImplemented("Implemente el metodo on_event.")
-    
-    def on_draw(self, window):
-        "El manejador de escenas llamara este metodo para dibujar la escena."
+
+    def on_draw(self):
+        "El manejador de escenas llamara este metodo cuando aya que dibujar algo."
         raise NotImplemented("Implemente el metodo on_draw.")
-    
-    def loadmap(self, mapfilepath):
+
+    def loadmap(self, mapfilepath=None):
         """Carga el mapa de la respectiva escena.
-        
-        No es necesario reimplementar éste metodo.
+
+        No es necesario reimplementar éste método.
         Todos los archivos de mapa a leer deben ser en
         formato tmx, del software Tiled Map Editor
         http://www.mapeditor.org/"""
         if mapfilepath:
             self.__tmxmapfile = common.settings.joinpaths(
                 common.settings.getrootfolder(),
-                "maps", mapfilepath)
+                                            "maps", mapfilepath)
             self.tmxmapdata = tmxloader.load_tmx(self.__tmxmapfile)
             
             heightlist = []
@@ -498,7 +510,7 @@ class AbstractScene(sfml.Drawable):
         """Retorna la altura del mapa en baldosas.
         """
         return self.getmaptilesize()[1]
-    
+
     def __str__(self):
         "Util para darle un nombre a tu escena."
         raise NotImplemented("Implemente el metodo __str__")
