@@ -27,7 +27,7 @@
  <tileset firstgid="2049" name="obj_misk_atlas" tilewidth="32" tileheight="32">
   <image source="../tilesets/obj_misk_atlas.png" width="1024" height="1024"/>
  </tileset>
- <layer name="Capa de patrones 2" width="50" height="50">
+ <layer name="piso inferior" width="50" height="50">
   <data>
    <tile gid="805"/>
    <tile gid="801"/>
@@ -2531,7 +2531,7 @@
    <tile gid="801"/>
   </data>
  </layer>
- <layer name="Capa de patrones 2" width="50" height="50">
+ <layer name="piso superior" width="50" height="50">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -5035,7 +5035,10 @@
    <tile gid="0"/>
   </data>
  </layer>
- <objectgroup name="Capa de Objetos 1" width="50" height="50">
+ <objectgroup name="objetos del mapa" width="50" height="50">
+  <properties>
+   <property name="drawbefore" value="piso superior"/>
+  </properties>
   <object gid="399" x="384" y="256"/>
   <object gid="431" x="384" y="288"/>
   <object gid="463" x="384" y="320">
@@ -5101,8 +5104,60 @@
   <object gid="1024" x="672" y="224"/>
   <object gid="960" x="672" y="160"/>
   <object gid="928" x="672" y="128"/>
-  <object gid="958" x="608" y="160"/>
-  <object gid="926" x="608" y="128"/>
   <object gid="959" x="640" y="160"/>
+  <object type="spawn point" x="480" y="448" width="32" height="32">
+   <ellipse/>
+  </object>
+  <object gid="399" x="384" y="256"/>
+  <object gid="402" x="480" y="320"/>
+  <object gid="1023" x="352" y="256">
+   <properties>
+    <property name="solid" value="True"/>
+   </properties>
+  </object>
+  <object gid="1022" x="320" y="256"/>
+  <object gid="991" x="352" y="224"/>
+  <object gid="990" x="320" y="224"/>
+  <object gid="992" x="384" y="224"/>
+  <object gid="958" x="320" y="192"/>
+  <object gid="959" x="352" y="192"/>
+  <object gid="960" x="384" y="192"/>
+  <object gid="926" x="320" y="160"/>
+  <object gid="927" x="352" y="160"/>
+  <object gid="928" x="384" y="160"/>
+  <object gid="991" x="192" y="352"/>
+  <object gid="927" x="192" y="288"/>
+  <object gid="990" x="160" y="352"/>
+  <object gid="1022" x="160" y="384"/>
+  <object gid="992" x="224" y="352"/>
+  <object gid="1023" x="192" y="384">
+   <properties>
+    <property name="solid" value="True"/>
+   </properties>
+  </object>
+  <object gid="1024" x="224" y="384"/>
+  <object gid="960" x="224" y="320"/>
+  <object gid="928" x="224" y="288"/>
+  <object gid="958" x="160" y="320"/>
+  <object gid="926" x="160" y="288"/>
+  <object gid="959" x="192" y="320"/>
+  <object gid="991" x="576" y="160"/>
+  <object gid="927" x="576" y="96"/>
+  <object gid="990" x="544" y="160"/>
+  <object gid="1022" x="544" y="192"/>
+  <object gid="1023" x="576" y="192">
+   <properties>
+    <property name="solid" value="True"/>
+   </properties>
+  </object>
+  <object gid="1024" x="608" y="192"/>
+  <object gid="928" x="608" y="96"/>
+  <object gid="958" x="544" y="128"/>
+  <object gid="926" x="544" y="96"/>
+  <object gid="959" x="576" y="128"/>
+  <object gid="960" x="608" y="128"/>
+  <object gid="992" x="608" y="160"/>
+  <object gid="926" x="608" y="128"/>
+  <object gid="958" x="608" y="160"/>
  </objectgroup>
 </map>

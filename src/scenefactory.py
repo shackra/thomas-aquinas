@@ -17,13 +17,14 @@
 #                       veni, Sancte Spiritus.
 
 import logging
+from src.spritefactory import Entity
 from thirdparty.pytmx import tmxloader
-from itertools import product, chain, izip_longest, cycle
+from itertools import product, chain, izip_longest
 import common
 import media
 import sfml
 import os
-from copy import copy
+
 
 class TATileImageException(Exception): pass
 
@@ -86,13 +87,32 @@ class AbstractScene(sfml.Drawable):
             heightlist = []
             widthlist = []
             tilesets = []
-            
+
+            # estos vertexarray llevaran los vertices visibles unicamente,
+            # por capa.
+            self.__vertexarraytodraw = []
+            for i in xrange(0, len(self.tmxmapdata.tilelayers)):
+                self.__vertexarraytodraw.append(
+                    sfml.VertexArray(sfml.PrimitiveType.QUADS))
+            # Agregamos una lista de listas vacias para colocar a los sprites
+            # cada lista vacia representa una capa del scenario.            
+            self.sprites = []
+            for i in xrange(0, len(self.tmxmapdata.tilelayers)):
+                self.sprites.append([])
+
             logging.info("Cargando las baldosas del escenario...")
             # carga todas las baldosas del set de baldosas
             # basado en el código escrito por bitcraft, del proyecto
             # pytmx. Revisar el método load_images_pygame del archivo
             # pytmx/tmxloader.py. fragmento de código bajo LGPL 3.
             self.tmxmapdata.images = [0] * self.tmxmapdata.maxgid
+            self.tmxmapdata.objectgids = [0] * self.tmxmapdata.maxgid
+
+            objgid = [obj.gid for obj in self.tmxmapdata.getObjects()]
+            for gid in objgid:
+                while objgid.count(gid) > 1:
+                    objgid.remove(gid)
+            objgid.remove(0)
             
             for firstgid, tile in sorted((tile.firstgid, tile) for tile in \
                                       self.tmxmapdata.tilesets):
@@ -129,17 +149,23 @@ class AbstractScene(sfml.Drawable):
                 
                 for (y, x) in p:
                     real_gid += 1
-                    # Puede que el llamado a ese metodo devuelva una tupla
-                    # Sólo Dios sabe porqué...
+                    # este GID es usado en alguna parte del escenario?
                     gids = self.tmxmapdata.mapGID(real_gid)
-                    if gids == []: continue
-                    
-                    # Esta operacion puede ser algo lenta...
-                    # creamos una textura (imagen en memoria de vídeo)
-                    # a partir de una imagen cargada de acuerdo a ciertas
-                    # coordenadas. En esté caso, "extraeremos" una baldosa
-                    # del set de imágenes de baldosas del respectivo mapa.
-                    
+                    if real_gid in objgid:
+                        # Este GID pertenece a un objeto que sera dibujado
+                        # dentro del escenario.
+                        texpos = sfml.Vector2(float(x), float(y + totalheight))
+                        texsize = sfml.Vector2(tile_size[0], tile_size[1])
+                        objimgrect = sfml.Rectangle(texpos, texsize)
+                        # sfml.Rectangle(
+                        #     (x, y + totalheight),
+                        #     (tile_size[0],
+                        #      totalheight + tile_size[1]))
+                        # almacenamos el rectangulo del objeto
+                        self.tmxmapdata.objectgids[real_gid] = objimgrect
+                    if gids == []: continue # Este GID no se usa para nada.
+
+                    # Este GID se usa como baldosa para el mapa
                     # se usan cuatro Vertexs, uno como cada esquina de un plano
                     # orden de coordenadas: X, Y
                     v1 = sfml.Vertex((0, 0), None, sfml.Vector2(
@@ -180,16 +206,8 @@ class AbstractScene(sfml.Drawable):
                 
             # Finalmente, creamos la textura con todos los tilesets
             self.scenetileset = sfml.Texture.from_image(alltilesimg)
-            # estos vertexarray llevaran los vertices visibles unicamente,
-            # por capa.
-            self.__vertexarraytodraw = [
-                sfml.VertexArray(sfml.PrimitiveType.QUADS),] * len(
-                self.tmxmapdata.tilelayers)
-            # Agregamos una lista de listas vacias para colocar a los sprites
-            # cada lista vacia representa una capa del scenario.            
-            self.sprites = []
-            for i in xrange(0, len(self.tmxmapdata.tilelayers)):
-                self.sprites.append([])
+                        # CARGAMOS LOS OBJETOS DEL MAPA
+            self.__loadsceneobjects()
             # POSICONANDO LOS TILES #
             self.__posvertexs()
             # PREPARANDO SOLAMENTE LOS TILES VISIBLES #
@@ -198,6 +216,53 @@ class AbstractScene(sfml.Drawable):
         else:
             self.__tmxmapfile = None
             self.sprites = [[]]
+
+    def __loadsceneobjects(self):
+        """ Carga todos los objetos del escenario comos sprites.
+
+        No tengo ni la menor idea sobre como identificar en qué capa
+        estaban estos objetos... sencillamente pytmx no nos puede decir!
+
+        Una posible solucion es buscar por una propiedad en una capa de
+        patrones y poner todos los sprites al nivel de esa capa para que se
+        dibujen **despues** de la capa de patrones.
+
+        Este metodo debe ser llamado despues de haber cargado las balsodas
+        ya que necesitamos los gid de cada una de ellas para armar nuestro
+        objeto.
+        """
+        ## Cada grupo de objetos contiene la propiedad 'drawbefore'
+        ## cuyo valor es el nombre de la capa de patrones.
+        # repasamos los grupos de objetos
+        for objectgroup in self.tmxmapdata.objectgroups:
+            layerindex = -1
+            if hasattr(objectgroup, "drawbefore"):
+                # Recuperamos la capa con ese nombre
+                tilelayer = self.tmxmapdata.getTileLayerByName(
+                    objectgroup.drawbefore)
+                # miramos en qué indice esta la capa de patrones
+                layerindex = self.tmxmapdata.tilelayers.index(tilelayer)
+                tilewidth, tileheight = (self.tmxmapdata.tilewidth,
+                                         self.tmxmapdata.tileheight)
+            # repasamos el grupo de objetos
+            for entity in objectgroup:
+                # todas las entidades cuyo tipo sea None, son objetos del
+                # juego.
+                if not entity.type:
+                    entityimgrect = self.tmxmapdata.objectgids[entity.gid]
+                    entityobj = Entity(
+                        "obj_{0}".format(
+                            len(self.sprites[layerindex]) if not entity.name else entity.name),
+                        self.scenetileset,
+                        self.scenemanager.window,
+                        None,
+                        entityimgrect)
+                    entityobj.sprite.position = sfml.Vector2(entity.x, entity.y)
+                    entityobj.setzindex(layerindex)
+                    # es solida la entidad?
+                    if hasattr(entity, "solid"):
+                        setattr(entityobj, "solid", entity.solid)
+                    self.addsprite(entityobj)
 
     def __refreshvisibletiles(self, currentview):
         """ Revisa cuales baldoas son visibles para el jugador.
@@ -321,7 +386,6 @@ class AbstractScene(sfml.Drawable):
                                      xrange(0, len(array), 4))
                                     for array in
                                     vertexarraylist]
-
         
     def addsprite(self, entity):
         """ Agrega un sprite para ser dibujado en el escenario.

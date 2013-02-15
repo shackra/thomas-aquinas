@@ -63,17 +63,22 @@ class Entity:
         if rectangle and not isinstance(rectangle, sfml.Rectangle):
             rectangle = self.__tupletorect(rectangle)
             self.sprite = sfml.Sprite(texture, rectangle)
+        elif rectangle and isinstance(rectangle, sfml.Rectangle):
+            self.sprite = sfml.Sprite(texture, rectangle)
         else:
             self.sprite = sfml.Sprite(texture)
 
         self.id = id
-        self.clock = sfml.Clock()
-        self.__deltatime = 0
-        self.__machinestate = None
-        self.__actualmachinestate = None
-        self.__actualframe = 0
         self.__window = window
-        self.__spritedata = self.__loadspritedata(spritedatafile)
+        if spritedatafile:
+            self.clock = sfml.Clock()
+            self.__deltatime = 0
+            self.__machinestate = None
+            self.__actualmachinestate = None
+            self.__actualframe = 0
+            self.__spritedata = self.__loadspritedata(spritedatafile)
+        else:
+            self.__spritedata = None
         # mantiene una instancia de itertools.cycle
         self.__actualoop = None
         self.zindex = None
@@ -216,7 +221,8 @@ class Entity:
 
     def on_draw(self):
         "Dibuja al sprite"
-        self.__animate() # Es correcto colocar la llamada al metodo acá?
+        if self.__spritedata:
+            self.__animate() # Es correcto colocar la llamada al metodo acá?
         
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
