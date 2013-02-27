@@ -5053,12 +5053,6 @@
     <property name="solid" value="True"/>
    </properties>
   </object>
-  <object gid="402" x="480" y="320"/>
-  <object gid="434" x="480" y="352">
-   <properties>
-    <property name="solid" value="True"/>
-   </properties>
-  </object>
   <object gid="1023" x="320" y="224">
    <properties>
     <property name="solid" value="True"/>
@@ -5109,7 +5103,6 @@
    <ellipse/>
   </object>
   <object gid="399" x="384" y="256"/>
-  <object gid="402" x="480" y="320"/>
   <object gid="1023" x="352" y="256">
    <properties>
     <property name="solid" value="True"/>
@@ -5159,5 +5152,11 @@
   <object gid="992" x="608" y="160"/>
   <object gid="926" x="608" y="128"/>
   <object gid="958" x="608" y="160"/>
+  <object gid="2384" x="480" y="320"/>
+  <object gid="2416" x="480" y="352">
+   <properties>
+    <property name="solid" value="True"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

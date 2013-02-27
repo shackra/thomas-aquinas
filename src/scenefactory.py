@@ -213,7 +213,7 @@ class AbstractScene(sfml.Drawable):
 
             # Finalmente, creamos la textura con todos los tilesets
             self.scenetileset = sfml.Texture.from_image(alltilesimg)
-                        # CARGAMOS LOS OBJETOS DEL MAPA
+            # CARGAMOS LOS OBJETOS DEL MAPA
             self.__loadsceneobjects()
             # POSICIONANDO LOS TILES #
             self.__posvertexs()
