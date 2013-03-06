@@ -16,7 +16,7 @@ class Helloworld(AbstractScene):
         doll.setstate(0)
         doll.addcontroller(move)
         doll.zindex = 1
-        doll.sprite.origin = (0, 75)
+        #doll.sprite.origin = (0, 75)
         self.addsprite(doll)
         
     def on_event(self, event):

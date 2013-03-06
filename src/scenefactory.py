@@ -101,15 +101,6 @@ class AbstractScene(sfml.Drawable):
             for i in xrange(0, len(self.tmxmapdata.tilelayers)):
                 self.sprites.append([])
 
-            objgid = []
-            for gid in self.tmxmapdata.getObjects():
-                # registramos el GID real.
-                rgid = self.tmxmapdata.registerGID(gid.gid)
-                if rgid not in objgid and rgid != 0:
-                    # el GID retornado es el GID usado internamente por pytmx
-                    objgid.append(rgid)
-            logging.info("GIDs de objetos: {0}".format(objgid))
-
             logging.info("Cargando las baldosas del escenario...")
             # carga todas las baldosas del set de baldosas
             # basado en el código escrito por bitcraft, del proyecto
@@ -155,47 +146,28 @@ class AbstractScene(sfml.Drawable):
                     real_gid += 1
 
                     gids = self.tmxmapdata.mapGID(real_gid)
-                    quad = None
 
-                    # este GID es usado en alguna parte del escenario?
-                    if gids and gids[0][0] in objgid:
-                        # Este GID pertenece a un objeto que sera dibujado
-                        # dentro del escenario.
-
+                    if gids:
+                        # Este GID pertenece a un objeto o a una baldosa que 
+                        # sera dibujado dentro del escenario.
                         texpos = sfml.Vector2(float(x), float(y + totalheight))
                         texsize = sfml.Vector2(tilewidth, tileheight)
                         quad = sfml.Rectangle(texpos, texsize)
-                        # sfml.Rectangle(
-                        #     (x, y + totalheight),
-                        #     (tilewidth,
-                        #      totalheight + tileheight))
-                    elif gids:
-                        # Este GID pertenece a una baldosa de la capa.
-                        v1 = sfml.Vertex((0, 0), None, sfml.Vector2(
-                                float(x), float(y + totalheight)))
-                        v2 = sfml.Vertex((0, 0), None, sfml.Vector2(
-                                v1.tex_coords.x + tilewidth,
-                                v1.tex_coords.y))
-                        v3 = sfml.Vertex((0, 0), None, sfml.Vector2(
-                                v1.tex_coords.x + tilewidth,
-                                v1.tex_coords.y + tileheight))
-                        v4 = sfml.Vertex((0, 0), None, sfml.Vector2(
-                                v1.tex_coords.x,
-                                v1.tex_coords.y + tileheight))
-                        quad = (v1, v2, v3, v4,)
-
-                    elif gids == []:
+                        # Se almacena el objeto.
+                        for gid, flag in gids:
+                            logging.debug("real_gid: {0}, gid:"
+                                          " {1}, flag: {2}".format(real_gid,
+                                                                   gid, flag))
+                            self.tmxmapdata.images[gid] = quad
+                            logging.info("Rectangulo de {0} "
+                                         "({2}) posicion {1}".format(gid, 
+                                                                     quad, 
+                                                                     real_gid))
+                    elif gids == None:
                         # Este GID no se usa para nada.
                         continue
 
-                    # Se almacena el objeto, sea una tupla de vértices o
-                    # un rectángulo de sfml.
-                    for gid, flag in gids:
-                        logging.debug("real_gid: {0}, gid:"
-                                      " {1}, flag: {2}".format(real_gid,
-                                                               gid, flag))
-                        self.tmxmapdata.images[gid] = quad
-
+            logging.info("Images: {0}".format(len(self.tmxmapdata.images)))
             # Unimos todos los tiles sets en una sola imagen
             ## creamos una imagen del tamaño adecuado
             widthlist.sort()
@@ -257,7 +229,12 @@ class AbstractScene(sfml.Drawable):
                 # juego.
                 if not entity.type:
                     entitygid = self.tmxmapdata.mapGID(entity.gid)
-                    entityimgrect = self.tmxmapdata.images[entitygid[0][0]]
+                    logging.info("Obj con gid: {0} tiene un"
+                                 " mapGID de {1}".format(entity.gid,
+                                                         entitygid))
+                    # FIXME: recuperar el rectangulo de self.tmxmapdata.images
+                    # prueba 1: usar el gid del objeto directamente.
+                    entityimgrect = self.tmxmapdata.images[entity.gid]
                     entityobj = Entity(
                         "obj_{0}".format(
                             len(self.sprites[layerindex]) if not entity.name else entity.name),
@@ -360,8 +337,19 @@ class AbstractScene(sfml.Drawable):
                 # (y * height / 2) - (x * height /2))
 
                 # Desempacamos los Vertexs
-                v1, v2, v3, v4 = quad
+                v1, v2, v3, v4 = (sfml.Vertex(), 
+                                  sfml.Vertex(), 
+                                  sfml.Vertex(), 
+                                  sfml.Vertex())
+
+                # mapeamos correctamente el vertice en la textura
+                v1.tex_coords = (quad.left, quad.top)
+                v2.tex_coords = (quad.right, quad.top)
+                v3.tex_coords = (quad.right, quad.bottom)
+                v4.tex_coords = (quad.left, quad.bottom)
+
                 if self.tmxmapdata.orientation == "isometric":
+                    # posicionamos el vertice con respecto a la pantalla
                     v1.position = sfml.Vector2(
                         float((x * width / 2) + (y * width / 2)),
                         float((y * height / 2) - (y * height / 2)))
@@ -381,6 +369,8 @@ class AbstractScene(sfml.Drawable):
                     v4.position = sfml.Vector2(v1.position.x,
                                                v1.position.y + height)
 
+
+                # agregamos los vertices a su respectivo VertexArray
                 vertexarraylist[layer].append(v1)
                 vertexarraylist[layer].append(v2)
                 vertexarraylist[layer].append(v3)
