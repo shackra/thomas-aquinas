@@ -253,6 +253,11 @@ class Director:
         """Retorna la posicion de la camara.
         """
         return self.__camera.getcenterxy()
+
+    def exitgame(self):
+        """Nos saca del loop del juego
+        """
+        self.__exitgame = True
     
 class customView(sfml.View):
     """"Clase personalizada para el manejo de una cámara. La inexistencia

@@ -229,12 +229,8 @@ class AbstractScene(sfml.Drawable):
                 # juego.
                 if not entity.type:
                     entitygid = self.tmxmapdata.mapGID(entity.gid)
-                    logging.info("Obj con gid: {0} tiene un"
-                                 " mapGID de {1}".format(entity.gid,
-                                                         entitygid))
-                    # FIXME: recuperar el rectangulo de self.tmxmapdata.images
-                    # prueba 1: usar el gid del objeto directamente.
                     entityimgrect = self.tmxmapdata.images[entity.gid]
+                    logging.debug("Tipo: {0}".format(type(entityimgrect)))
                     entityobj = Entity(
                         "obj_{0}".format(
                             len(self.sprites[layerindex]) if not entity.name else entity.name),
