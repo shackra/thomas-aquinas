@@ -32,26 +32,33 @@ class Scene(AbstractScene):
         
     def on_draw(self, window):
         window.draw(self)
+        self.timelapsed += self.clock.restart().milliseconds
+        if self.timelapsed >= 3000.0:
+            self.scenemanager.exitgame()
 
     def on_event(self, event):
-        self.timelapsed += self.clock.restart().milliseconds
-        if self.timelapsed >= 3.0:
-            self.scenemanager.exitgame()
+        pass
+    
+    def __str__(self):
+        return "<Scene: Vacia>"
 
 class TestOpenwindow:
     @classmethod
     def setup_class(cls):
         print ("Configurando la prueba...")
-        self.director = Director()
-        self.scene = Scene(self.director)
+        global director
+        global scene
+        director = Director()
+        scene = Scene(director)
 
     @classmethod
     def teardown_class(cls):
         print ("Limpiando la configuracion de la prueba")
-        del(self.director)
-        del(self.scene)
+        # del(director)
+        # del(scene)
 
+    @nose.tools.timed(4)
     def test_openwindow(self):
-        self.director.changescene(self.scene)
+        director.changescene(scene)
         print ("Una ventana debe abrirse durante tres segundos")
-        self.director.loop()
+        director.loop()

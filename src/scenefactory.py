@@ -447,8 +447,6 @@ class AbstractScene(sfml.Drawable):
         else:
             target.clear(sfml.Color.WHITE)
             self.sprites[-1].sort(key=lambda entity: entity.sprite.position.y)
-            logging.debug("Dibujando {0} entidad(s)".format(
-                    len(drawable)))
             for entity in self.sprites[-1]:
                 entity.on_draw()
                 target.draw(entity.sprite, states)
