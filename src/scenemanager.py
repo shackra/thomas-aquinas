@@ -21,7 +21,7 @@ import common
 import sfml
 import media
 import scenefactory
-from src.thirdparty.pytweener import pytweener
+from thirdparty.pytweener import pytweener
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
