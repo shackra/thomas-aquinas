@@ -8,3 +8,4 @@ syntax: glob
 src/scenes/*
 cover*
 .coverage
+*.orig
