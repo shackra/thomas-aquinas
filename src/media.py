@@ -19,14 +19,10 @@
 import os
 import logging
 import common
+import sfml
 
 class TAUnknownFileFormatException(Exception): pass
 
-try:
-    import sfml
-except ImportError:
-    logging.fatal("No se puede importar SFML, no existe en el sistema")
-    raise
 
 def loadmedia(mediafile, mediatype=None, toram=True):
     """ Retorna un objeto SFML.
