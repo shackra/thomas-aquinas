@@ -172,7 +172,7 @@ object:     name, type, x, y, width, height, gid, properties, polygon,
 
 Please see the TiledMap class for more api information.
 """
-from pygame import Surface, mask, RLEACCEL
+#from pygame import Surface, mask, RLEACCEL
 from utils import types
 from constants import *
 
@@ -186,165 +186,165 @@ def load_tmx(filename, *args, **kwargs):
     return tiledmap
 
 
+# I don't need these lines of code.
+# def pygame_convert(original, colorkey, force_colorkey, pixelalpha):
+#     """
+#     this method does several tests on a surface to determine the optimal
+#     flags and pixel format for each tile.
 
-def pygame_convert(original, colorkey, force_colorkey, pixelalpha):
-    """
-    this method does several tests on a surface to determine the optimal
-    flags and pixel format for each tile.
+#     this is done for the best rendering speeds and removes the need to
+#     convert() the images on your own
 
-    this is done for the best rendering speeds and removes the need to
-    convert() the images on your own
+#     original is a surface and MUST NOT HAVE AN ALPHA CHANNEL
+#     """
 
-    original is a surface and MUST NOT HAVE AN ALPHA CHANNEL
-    """
+#     tile_size = original.get_size()
 
-    tile_size = original.get_size()
+#     # count the number of pixels in the tile that are not transparent
+#     px = mask.from_surface(original).count()
 
-    # count the number of pixels in the tile that are not transparent
-    px = mask.from_surface(original).count()
+#     # there are no transparent pixels in the image
+#     if px == tile_size[0] * tile_size[1]:
+#         tile = original.convert()
 
-    # there are no transparent pixels in the image
-    if px == tile_size[0] * tile_size[1]:
-        tile = original.convert()
+#     # there are transparent pixels, and set to force a colorkey
+#     elif force_colorkey:
+#         tile = Surface(tile_size)
+#         tile.fill(force_colorkey)
+#         tile.blit(original, (0,0))
+#         tile.set_colorkey(force_colorkey, RLEACCEL)
 
-    # there are transparent pixels, and set to force a colorkey
-    elif force_colorkey:
-        tile = Surface(tile_size)
-        tile.fill(force_colorkey)
-        tile.blit(original, (0,0))
-        tile.set_colorkey(force_colorkey, RLEACCEL)
+#     # there are transparent pixels, and tiled set a colorkey
+#     elif colorkey:
+#         tile = original.convert()
+#         tile.set_colorkey(colorkey, RLEACCEL)
 
-    # there are transparent pixels, and tiled set a colorkey
-    elif colorkey:
-        tile = original.convert()
-        tile.set_colorkey(colorkey, RLEACCEL)
+#     # there are transparent pixels, and set for perpixel alpha
+#     elif pixelalpha:
+#         tile = original.convert_alpha()
 
-    # there are transparent pixels, and set for perpixel alpha
-    elif pixelalpha:
-        tile = original.convert_alpha()
+#     # there are transparent pixels, and we won't handle them
+#     else:
+#         tile = original.convert()
 
-    # there are transparent pixels, and we won't handle them
-    else:
-        tile = original.convert()
-
-    return tile
-
-
-def load_images_pygame(tmxdata, mapping, *args, **kwargs):
-    """
-    due to the way the tiles are loaded, they will be in the same pixel format
-    as the display when it is loaded.  take this into consideration if you
-    intend to support different screen pixel formats.
-
-    by default, the images will not have per-pixel alphas.  this can be
-    changed by including "pixelalpha=True" in the keywords.  this will result
-    in much slower blitting speeds.
-
-    if the tileset's image has colorkey transparency set in Tiled, the loader
-    will return images that have their transparency already set.  using a
-    tileset with colorkey transparency will greatly increase the speed of
-    rendering the map.
-
-    optionally, you can force the loader to strip the alpha channel of the
-    tileset image and to fill in the missing areas with a color, then use that
-    new color as a colorkey.  the resulting tiles will render much faster, but
-    will not preserve the transparency of the tile if it uses partial
-    transparency (which you shouldn't be doing anyway, this is SDL).
+#     return tile
 
 
-    TL;DR:
-    Don't attempt to convert() or convert_alpha() the individual tiles.  It is
-    already done for you.
+# def load_images_pygame(tmxdata, mapping, *args, **kwargs):
+#     """
+#     due to the way the tiles are loaded, they will be in the same pixel format
+#     as the display when it is loaded.  take this into consideration if you
+#     intend to support different screen pixel formats.
 
-    """
-    from itertools import product
-    from pygame import Surface
-    import pygame, os
+#     by default, the images will not have per-pixel alphas.  this can be
+#     changed by including "pixelalpha=True" in the keywords.  this will result
+#     in much slower blitting speeds.
 
+#     if the tileset's image has colorkey transparency set in Tiled, the loader
+#     will return images that have their transparency already set.  using a
+#     tileset with colorkey transparency will greatly increase the speed of
+#     rendering the map.
 
-    def handle_transformation(tile, flags):
-        if flags:
-            fx = flags & TRANS_FLIPX == TRANS_FLIPX
-            fy = flags & TRANS_FLIPY == TRANS_FLIPY
-            r  = flags & TRANS_ROT == TRANS_ROT
-
-            if r:
-                # not sure why the flip is required...but it is.
-                newtile = pygame.transform.rotate(tile, 270)
-                newtile = pygame.transform.flip(newtile, 1, 0)
-
-                if fx or fy:
-                    newtile = pygame.transform.flip(newtile, fx, fy)
-
-            elif fx or fy:
-                newtile = pygame.transform.flip(tile, fx, fy)
-
-            # preserve any flags that may have been lost after the transformation
-            return newtile
-            #return newtile.convert(tile)
-
-        else:
-            return tile
+#     optionally, you can force the loader to strip the alpha channel of the
+#     tileset image and to fill in the missing areas with a color, then use that
+#     new color as a colorkey.  the resulting tiles will render much faster, but
+#     will not preserve the transparency of the tile if it uses partial
+#     transparency (which you shouldn't be doing anyway, this is SDL).
 
 
-    pixelalpha     = kwargs.get("pixelalpha", False)
-    force_colorkey = kwargs.get("force_colorkey", False)
-    force_bitdepth = kwargs.get("depth", False)
+#     TL;DR:
+#     Don't attempt to convert() or convert_alpha() the individual tiles.  It is
+#     already done for you.
 
-    if force_colorkey:
-        try:
-            force_colorkey = pygame.Color(*force_colorkey)
-        except:
-            msg = "Cannot understand color: {0}"
-            raise Exception, msg.format(force_colorkey)
-
-    tmxdata.images = [0] * tmxdata.maxgid
-
-    for firstgid, t in sorted((t.firstgid, t) for t in tmxdata.tilesets):
-        path = os.path.join(os.path.dirname(tmxdata.filename), t.source)
-
-        image = pygame.image.load(path)
-
-        w, h = image.get_size()
-        tile_size = (t.tilewidth, t.tileheight)
-        real_gid = t.firstgid - 1
-
-        colorkey = None
-        if t.trans:
-            colorkey = pygame.Color("#{0}".format(t.trans))
-
-        # i dont agree with margins and spacing, but i'll support it anyway
-        # such is life.  okay.jpg
-        tilewidth = t.tilewidth + t.spacing
-        tileheight = t.tileheight + t.spacing
-
-        # some tileset images may be slightly larger than the tile area
-        # ie: may include a banner, copyright, ect.  this compensates for that
-        width = ((int((w-t.margin*2) + t.spacing) / tilewidth) * tilewidth) - t.spacing
-        height = ((int((h-t.margin*2) + t.spacing) / tileheight) * tileheight) - t.spacing
-
-        # using product avoids the overhead of nested loops
-        p = product(xrange(t.margin, height+t.margin, tileheight),
-                    xrange(t.margin, width+t.margin, tilewidth))
-
-        for (y, x) in p:
-            real_gid += 1
-            gids = tmxdata.mapGID(real_gid)
-            if gids == []: continue
-
-            original = image.subsurface(((x,y), tile_size))
-
-            for gid, flags in gids:
-                tile = handle_transformation(original, flags)
-                tile = pygame_convert(tile, colorkey, force_colorkey, pixelalpha)
-                tmxdata.images[gid] = tile
+#     """
+#     from itertools import product
+#     from pygame import Surface
+#     import pygame, os
 
 
-def load_pygame(filename, *args, **kwargs):
-    tmxdata = load_tmx(filename, *args, **kwargs)
-    load_images_pygame(tmxdata, None, *args, **kwargs)
+#     def handle_transformation(tile, flags):
+#         if flags:
+#             fx = flags & TRANS_FLIPX == TRANS_FLIPX
+#             fy = flags & TRANS_FLIPY == TRANS_FLIPY
+#             r  = flags & TRANS_ROT == TRANS_ROT
 
-    return tmxdata
+#             if r:
+#                 # not sure why the flip is required...but it is.
+#                 newtile = pygame.transform.rotate(tile, 270)
+#                 newtile = pygame.transform.flip(newtile, 1, 0)
+
+#                 if fx or fy:
+#                     newtile = pygame.transform.flip(newtile, fx, fy)
+
+#             elif fx or fy:
+#                 newtile = pygame.transform.flip(tile, fx, fy)
+
+#             # preserve any flags that may have been lost after the transformation
+#             return newtile
+#             #return newtile.convert(tile)
+
+#         else:
+#             return tile
+
+
+#     pixelalpha     = kwargs.get("pixelalpha", False)
+#     force_colorkey = kwargs.get("force_colorkey", False)
+#     force_bitdepth = kwargs.get("depth", False)
+
+#     if force_colorkey:
+#         try:
+#             force_colorkey = pygame.Color(*force_colorkey)
+#         except:
+#             msg = "Cannot understand color: {0}"
+#             raise Exception, msg.format(force_colorkey)
+
+#     tmxdata.images = [0] * tmxdata.maxgid
+
+#     for firstgid, t in sorted((t.firstgid, t) for t in tmxdata.tilesets):
+#         path = os.path.join(os.path.dirname(tmxdata.filename), t.source)
+
+#         image = pygame.image.load(path)
+
+#         w, h = image.get_size()
+#         tile_size = (t.tilewidth, t.tileheight)
+#         real_gid = t.firstgid - 1
+
+#         colorkey = None
+#         if t.trans:
+#             colorkey = pygame.Color("#{0}".format(t.trans))
+
+#         # i dont agree with margins and spacing, but i'll support it anyway
+#         # such is life.  okay.jpg
+#         tilewidth = t.tilewidth + t.spacing
+#         tileheight = t.tileheight + t.spacing
+
+#         # some tileset images may be slightly larger than the tile area
+#         # ie: may include a banner, copyright, ect.  this compensates for that
+#         width = ((int((w-t.margin*2) + t.spacing) / tilewidth) * tilewidth) - t.spacing
+#         height = ((int((h-t.margin*2) + t.spacing) / tileheight) * tileheight) - t.spacing
+
+#         # using product avoids the overhead of nested loops
+#         p = product(xrange(t.margin, height+t.margin, tileheight),
+#                     xrange(t.margin, width+t.margin, tilewidth))
+
+#         for (y, x) in p:
+#             real_gid += 1
+#             gids = tmxdata.mapGID(real_gid)
+#             if gids == []: continue
+
+#             original = image.subsurface(((x,y), tile_size))
+
+#             for gid, flags in gids:
+#                 tile = handle_transformation(original, flags)
+#                 tile = pygame_convert(tile, colorkey, force_colorkey, pixelalpha)
+#                 tmxdata.images[gid] = tile
+
+
+# def load_pygame(filename, *args, **kwargs):
+#     tmxdata = load_tmx(filename, *args, **kwargs)
+#     load_images_pygame(tmxdata, None, *args, **kwargs)
+
+#     return tmxdata
 
 
 
