@@ -6,3 +6,6 @@ syntax: glob
 *.pyc
 *.git*
 src/scenes/*
+cover*
+.coverage
+*.orig
