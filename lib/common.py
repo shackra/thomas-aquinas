@@ -172,7 +172,7 @@ class Conf:
         """
         return self.__convertpath(self.__ROOTFOLDER)
     
-    def joinpaths(self, *args, **kwords):
+    def joinpaths(self, *args):
         """ Retorna una dirección de archivo juntando todos los argumentos.
         """
         logging.debug("Se han de unir las siguientes carpetas {0}".format(args))
@@ -342,12 +342,11 @@ class Conf:
         los tipos son:
           · Keyboard & Mouse
           · Joystick"""
-        
-        self.__parsed.set("CONTROLLER", "keyboard_or_joystick", 
-                          str(\
-                              not self.__parsed.getboolean("CONTROLLER", 
-                                                        "keyboard_or_joystick"))
-        )
+
+        actualvalue = self.__parsed.getboolean("CONTROLLER",
+                                               "keyboard_or_joystick")
+        self.__parsed.set("CONTROLLER", "keyboard_or_joystick",
+                          str(int(not actualvalue)))
         
 if __name__ != "__main__":
     # Esta linea a de cambiarse según el proyecto en el que se use el modulo
