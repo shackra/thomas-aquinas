@@ -20,8 +20,8 @@ import nose
 import logging
 import sfml
 
-from src.scenefactory import AbstractScene
-from src.scenemanager import Director
+from lib.scenefactory import AbstractScene
+from lib.scenemanager import Director
 
 class Scene(AbstractScene):
     def __init__(self, scenemanager):

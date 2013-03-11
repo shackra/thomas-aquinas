@@ -17,7 +17,7 @@
 #                       veni, Sancte Spiritus.
 
 import logging
-from src.spritefactory import Entity
+from lib.spritefactory import Entity
 from thirdparty.pytmx import tmxloader
 from itertools import product, chain, izip_longest
 import common

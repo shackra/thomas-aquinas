@@ -19,7 +19,7 @@
 import logging
 import nose
 import sfml
-from src import media
+from lib import media
 
 class TestLoadstuff:
     def test_loadtex(self):
