@@ -94,3 +94,4 @@ class TestCommon:
         common.settings.alternatecontrollertype()
         result = common.settings.usingjoystick()
         ok_(result, "No se cambio el valor")
+        
