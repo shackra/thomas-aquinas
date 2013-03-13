@@ -20,6 +20,7 @@ import logging
 import nose
 from nose.tools import ok_, eq_, raises
 from lib.spritefactory import Entity
+from lib import media
 
 import sfml
 
@@ -28,5 +29,17 @@ class TestEntity:
     def setup_class(cls):
         print ("Creando una ventana SFML")
         global window
-        window = sfml.RenderWindow(sfml.VideoMode((320, 240)),
+        global tex
+        window = sfml.RenderWindow(sfml.VideoMode(320, 240),
                                    "Test_spritefactory")
+        tex = media.loadimg("uniteststuff/test.png", False)
+
+    def test_entitybuild(self):
+        entity = Entity("test", tex, window, None, None)
+        eq_(entity.id, "test")
+        ok_(isinstance(entity.sprite, sfml.Sprite),
+            "La entidad no tiene un objet sprite")
+        ok_(isinstance(entity.clock, sfml.Clock),
+            "La entidad no tiene un objeto clock")
+        eq_(entity.zindex, None)
+        

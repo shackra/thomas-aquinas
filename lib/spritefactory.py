@@ -70,8 +70,8 @@ class Entity:
 
         self.id = id
         self.__window = window
+        self.clock = sfml.Clock()
         if spritedatafile:
-            self.clock = sfml.Clock()
             self.__deltatime = 0
             self.__machinestate = None
             self.__actualmachinestate = None
