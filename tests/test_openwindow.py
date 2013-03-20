@@ -26,7 +26,6 @@ from lib.scenemanager import Director
 class Scene(AbstractScene):
     def __init__(self, scenemanager):
         AbstractScene.__init__(self, scenemanager)
-        self.loadmap() # Cargamos ningun mapa
         self.clock = sfml.Clock()
         self.timelapsed = 0
         
@@ -59,13 +58,16 @@ class TestOpenwindow:
 
     @nose.tools.timed(4)
     def test_openwindow(self):
+        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        scene.loadmapimages()
         director.changescene(scene)
         print ("Una ventana debe abrirse durante tres segundos")
         director.loop()
 
     def test_loadmaptiles(self):
-        scene.loadmaptiles("/uniteststuff/3tilesmap.tmx")
-        eq_(len(scene.tmxdata.images), 3)
+        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        eq_(len(scene.tmxdata.images), 4)
 
     def test_loadmapimages(self):
+        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
         scene.loadmapimages()

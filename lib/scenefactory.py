@@ -71,7 +71,7 @@ class AbstractScene(sfml.Drawable):
         "El manejador de escenas llamara este método cuando aya que dibujar algo."
         raise NotImplemented("Implemente el método on_draw.")
 
-    def loadmaptiles(tmxfile, dontdrawtiles=False):
+    def loadmaptiles(self, tmxfile, dontdrawtiles=False):
         """ Carga los rectangulos de un mapa TMX.
 
         Este metodo SOLAMENTE cargara todos los rectangulos
@@ -95,10 +95,6 @@ class AbstractScene(sfml.Drawable):
         logging.info("Cargando las baldosas del escenerio...")
         for firstgid, tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
-            if not tile.visible:
-                # si la capa no es visible, no hacemos nada
-                # y proseguimos con la siguiente capa
-                continue
 
             # agregamos una lista como capa para los sprites
             self.sprites.append([])
@@ -109,6 +105,7 @@ class AbstractScene(sfml.Drawable):
             realgid = tile.firstgid - 1
             logging.debug("GID del set de baldosas: {0}".format(tile.firstgid))
 
+            w, h = tile.width, tile.height
             tilewidth = tile.tilewidth + tile.spacing
             tileheight = tile.tileheight + tile.spacing
 
@@ -164,7 +161,7 @@ class AbstractScene(sfml.Drawable):
                              " tiene un limite de {0} pixeles".format(
                     maximumsize))
             # TODO: sacarnos del juego.
-
+            
         actualimageheight = 0.0
         # FIXME: no deben tomarse en cuenta sets de baldosas
         # que no sean visibles.
