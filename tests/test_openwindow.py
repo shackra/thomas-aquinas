@@ -62,3 +62,10 @@ class TestOpenwindow:
         director.changescene(scene)
         print ("Una ventana debe abrirse durante tres segundos")
         director.loop()
+
+    def test_loadmaptiles(self):
+        scene.loadmaptiles("/uniteststuff/3tilesmap.tmx")
+        eq_(len(scene.tmxdata.images), 3)
+
+    def test_loadmapimages(self):
+        scene.loadmapimages()
