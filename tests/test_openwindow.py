@@ -17,6 +17,7 @@
 #                       veni, Sancte Spiritus.
 
 import nose
+from nose.tools import eq_, ok_
 import logging
 import sfml
 
@@ -60,14 +61,19 @@ class TestOpenwindow:
     def test_openwindow(self):
         scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
         scene.loadmapimages()
+        scene.posvertexs()
         director.changescene(scene)
         print ("Una ventana debe abrirse durante tres segundos")
         director.loop()
 
     def test_loadmaptiles(self):
         scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
-        eq_(len(scene.tmxdata.images), 4)
+        eq_(len(scene.tmxdata.images), 5)
+        ok_(isinstance(scene.tmxdata.images[0], int), ("El primer valor de la "
+                                                        "lista no es del tipo"
+                                                        " int"))
 
     def test_loadmapimages(self):
         scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
         scene.loadmapimages()
+        

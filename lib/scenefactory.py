@@ -105,17 +105,16 @@ class AbstractScene(sfml.Drawable):
             realgid = tile.firstgid - 1
             logging.debug("GID del set de baldosas: {0}".format(tile.firstgid))
 
-            w, h = tile.width, tile.height
             tilewidth = tile.tilewidth + tile.spacing
             tileheight = tile.tileheight + tile.spacing
 
             # some tileset images may be slightly larger than the tile area
             # ie: may include a banner, copyright, ect.
             # this compensates for that
-            width = ((int((w - tile.margin * 2) + tile.spacing) / tilewidth) \
-                         * tilewidth) - tile.spacing
-            height = ((int((h - tile.margin * 2) + tile.spacing) / tileheight) \
-                          * tileheight) - tile.spacing
+            width = ((int((tile.width - tile.margin * 2) + tile.spacing) /
+                      tilewidth) * tilewidth) - tile.spacing
+            height = ((int((tile.height - tile.margin * 2) + tile.spacing) /
+                       tileheight) * tileheight) - tile.spacing
 
             # using product avoids the overhead of nested loops
             p = product(xrange(tile.margin, height+tile.margin, tileheight),
@@ -123,7 +122,7 @@ class AbstractScene(sfml.Drawable):
 
             for (y, x) in p:
                 realgid += 1
-                gids = self.tmxdata.mapGID(real_gid)
+                gids = self.tmxdata.mapGID(realgid)
 
                 if gids:
                     # Este GID pertenece a un objeto o a una baldosa que
@@ -134,13 +133,13 @@ class AbstractScene(sfml.Drawable):
                     # Se almacena el objeto.
                     for gid, flag in gids:
                         logging.debug("real_gid: {0}, gid:"
-                                      " {1}, flag: {2}".format(real_gid,
+                                      " {1}, flag: {2}".format(realgid,
                                                                gid, flag))
                         self.tmxdata.images[gid] = quad
                         logging.debug("Rectangulo de {0} "
                                      "({2}) posicion {1}".format(gid,
                                                                  quad,
-                                                                 real_gid))
+                                                                 realgid))
                 elif gids == None:
                     # Este GID no se usa para nada.
                     continue
@@ -169,12 +168,8 @@ class AbstractScene(sfml.Drawable):
         imagewidth = sorted(tile.width for tile in self.tmxdata.tilesets)[-1]
         imagetmp = sfml.Image.create(imagewidth, imageheight, sfml.Color.WHITE)
 
-        for tile in sorted(tile.firstgid for tile in self.tmxdata.tilesets):
-            if not tile.visible:
-                # si la capa no es visible, no hacemos nada
-                # y proseguimos con la siguiente capa
-                continue
-
+        for firstgid, tile in sorted((tile.firstgid, tile) 
+                                     for tile in self.tmxdata.tilesets):
             tilefilepath = common.settings.joinpaths(
                 common.settings.getrootfolder(),
                 tile.source[2:]
@@ -292,7 +287,7 @@ class AbstractScene(sfml.Drawable):
                         self.__vertexarraytodraw[arrayindex].append(
                             array[vertex + 3])
 
-    def __posvertexs(self):
+    def posvertexs(self):
         """ Posiciona los vértices y los guarda en la lista de VertexArrays.
 
         Lo ideal es llamar a esta función una vez luego de cargado el mapa.
