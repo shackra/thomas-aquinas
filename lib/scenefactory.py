@@ -160,7 +160,7 @@ class AbstractScene(sfml.Drawable):
                              " tiene un limite de {0} pixeles".format(
                     maximumsize))
             # TODO: sacarnos del juego.
-            
+
         actualimageheight = 0.0
         # FIXME: no deben tomarse en cuenta sets de baldosas
         # que no sean visibles.
@@ -168,7 +168,7 @@ class AbstractScene(sfml.Drawable):
         imagewidth = sorted(tile.width for tile in self.tmxdata.tilesets)[-1]
         imagetmp = sfml.Image.create(imagewidth, imageheight, sfml.Color.WHITE)
 
-        for firstgid, tile in sorted((tile.firstgid, tile) 
+        for firstgid, tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
             tilefilepath = common.settings.joinpaths(
                 common.settings.getrootfolder(),
@@ -182,7 +182,7 @@ class AbstractScene(sfml.Drawable):
         # Finalmente, creamos la textura con todos los tilesets
         self.scenetileset = sfml.Texture.from_image(imagetmp)
 
-    def loadsceneobjects(self):
+    def loadmapobjects(self):
         """ Carga todos los objetos del escenario como sprites.
 
         No tengo ni la menor idea sobre como identificar en qué capa
@@ -192,7 +192,7 @@ class AbstractScene(sfml.Drawable):
         patrones y poner todos los sprites al nivel de esa capa para que se
         dibujen **después** de la capa de patrones.
 
-        Este método debe ser llamado después de haber cargado las balsodas
+        Este método debe ser llamado después de haber cargado las baldosas
         ya que necesitamos los gid de cada una de ellas para armar nuestro
         objeto.
         """

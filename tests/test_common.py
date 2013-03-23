@@ -57,16 +57,17 @@ class TestCommon:
 
     def test_getscreensize(self):
         screensize = common.settings.getscreensize()
-        eq_(screensize, (800, 600))
+        eq_(screensize, (320, 240))
 
     def test_setscreensize(self):
         common.settings.setscreensize((1024, 768))
         newscreensize = common.settings.getscreensize()
         eq_(newscreensize, (1024, 768))
+        common.settings.setscreensize((320, 240))
 
     def test_getscreentitle(self):
         title = common.settings.getscreentitle()
-        eq_(title, "Probando el framework Thomas de Aquino")
+        eq_(title, "Prueba")
 
     def test_setscreentitle(self):
         common.settings.setscreentitle("hola mundo")
@@ -94,4 +95,3 @@ class TestCommon:
         common.settings.alternatecontrollertype()
         result = common.settings.usingjoystick()
         ok_(result, "No se cambio el valor")
-        
