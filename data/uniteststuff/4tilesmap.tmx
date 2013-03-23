@@ -12,10 +12,10 @@
  <layer name="patrones test" width="3" height="4">
   <data>
    <tile gid="801"/>
-   <tile gid="1794"/>
+   <tile gid="0"/>
    <tile gid="2438"/>
    <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="1794"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>

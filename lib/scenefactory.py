@@ -225,6 +225,10 @@ class AbstractScene(sfml.Drawable):
                         None,
                         entityimgrect)
                     entityobj.sprite.position = sfml.Vector2(entity.x, entity.y)
+                    # el origen de los objetos en
+                    # Tiled es su esquina inferior izquierda
+                    originy = float(self.tmxdata.tilesets[0].tileheight)
+                    entityobj.sprite.origin = sfml.Vector2(0.0, originy)
                     entityobj.setzindex(layerindex)
                     # es solida la entidad?
                     if hasattr(entity, "solid"):
