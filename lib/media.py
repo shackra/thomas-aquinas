@@ -1,6 +1,6 @@
 # coding: utf-8
 # This file is part of Thomas Aquinas.
-#    
+#
 # Thomas Aquinas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -20,6 +20,7 @@ import os
 import logging
 import common
 import sfml
+from thirdparty.pytweener import pytweener
 
 class TAUnknownFileFormatException(Exception): pass
 
@@ -34,20 +35,20 @@ def loadmedia(mediafile, mediatype=None, toram=True):
     Si dicho argumento esta en None, la función tratara de cargar el audio-
     visual de forma automática (no recomendado para archivos de sonido y/o
     musicales. Por defecto tratara de devolver un objeto de sonido).
-    
+
     'toram' nos indica si debemos cargar los archivos de imagen a la memoria
     RAM o a la memoria de la tarjeta de vídeo. Si es True, cargara a la RAM"""
-    
+
     logging.info("Buscando por el audiovisual {0}".format(mediafile))
     extension = os.path.splitext(mediafile)[-1]
     logging.debug("Extensión del audiovisual: {0}".format(extension))
-    
+
     if extension in [".bmp", ".png", ".tga", ".jpg",
                      ".gif", ".psd", ".hdr", ".pic"]:
         logging.debug("El archivo {0} es un"
                       " archivo de imagen".format(mediafile))
         return loadimg(mediafile, toram)
-    
+
     elif extension in [".ogg", ".oga", ".mp3", ".flac", ".wav"]:
         logging.debug("El archivo {0} es un"
                       " archivo de audio".format(mediafile))
@@ -59,7 +60,7 @@ def loadmedia(mediafile, mediatype=None, toram=True):
         raise TAUnknownFileFormatException, ("formato de archivo "
                                              "{0} desconocido".format(
                                                  extension))
-    
+
 def loadsong(mediafile):
     """ Retorna un objeto SFML para la música dado un archivo.
     """
@@ -72,7 +73,7 @@ def loadsong(mediafile):
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
         raise
-    
+
 def loadsound(mediafile):
     """ Retorna un objeto SFML para el sonido dado un archivo.
     """
@@ -86,7 +87,7 @@ def loadsound(mediafile):
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
         raise
-    
+
 def loadimg(mediafile, toram=True):
     """ Retorna un objeto imagen SFML dado un archivo.
     """
@@ -104,3 +105,105 @@ def loadimg(mediafile, toram=True):
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
         raise
+
+class MusicManager:
+    """ Esta clase se encarga de manejar la musica que sonara durante el juego.
+
+    Esta clase no debe ser instanciada, ya que puede manejar
+    varias pistas de musica a la vez.
+    """
+    songs = {}
+    musictweener = pytweener.Tweener()
+    actualsong = None
+    __nextsongtoplay = None
+
+    def __init__(self):
+        raise UserWarning, "¡No me instancies!"
+
+    @classmethod
+    def updatetweener(cls, time):
+        """ Actualiza el tweener, entre otras cosas.
+        """
+        cls.musictweener.update(time)
+        if cls.actualsong.volume == 0 and cls.__nextsongtoplay:
+            songname, play_offset, loop = cls.__nextsongtoplay
+            cls.actualsong.stop()
+            cls.actualsong.volume = 100
+            cls.playsong(songname, play_offset, loop)
+            cls.__nextsongtoplay = None
+
+    @classmethod
+    def _alreadyexists(cls, filename):
+        """ Ya existe esta canción que pretendemos cargar?
+        """
+        try:
+            songname = os.path.basename(filename)
+            cls.songs[songname]
+            return True
+        except KeyError:
+            return False
+
+    @classmethod
+    def loadsong(cls, filename):
+        """ Carga una canción para ser reproducid a demanda.
+        """
+        if not cls._alreadyexists(filename):
+            songname = os.path.basename(filename)
+            logging.info("Cargando canción: {0}".format(songname))
+            cls.songs[songname] = loadsong(filename)
+        else:
+            logging.warning("Canción {0} ya había sido cargada".format(
+                    os.path.basename(filename)))
+            raise UserWarning, "Esta canción ya a sido cargada!"
+
+    @classmethod
+    def playsong(cls, songname, play_offset=0, loop=True):
+        """ Reproduce determinada canción.
+
+        'play_offset' indica la nueva posición donde comenzara a
+        sonar la musica. Esto se aplica DESPUÉS de iniciar la reproducción.
+        el tiempo se expresa en milisegundos.
+        'loop' al ser falso, reproduce la musica una sola vez. de lo contrario
+        reproducirá la canción por siempre en bucle.
+        """
+        try:
+            cls.actualsong = cls.songs[songname]
+            cls.actualsong.loop = loop
+            cls.actualsong.play()
+            cls.actualsong.playing_offset = sfml.milliseconds(play_offset)
+        except KeyError:
+            logging.exception("Canción {0} no a "
+                              "sido cargada o no existe".format(songname))
+
+    @classmethod
+    def fadeoutandplaysong(cls, fadeout, nsongname,
+                           nsongplay_offset, nsong_loop):
+        """ Cambia de canción de forma suave.
+
+        'fadeout' es la cantidad de tiempo (en segundos) en la
+        que se bajara el volumen de la canción actual hasta 0.
+        'nsongname' es el nombre de la siguiente canción a reproducir.
+        'nsongplay_offset' es el nuevo offset para el inicio de la siguiente
+        canción, ver playsong() para más información.
+        'nsong_loop' indica sí se desea que la siguiente canción se
+        repita de forma indefinida.
+        """
+        cls.musictweener.addTween(cls.actualsong,
+                              volume=0,
+                              tweenTime=fadeout,
+                              tweenType=pytweener.Easing.Quad.easeOut)
+        cls.__nextsongtoplay = [nsongname, nsongplay_offset, nsong_loop]
+
+    @classmethod
+    def pausesong(cls):
+        """ Pausa la reproducción de la canción actual.
+        """
+        cls.actualsong.pause()
+
+    @classmethod
+    def unpausesong(cls):
+        cls.actualsong.play()
+
+    @classmethod
+    def stopsong(cls):
+        cls.actualsong.stop()

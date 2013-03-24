@@ -248,7 +248,7 @@ class AbstractScene(sfml.Drawable):
         except AttributeError:
             # FIRST time!
             logging.debug("La propiedad '__oldviewcenter'"
-                          " no existe, creandola...")
+                          " no existe, creándola...")
             self.__oldviewcenter = currentview.center
             self.__oldviewcenter += sfml.Vector2(1000.0, 1000.0)
 
