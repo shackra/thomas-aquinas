@@ -20,7 +20,7 @@ import os
 import logging
 import common
 import sfml
-from thirdparty.pytweener import pytweener
+from thirdparty.pitweener.src import PiTweener
 
 class TAUnknownFileFormatException(Exception): pass
 
@@ -113,7 +113,7 @@ class MusicManager:
     varias pistas de musica a la vez.
     """
     songs = {}
-    musictweener = pytweener.Tweener()
+    musictweener = PiTweener.Tweener()
     actualsong = None
     __nextsongtoplay = None
 
@@ -166,6 +166,13 @@ class MusicManager:
         'loop' al ser falso, reproduce la musica una sola vez. de lo contrario
         reproducirá la canción por siempre en bucle.
         """
+        if hasattr(cls.actualsong, "play"):
+            # tiene el volumen en 0 la canción actual?
+            if cls.actualsong == 0:
+                # detenemos la canción y le restablecemos el volumen
+                cls.actualsong.stop()
+                cls.actualsong.volume = 100.0
+
         try:
             cls.actualsong = cls.songs[songname]
             cls.actualsong.loop = loop
@@ -188,10 +195,15 @@ class MusicManager:
         'nsong_loop' indica sí se desea que la siguiente canción se
         repita de forma indefinida.
         """
-        cls.musictweener.addTween(cls.actualsong,
-                              volume=0,
-                              tweenTime=fadeout,
-                              tweenType=pytweener.Easing.Quad.easeOut)
+        cls.musictweener.add_tween(cls.actualsong,
+                                   volume=0.0,
+                                   tween_time=fadeout,
+                                   tween_type=cls.musictweener.LINEAR,
+                                   # on_complete_function = cls.playsong(
+                                   # nsongname,
+                                   # nsongplay_offset,
+                                   # nsong_loop)
+                                   )
         cls.__nextsongtoplay = [nsongname, nsongplay_offset, nsong_loop]
 
     @classmethod

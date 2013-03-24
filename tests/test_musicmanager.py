@@ -72,8 +72,8 @@ class TestMusicManager:
         sleep(10)
         media.MusicManager.fadeoutandplaysong(5, "Movement Proposition.ogg",
                                               0, False)
-        while media.MusicManager.actualsong.volume >= 0:
-            media.MusicManager.updatetweener(60 / 1000.0)
+        for i in xrange(10):
+            media.MusicManager.updatetweener(1)
             sleep(0.6)
         sleep(10)
         media.MusicManager.stopsong()
