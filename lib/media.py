@@ -22,8 +22,8 @@ import common
 import sfml
 from thirdparty.pitweener.src import PiTweener
 
-class TAUnknownFileFormatException(Exception): pass
 
+class TAUnknownFileFormatException(Exception): pass
 
 def loadmedia(mediafile, mediatype=None, toram=True):
     """ Retorna un objeto SFML.
@@ -83,6 +83,20 @@ def loadsound(mediafile):
         sfmlobject = sfml.Sound(soundbuffer)
         logging.info("Cargado el archivo de sonido {0}".format(mediapath))
         return sfmlobject
+    except IOError:
+        logging.error("El archivo {arch} tiene una "
+                      "extensión incorrecta".format(arch=mediapath))
+        raise
+
+def loadbuffer(mediafile):
+    """ Retorna un buffer de sonido SFML para uso posterior.
+    """
+    mediapath = common.settings.fromrootfolderget(mediafile)
+    try:
+        soundbuffer = sfml.SoundBuffer.from_file(mediapath)
+        logging.info("Cargado el archivo de "
+                     "sonido {0} como buffer".format(mediapath))
+        return soundbuffer
     except IOError:
         logging.error("El archivo {arch} tiene una "
                       "extensión incorrecta".format(arch=mediapath))
@@ -219,3 +233,66 @@ class MusicManager:
     @classmethod
     def stopsong(cls):
         cls.actualsong.stop()
+
+
+class SoundFXManager:
+
+    buffers = {}
+    
+    def __init__(self):
+        raise UserWarning, "No me instancies!"
+
+    @classmethod
+    def _alreadyexists(cls, filename):
+        """ Ya existe esta canción que pretendemos cargar?
+        """
+        try:
+            buffername = os.path.basename(filename)
+            cls.buffers[songname]
+            return True
+        except KeyError:
+            return False
+
+    @classmethod
+    def loadbuffer(cls, filename):
+        """ Carga un archivo de sonido en un buffer.
+        """
+        buffername = os.path.basename(filename)
+        if not cls._alreadyexists(filename):
+            logging.info("Cargando audio a buffer: {0}".format(buffername))
+            cls.buffers[buffername] = loadbuffer(filename)
+        else:
+            logging.warning("Audio {0} ya había "
+                            "sido caragado como buffer.".format(buffername))
+            raise UserWarning, "Este audio ya a sido cargado como buffer!"
+
+    @classmethod
+    def setentitysndfx(cls, entity):
+        """ Establece todos los efectos de sonido que una entidad necesite.
+
+        Las entidades que quieran efectos de sonido, deben poseer la propiedad
+        entity._sndfx el cual es un diccionario. Las palabras claves del
+        diccionario son los nombres de los efectos de sonido y los valores
+        son objetos SFML Sound. Todos los objetos SFML Sound de cada entidad
+        comparten la posición espacial de entity.sprite
+        """
+        if hasattr(entity, "_sndfx"):
+            for soundname in entity._sndfx.iterkeys():
+                try:
+                    entity._sndfx[soundname] = sfml.Sound(
+                        cls.buffers[soundname])
+                    # Estableciendo la posición del sonido con respecto a la
+                    # posición del sprite de la entidad.
+                    entityposx, entityposy = entity.sprite.position
+                    entity._sndfx[soundname].position = sfml.Vector3(entityposx,
+                    entityposy,
+                    0.0)
+                except KeyError:
+                    logging.error("Buffer {0} aun no a sido cargado. "
+                        "No se puede crear el sonido para"
+                        " la entidad {1}".format(soundname, entity.id)
+                    raise UserWarning, ("No se pudo cargar un sonido"
+                                        " para la entidad {0}".format(entity.id)
+        else:
+            logging.info("La entidad {0} no requiere de sonidos".format(
+            entity.id))

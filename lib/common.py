@@ -29,6 +29,7 @@ class TAConfOptionException(Exception): pass
 class TAConfSectionException(Exception): pass
 class TAConfFailException(Exception): pass
 
+
 class Conf:
     def __init__(self, gamefolder, configurationfiles):
         logging.info("Iniciando una instancia de la clase Conf")
@@ -193,7 +194,7 @@ class Conf:
 
         whichoneunicode = None
 
-        if isinstance(whichone, str) or isinstance(whichone, unicode):
+        if isinstance(whichone, str):
             guess = chardet.detect(whichone)
             noconvertedstring = whichone
             whichone = whichone.decode(guess["encoding"])
@@ -207,8 +208,18 @@ class Conf:
             else:
                 logging.debug("No hay nada que convertir, "
                               "no estamos en Windows")
-                pass
+            return whichone
 
+        elif isinstance(whichone, unicode):
+            # Si la cadena de caracteres ya estaba como unicode
+            # es estúpido convertirla a unicode nuevamente.
+            if self.__os == "nt":
+                logging.debug("Convirtiendo '/' a '\\' "
+                              "para compatibilidad con Windows")
+                whichone = whichone.replace("/", "\\")
+            else:
+                logging.debug("No hay nada que convertir, "
+                              "no estamos en Windows")
             return whichone
 
         elif isinstance(whichone, list):

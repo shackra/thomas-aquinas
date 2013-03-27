@@ -37,7 +37,7 @@ class Entity:
     Una propiedad de la entidad, use del(entidad.propiedad).
     así de fácil. De ahí que `AbstractSprite` carezca de interfaces
     para agregar o eliminar propiedades. Python ya las provee.
-    
+
     Cada sprite debe poseer un archivo de configuración que defina
     sus propiedades. Las dos más importantes, hasta el momento, son
     'animation' y 'rectangles'. Ambas son diccionarios.
@@ -88,7 +88,7 @@ class Entity:
         """ Agrega un controlador para la entidad.
         """
         self.__controllers[func.func_name] = func
-        
+
     def delcontroller(self, funcname):
         """ Borra un controlador para la entidad.
         """
@@ -223,7 +223,7 @@ class Entity:
         "Dibuja al sprite"
         if self.__spritedata:
             self.__animate() # Es correcto colocar la llamada al metodo acá?
-        
+
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
 

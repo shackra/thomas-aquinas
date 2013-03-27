@@ -42,4 +42,4 @@ class TestEntity:
         ok_(isinstance(entity.clock, sfml.Clock),
             "La entidad no tiene un objeto clock")
         eq_(entity.zindex, None)
-        
+
