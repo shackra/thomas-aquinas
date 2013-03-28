@@ -20,7 +20,6 @@ import logging
 import os
 import ConfigParser
 import chardet
-import codecs
 
 LOGGING_FORMAT = "%(levelname)s - #%(lineno)d - %(funcName)s: %(message)s"
 logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
@@ -164,8 +163,6 @@ class Conf:
         En caso de que whichone sea una lista, se iterara la lista y se
         devolverá el mismo tipo con las direcciones corregidas."""
 
-        whichoneunicode = None
-
         if isinstance(whichone, str):
             guess = chardet.detect(whichone)
             noconvertedstring = whichone
@@ -215,7 +212,7 @@ class Conf:
         los cuales los juegos necesitan para funcionar de forma apropiada.
         En caso de faltar algún valor, el juego DEBERÍA cerrarse y notificar
         al usuario."""
-        problem = None
+
         # Variables que contienen la ubicación de los archivos audiovisuales
         if cls.__parsed.has_section("DATA_PATH"):
             for opcion in ["root_path", "common_data"]:

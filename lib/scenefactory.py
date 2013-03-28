@@ -20,10 +20,8 @@ import logging
 from lib.spritefactory import Entity
 from thirdparty.pytmx import tmxloader
 from itertools import product, chain, izip_longest
-import common
-import media
+from lib import common
 import sfml
-import os
 
 
 class TATileImageException(Exception): pass
@@ -65,11 +63,11 @@ class AbstractScene(sfml.Drawable):
 
     def on_event(self, event):
         "El manejador de escenas llamara este método cuando aya eventos."
-        raise NotImplemented("Implemente el método on_event.")
+        raise NotImplementedError("Implemente el método on_event.")
 
     def on_draw(self):
         "El manejador de escenas llamara este método cuando aya que dibujar algo."
-        raise NotImplemented("Implemente el método on_draw.")
+        raise NotImplementedError("Implemente el método on_draw.")
 
     def loadmaptiles(self, tmxfile, dontdrawtiles=False):
         """ Carga los rectangulos de un mapa TMX.
@@ -480,7 +478,7 @@ class AbstractScene(sfml.Drawable):
 
     def __str__(self):
         "Útil para darle un nombre a tu escena."
-        raise NotImplemented("Implemente el método __str__")
+        raise NotImplementedError("Implemente el método __str__")
         # por ejemplo:
         #  return "<Scene: Escena #1, File: {0}>".format(self.__tmxmapfile)
         # o como usted más prefiera :)

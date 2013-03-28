@@ -17,8 +17,8 @@
 #                       veni, Sancte Spiritus.
 
 import logging
-import common
-import media
+import lib.common
+from lib import media
 import sfml
 from math import sqrt
 import cjson as json

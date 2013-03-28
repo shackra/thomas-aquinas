@@ -18,7 +18,7 @@
 
 import os
 import logging
-import common
+from lib import common
 import sfml
 from thirdparty.pitweener.src import PiTweener
 
@@ -150,12 +150,8 @@ class MusicManager:
     def _alreadyexists(cls, filename):
         """ Ya existe esta canción que pretendemos cargar?
         """
-        try:
-            songname = os.path.basename(filename)
-            cls.songs[songname]
-            return True
-        except KeyError:
-            return False
+        songname = os.path.basename(filename)
+        return not cls.songs.has_key(songname)
 
     @classmethod
     def loadsong(cls, filename):
@@ -228,10 +224,14 @@ class MusicManager:
 
     @classmethod
     def unpausesong(cls):
+        """ Continua la reproducción de la canción actual.
+        """
         cls.actualsong.play()
 
     @classmethod
     def stopsong(cls):
+        """ Detiene la reproducción de la canción actual.
+        """
         cls.actualsong.stop()
 
 
@@ -246,12 +246,8 @@ class SoundFXManager:
     def _alreadyexists(cls, filename):
         """ Ya existe esta canción que pretendemos cargar?
         """
-        try:
-            buffername = os.path.basename(filename)
-            cls.buffers[songname]
-            return True
-        except KeyError:
-            return False
+        buffername = os.path.basename(filename)
+        return not cls.buffers.has_key(buffername)
 
     @classmethod
     def loadbuffer(cls, filename):
