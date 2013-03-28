@@ -140,7 +140,7 @@ class AbstractScene(sfml.Drawable):
                                      "({2}) posicion {1}".format(gid,
                                                                  quad,
                                                                  realgid))
-                elif gids == None:
+                elif gids is None:
                     # Este GID no se usa para nada.
                     continue
 

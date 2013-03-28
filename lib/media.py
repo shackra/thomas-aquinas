@@ -52,7 +52,7 @@ def loadmedia(mediafile, mediatype=None, toram=True):
     elif extension in [".ogg", ".oga", ".mp3", ".flac", ".wav"]:
         logging.debug("El archivo {0} es un"
                       " archivo de audio".format(mediafile))
-        if mediatype == "snd" or mediatype == None:
+        if mediatype == "snd" or mediatype is None:
             return loadsound(mediafile)
         elif mediatype == "msc":
             return loadsong(mediafile)
