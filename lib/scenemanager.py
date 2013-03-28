@@ -38,9 +38,9 @@ class Director:
 
     def __init__(self, icon=None):
         self.window = sfml.RenderWindow(sfml.VideoMode(
-            common.settings.getscreensize()[0],
-            common.settings.getscreensize()[1]),
-                                        common.settings.getscreentitle())
+            common.Conf.getscreensize()[0],
+            common.Conf.getscreensize()[1]),
+                                        common.Conf.getscreentitle())
         self.defaulteasing = pytweener.Easing.Quad.easeOut
         self.tweener = pytweener.Tweener()
         self.window.framerate_limit = 60
@@ -59,11 +59,11 @@ class Director:
         self.__camera = customView()
         # Reiniciamos la cámara al tamaño de la pantalla.
         self.__camera.reset(sfml.Rectangle((0, 0),
-                                           common.settings.getscreensize()))
+                                           common.Conf.getscreensize()))
 
         # Iniciamos algunas variables globales
         self.setglobalvariable("game title",
-                               common.settings.getscreentitle())
+                               common.Conf.getscreentitle())
         self.__text = sfml.Text()
         self.__text.font = sfml.Font.get_default_font()
         self.__text.color = sfml.Color.BLUE
@@ -89,7 +89,7 @@ class Director:
         en algún momento dentro de una instancia de la clase AbstractScene
         con las coordenadas del sprite origen.
         """
-        screensizex, screensizey = common.settings.getscreensize()
+        screensizex, screensizey = common.Conf.getscreensize()
         if withplayer:
             camerax = -(screensizex / 2) + playerx
             cameray = -(screensizey / 2) + playery
@@ -135,7 +135,7 @@ class Director:
                     self.__exitgame = True
                     logging.info("Cerrando el programa...")
                     logging.info("Salvando la configuración...")
-                    common.settings.saveconf()
+                    common.Conf.saveconf()
                     logging.info("Configuración del juego salvada!")
                     # logging.info("Guardando las variables globales...")
                     # pass

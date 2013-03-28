@@ -131,7 +131,7 @@ class Entity:
         Este metodo devuelve un diccionario con todos los objetos python
         correspondientes.
         """
-        with open(common.settings.fromrootfolderget(filepath)) as fileopen:
+        with open(common.Conf.fromrootfolderget(filepath)) as fileopen:
             tmpdict = json.decode(fileopen.read())
             parsedata = {"animation": []}
             for state in tmpdict["animation"]:

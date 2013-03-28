@@ -64,7 +64,7 @@ def loadmedia(mediafile, mediatype=None, toram=True):
 def loadsong(mediafile):
     """ Retorna un objeto SFML para la música dado un archivo.
     """
-    mediapath = common.settings.fromrootfolderget(mediafile)
+    mediapath = common.Conf.fromrootfolderget(mediafile)
     try:
         sfmlobject = sfml.Music.from_file(mediapath)
         logging.info("Cargado el archivo de musica {0}".format(mediapath))
@@ -77,7 +77,7 @@ def loadsong(mediafile):
 def loadsound(mediafile):
     """ Retorna un objeto SFML para el sonido dado un archivo.
     """
-    mediapath = common.settings.fromrootfolderget(mediafile)
+    mediapath = common.Conf.fromrootfolderget(mediafile)
     try:
         soundbuffer = sfml.SoundBuffer.from_file(mediapath)
         sfmlobject = sfml.Sound(soundbuffer)
@@ -91,7 +91,7 @@ def loadsound(mediafile):
 def loadbuffer(mediafile):
     """ Retorna un buffer de sonido SFML para uso posterior.
     """
-    mediapath = common.settings.fromrootfolderget(mediafile)
+    mediapath = common.Conf.fromrootfolderget(mediafile)
     try:
         soundbuffer = sfml.SoundBuffer.from_file(mediapath)
         logging.info("Cargado el archivo de "
@@ -105,7 +105,7 @@ def loadbuffer(mediafile):
 def loadimg(mediafile, toram=True):
     """ Retorna un objeto imagen SFML dado un archivo.
     """
-    mediapath = common.settings.fromrootfolderget(mediafile)
+    mediapath = common.Conf.fromrootfolderget(mediafile)
     try:
         img = sfml.Image.from_file(mediapath)
         if toram:
@@ -290,9 +290,9 @@ class SoundFXManager:
                 except KeyError:
                     logging.error("Buffer {0} aun no a sido cargado. "
                         "No se puede crear el sonido para"
-                        " la entidad {1}".format(soundname, entity.id)
+                        " la entidad {1}".format(soundname, entity.id))
                     raise UserWarning, ("No se pudo cargar un sonido"
-                                        " para la entidad {0}".format(entity.id)
+                                    " para la entidad {0}".format(entity.id))
         else:
             logging.info("La entidad {0} no requiere de sonidos".format(
             entity.id))

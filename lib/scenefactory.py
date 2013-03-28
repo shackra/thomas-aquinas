@@ -82,8 +82,8 @@ class AbstractScene(sfml.Drawable):
         o no las baldosas del escenario. Util cuando se quiere
         dibujar solamente los objetos del escenario.
         """
-        self.__tmxmapfile = common.settings.joinpaths(
-            common.settings.getrootfolder(), tmxfile
+        self.__tmxmapfile = common.Conf.joinpaths(
+            common.Conf.getrootfolder(), tmxfile
             )
         self.tmxdata = tmxloader.load_tmx(self.__tmxmapfile)
         self.tmxdata.dontdrawtiles = dontdrawtiles
@@ -170,8 +170,8 @@ class AbstractScene(sfml.Drawable):
 
         for firstgid, tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
-            tilefilepath = common.settings.joinpaths(
-                common.settings.getrootfolder(),
+            tilefilepath = common.Conf.joinpaths(
+                common.Conf.getrootfolder(),
                 tile.source[2:]
                 )
             # sfml.graphics.RenderTexture es una buena opcion.

@@ -31,158 +31,130 @@ class TAConfFailException(Exception): pass
 
 
 class Conf:
-    def __init__(self, gamefolder, configurationfiles):
-        logging.info("Iniciando una instancia de la clase Conf")
-        logging.debug("Cargando la configuración: %s..." % configurationfiles)
-        self.__os = os.name
-        self.__gamefolder = gamefolder
-        self.confilepath = None
-        self.__parsed = ConfigParser.SafeConfigParser()
-        self.loadconf(configurationfiles)
-        if self.confilepath:
-            self._checkconf()
-            logging.debug("Revisando que la configuración sea valida...")
+    __os = os.name
+    __gamefolder = None
+    confilepath = None
+    __parsed = ConfigParser.SafeConfigParser()
+    
+    def __init__(self):
+        raise UserWarning, "No me instancies!"
 
-        if self.getosname() != "nt":
-            self.__USERFOLDER = self.joinpaths(os.environ["HOME"],
-                                               ".{game}")
-        else:
-            self.__USERFOLDER = self.joinpaths(os.environ["APPDATA"],
-                                               "{game}")
-
-        self.__USERFOLDER = self.__USERFOLDER.format(
-            game=self.__gamefolder)
-
-        # verificando que la carpeta del juego exista en la carpeta
-        # personal del usuario.
-        if not os.path.isdir(self.__USERFOLDER):
-            os.mkdir(self.__USERFOLDER)
-
-    def loadconf(self, configurationfiles=None):
+    @classmethod
+    def loadconf(cls, gamefolder, configurationfiles=None):
         """ Carga la configuración del juego y del usuario u otras.
 
         Si configurationfiles es una cadena o una lista de cadenas de texto
-        los usara
+        los usara.
+
+        Si existe alguna configuración guardada en la carpeta del juego que
+        reside en la carpeta personal del usuario, la carga junto con la
+        configuración principal del proyecto.
         """
+        
+        cls.__gamefolder = gamefolder
+        
+        if cls.getosname() != "nt":
+            cls.__USERFOLDER = cls.joinpaths(os.environ["HOME"],
+                                               ".{game}")
+        else:
+            cls.__USERFOLDER = cls.joinpaths(os.environ["APPDATA"],
+                                               "{game}")
+
+        cls.__USERFOLDER = cls.__USERFOLDER.format(
+            game=cls.__gamefolder)
+
+        # verificando que la carpeta del juego exista en la carpeta
+        # personal del usuario.
+        if not os.path.isdir(cls.__USERFOLDER):
+            os.mkdir(cls.__USERFOLDER)
+
+        # ¿Existe una configuración del usuario guardada con anterioridad?
+        usergameconf = cls.fromuserfolderget("gameconf.ini")
+        if os.path.isfile(cls.__convertpath(usergameconf)):
+            logging.info("Una configuración personal existe, sera cargada.")
+            configurationfiles = [configurationfiles, usergameconf]
+
         if configurationfiles:
             logging.info("Cargando configuración del juego...")
-            self.confilepath = self.__parsed.read(
-                self.__convertpath(configurationfiles))
-            if self.confilepath:
-                self._checkconf()
+            cls.confilepath = cls.__parsed.read(
+                cls.__convertpath(configurationfiles))
+            if cls.confilepath:
+                cls._checkconf()
                 logging.info("Configuración del juego "
                              "cargada de forma exitosa!")
 
-                if self.__os == "posix":
-                    if self.__parsed.has_option("DATA_PATH", "root_path"):
-                        self.__ROOTFOLDER = self.__parsed.get("DATA_PATH",
+                if cls.__os == "posix":
+                    if cls.__parsed.has_option("DATA_PATH", "root_path"):
+                        cls.__ROOTFOLDER = cls.__parsed.get("DATA_PATH",
                                                               "root_path")
                     else:
-                        self.__ROOTFOLDER = "/usr/share/games/{game}"
+                        cls.__ROOTFOLDER = "/usr/share/games/{game}"
 
-                elif self.__os == "nt":
-                    if self.__parsed.has_option("DATA_PATH", "root_path"):
-                        self.__ROOTFOLDER = self.__parsed.get("DATA_PATH",
+                elif cls.__os == "nt":
+                    if cls.__parsed.has_option("DATA_PATH", "root_path"):
+                        cls.__ROOTFOLDER = cls.__parsed.get("DATA_PATH",
                                                               "root_path")
                     else:
-                        self.__ROOTFOLDER = self.joinpaths(
+                        cls.__ROOTFOLDER = cls.joinpaths(
                             os.environ["PROGRAMFILES"], "{game}")
 
-                self.__ROOTFOLDER = self.__ROOTFOLDER.format(
-                    game=self.__gamefolder)
+                cls.__ROOTFOLDER = cls.__ROOTFOLDER.format(
+                    game=cls.__gamefolder)
             else:
-                if self.confilepath:
+                if cls.confilepath:
                     logging.info("Recargando la configuracion...")
-                    self.loadconf(self.confilepath)
+                    cls.loadconf(cls.confilepath)
                     logging.info("Recarga completada!")
                 else:
                     raise TAConfFailException, ("La configuración no pudo ser"
                                                 " cargada de manera exitosa")
 
-    def saveconf(self, onuserfolder=True, filepath=None):
+    @classmethod
+    def saveconf(cls):
         """ Salva la configuración actual en un archivo ini.
 
-        Si onuserfolder es verdadero, se guardara toda la configuración
-        en la carpeta personal del usuario. De lo contrario se guardara
-        en el archivo especificado por filepath.
+        La configuración se guarda en la carpeta del juego, dentro de la
+        carpeta personal del usuario."""
+        with open(cls.joinpaths(cls.getuserfolder(),
+                "gameconf.ini"), "w") as conf:
+            cls.__parsed.write(conf)
 
-        en caso de problemas de escritura en filepath, se escribirá
-        el archivo de configuración en la carpeta del usuario."""
-
-        confilepath = None
-
-        if onuserfolder == True:
-            # Guardamos la configuración en la carpeta personal
-            # del usuario.
-            try:
-                confilepath = open(
-                    self.joinpaths(self.getuserfolder(), "gameconf.ini"), "w")
-            except IOError as e:
-                logging.exception(e)
-                raise
-        else:
-            # Guardamos la configuración en otra carpeta,
-            # especificada por el usuario.
-            if filepath and isinstance(filepath, str):
-                try:
-                    confilepath = open(
-                    self.__convertpath(filepath), "w")
-                except IOError as e:
-                    logging.exception(e)
-                    confilepath = open(
-                        self.joinpaths(self.getuserfolder(), "gameconf.ini"),
-                        "w")
-            else:
-                logging.error("%s no es del tipo str" % filepath)
-                logging.debug("Guardando la configuración"
-                              " en la carpeta personal")
-                try:
-                    confilepath = open(
-                        self.joinpaths(self.getuserfolder(), "gameconf.ini"),
-                        "w")
-                except IOError as e:
-                    logging.exception(e)
-                    raise
-
-        try:
-            self.__parsed.write(confilepath)
-            confilepath.close()
-        except:
-            logging.exception("El archivo de configuración no"
-                              " pudo ser guardado en ningún "
-                              "sitio, ¿Tiene el usuario espacio"
-                              " en su disco duro?")
-
-    def fromuserfolderget(self, file):
+    @classmethod
+    def fromuserfolderget(cls, file):
         """ Retorna una dirección absoluta del directorio en la carpeta personal
         """
-        return self.joinpaths(self.getuserfolder(), file)
+        return cls.joinpaths(cls.getuserfolder(), file)
 
-    def fromrootfolderget(self, file):
+    @classmethod
+    def fromrootfolderget(cls, file):
         """ Retorna una dirección absoluta desde el directorio del juego.
         """
-        return self.joinpaths(self.getrootfolder(), file)
+        return cls.joinpaths(cls.getrootfolder(), file)
 
-    def getuserfolder(self):
+    @classmethod
+    def getuserfolder(cls):
         """ Retorna el directorio personal del usuario.
         """
-        return self.__convertpath(self.__USERFOLDER)
+        return cls.__convertpath(cls.__USERFOLDER)
 
-    def getrootfolder(self):
+    @classmethod
+    def getrootfolder(cls):
         """ Retorna el directorio donde se almacena el juego.
         """
-        return self.__convertpath(self.__ROOTFOLDER)
+        return cls.__convertpath(cls.__ROOTFOLDER)
 
-    def joinpaths(self, *args):
+    @classmethod
+    def joinpaths(cls, *args):
         """ Retorna una dirección de archivo juntando todos los argumentos.
         """
         logging.debug("Se han de unir las siguientes carpetas {0}".format(args))
         path = "/".join(args)
         path = path.replace("//", "/")
 
-        return self.__convertpath(path)
+        return cls.__convertpath(path)
 
-    def __convertpath(self, whichone):
+    @classmethod
+    def __convertpath(cls, whichone):
         """ Convierte y retorna direcciones de archivos de forma adecuada.
 
         Para cualquier dirección de archivos se usara las barras inclinadas,
@@ -201,7 +173,7 @@ class Conf:
             logging.debug("Cadena {0} tiene codificación '{1}'".format(
                 noconvertedstring, guess["encoding"]))
 
-            if self.__os == "nt":
+            if cls.__os == "nt":
                 logging.debug("Convirtiendo '/' a '\\' "
                               "para compatibilidad con Windows")
                 whichone = whichone.replace("/", "\\")
@@ -213,7 +185,7 @@ class Conf:
         elif isinstance(whichone, unicode):
             # Si la cadena de caracteres ya estaba como unicode
             # es estúpido convertirla a unicode nuevamente.
-            if self.__os == "nt":
+            if cls.__os == "nt":
                 logging.debug("Convirtiendo '/' a '\\' "
                               "para compatibilidad con Windows")
                 whichone = whichone.replace("/", "\\")
@@ -228,14 +200,15 @@ class Conf:
             logging.debug("Iterando la lista...")
             for thisone in whichone:
                 logging.debug("Convirtiendo la cadena: %s..." % thisone)
-                thisone = self.__convertpath(thisone)
+                thisone = cls.__convertpath(thisone)
                 logging.debug("Convertido: %s" % thisone)
                 pathlist.append(thisone)
             return pathlist
         else:
             raise ValueError, "argument is not a str or list object"
 
-    def _checkconf(self):
+    @classmethod
+    def _checkconf(cls):
         """ Revisa que los datos básicos existan.
 
         Deben existir algunos datos básicos sobre la configuración
@@ -244,9 +217,9 @@ class Conf:
         al usuario."""
         problem = None
         # Variables que contienen la ubicación de los archivos audiovisuales
-        if self.__parsed.has_section("DATA_PATH"):
+        if cls.__parsed.has_section("DATA_PATH"):
             for opcion in ["root_path", "common_data"]:
-                if not self.__parsed.has_option("DATA_PATH", opcion):
+                if not cls.__parsed.has_option("DATA_PATH", opcion):
                     raise TAConfOptionException, ("{0} no existe en "
                                                   "DATA_PATH".format(opcion))
         else:
@@ -255,11 +228,11 @@ class Conf:
 
         # Variables que contienen la distribución básica de los botones del
         # control del jugador.
-        if self.__parsed.has_section("CONTROLLER"):
+        if cls.__parsed.has_section("CONTROLLER"):
             for opcion in ["action_button", "cancel_button", "pause_button",
                            "up_button", "down_button", "left_button",
                            "right_button", "keyboard_or_joystick"]:
-                if not self.__parsed.has_option("CONTROLLER", opcion):
+                if not cls.__parsed.has_option("CONTROLLER", opcion):
                     raise TAConfOptionException, ("{0} no existe en "
                                                   "CONTROLLER".format(opcion))
         else:
@@ -268,106 +241,109 @@ class Conf:
 
         # Variables que contienen los valores de configuración de visualización
         # del juego.
-        if self.__parsed.has_section("DISPLAY"):
+        if cls.__parsed.has_section("DISPLAY"):
             for opcion in ["screen_size", "window_title"]:
-                if not self.__parsed.has_option("DISPLAY", opcion):
+                if not cls.__parsed.has_option("DISPLAY", opcion):
                     raise TAConfOptionException, ("{0} no existe en "
                                                   "DISPLAY".format(opcion))
         else:
             raise TAConfSectionException, ("La sección DISPLAY no existe"
                                            " en la configuración")
 
-    def getosname(self):
+    @classmethod
+    def getosname(cls):
         """ Retorna el nombre del sistema operativo.
 
         nt: para cualquier sistema operativo Windows.
         posix: para cualquier sistema operativo
         derivado de Unix (GNU/Linux, *BSD)"""
-        return self.__os
+        return cls.__os
 
-    def getscreensize(self):
+    @classmethod
+    def getscreensize(cls):
         """ Retorna una tupla con las dimensiones de la pantalla del juego.
         """
-        sizestring = self.__parsed.get("DISPLAY", "screen_size")
+        sizestring = cls.__parsed.get("DISPLAY", "screen_size")
         # partimos la cadena, convertimos a entero y ponemos todo en una tupla
         # es de esperar que las dimensiones de la pantalla se expresen como
         # 320x240 por ejemplo.
         sizex, sizey = int(sizestring.split("x")[0]), int(sizestring.split("x")[1])
         return sizex, sizey
 
-    def setscreensize(self, (width, height)):
+    @classmethod
+    def setscreensize(cls, (width, height)):
         """ Guarda el nuevo tamaño de la pantalla del juego.
 
         Este dato no sera guardado en un archivo de configuración hasta llamar
         al método saveconf().
         """
         sizestring = "{w}x{h}".format(w=width, h=height)
-        self.__parsed.set("DISPLAY", "screen_size", sizestring)
+        cls.__parsed.set("DISPLAY", "screen_size", sizestring)
 
-    def getscreentitle(self):
+    @classmethod
+    def getscreentitle(cls):
         """ Retorna el texto a mostrar en la barra de titulo del juego.
         """
-        return self.__parsed.get("DISPLAY", "window_title").decode("utf-8")
+        return cls.__parsed.get("DISPLAY", "window_title").decode("utf-8")
 
-    def setscreentitle(self, title):
+    @classmethod
+    def setscreentitle(cls, title):
         """ Guarda el nuevo texto de la barra de titulo del juego
         """
-        self.__parsed.set("DISPLAY", "window_title", title)
+        cls.__parsed.set("DISPLAY", "window_title", title)
 
-    def getcontrollerbutton(self, button):
+    @classmethod
+    def getcontrollerbutton(cls, button):
         """ Retorna el código SFML de la tecla perteneciente al botón especifico
 
         el argumento button puede ser cualquier cosa, aunque usualmente puede
         pedirse las teclas asignadas para action_button, cancel_button,
         pause_button, etc.
         """
-        return self.__parsed.getint("CONTROLLER", str(button))
+        return cls.__parsed.getint("CONTROLLER", str(button))
 
-    def setcontrollerbutton(self, button, code):
+    @classmethod
+    def setcontrollerbutton(cls, button, code):
         """ Guarda un botón con su respectivo código numérico.
 
         Este dato no sera guardado en un archivo de configuración hasta llamar
         al método saveconf().
         """
-        self.__parsed.set("CONTROLLER", str(button), str(code))
+        cls.__parsed.set("CONTROLLER", str(button), str(code))
 
-    def usingkeyboard(self):
+    @classmethod
+    def usingkeyboard(cls):
         """ Retorna verdadero si se esta usando el teclado.
         """
-        if self.__parsed.getboolean("CONTROLLER", "keyboard_or_joystick"):
+        if cls.__parsed.getboolean("CONTROLLER", "keyboard_or_joystick"):
             return True
         else:
             return False
 
-    def usingjoystick(self):
+    @classmethod
+    def usingjoystick(cls):
         """ Retorna verdadero si se esta usando un joystick
         """
-        if self.__parsed.getboolean("CONTROLLER", "keyboard_or_joystick"):
+        if cls.__parsed.getboolean("CONTROLLER", "keyboard_or_joystick"):
             return False
         else:
             return True
 
-    def alternatecontrollertype(self):
+    @classmethod
+    def alternatecontrollertype(cls):
         """ Alterna entre el tipo de controlador a usar por el usuario.
 
         los tipos son:
           · Keyboard & Mouse
           · Joystick"""
 
-        actualvalue = self.__parsed.getboolean("CONTROLLER",
+        actualvalue = cls.__parsed.getboolean("CONTROLLER",
                                                "keyboard_or_joystick")
-        self.__parsed.set("CONTROLLER", "keyboard_or_joystick",
+        cls.__parsed.set("CONTROLLER", "keyboard_or_joystick",
                           str(int(not actualvalue)))
 
 if __name__ != "__main__":
-    # Esta linea a de cambiarse según el proyecto en el que se use el modulo
-    settings = Conf("thomas-aquinas", None)
     ### NO MODIFICAR ###
-    ROOTCONFPATH = os.path.join(os.path.dirname(__file__), "gameconf.ini")
-    USERCONFPATH = settings.joinpaths(settings.getuserfolder(), "gameconf.ini")
+    ROOTCONFPATH = "/".join([os.path.dirname(__file__), "gameconf.ini"])
     ### FIN DE LA "PROHIBICIÓN" ###
-    # Ahora cargamos las configuraciones en la carpeta raíz del proyecto
-    # como también desde la carpeta personal del usuario de el juego.
-    # Si algo, comparado con la configuración original, debe modificarse
-    # el orden del procesamiento de las configuraciones hará el trabajo.
-    settings.loadconf([ROOTCONFPATH, USERCONFPATH])
+    Conf.loadconf("thomas-aquinas", ROOTCONFPATH)
