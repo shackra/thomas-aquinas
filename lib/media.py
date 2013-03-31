@@ -151,7 +151,7 @@ class MusicManager:
         """ Ya existe esta canción que pretendemos cargar?
         """
         songname = os.path.basename(filename)
-        return not cls.songs.has_key(songname)
+        return cls.songs.has_key(songname)
 
     @classmethod
     def loadsong(cls, filename):
@@ -291,6 +291,26 @@ class SoundFXManager:
         """
         try:
             cls._scenesounds[soundname] = position
+        except KeyError:
+            raise KeyError, "sonido {0} no fue cargado previamente.".format(
+                soundname)
+
+    @classmethod
+    def setscenesoundfxrelative(cls, soundname):
+        """ Hace que un sonido del escenario sea relativo al escucha
+        """
+        try:
+            cls._scenesounds[soundname].relative_to_listener = True
+        except KeyError:
+            raise KeyError, "sonido {0} no fue cargado previamente.".format(
+                soundname)
+
+    @classmethod
+    def setscenesoundfxabsolute(cls, soundname):
+        """ Hace que un sonido del escenario sea absoluto para el escucha.
+        """
+        try:
+            cls._scenesounds[soundname].relative_to_listener = False
         except KeyError:
             raise KeyError, "sonido {0} no fue cargado previamente.".format(
                 soundname)

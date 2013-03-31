@@ -70,6 +70,7 @@ class Entity:
 
         self.id = id
         self._sndfx = {}
+        self.__listener = False
         self.__window = window
         self.clock = sfml.Clock()
         if spritedatafile:
@@ -98,6 +99,7 @@ class Entity:
         self._sndfx[soundname].position = sfml.Vector3(entityposx,
                                                         entityposy,
                                                         0.0)
+        self._sndfx[soundname].relative_to_listener = not self.__listener
 
     def removesoundfx(self, soundname):
         """ Elimina un efecto de sonido de la entidad.
@@ -107,6 +109,18 @@ class Entity:
         except KeyError:
             logging.error("El sonido {0} no existe en la entidad {1}".format(
                 soundname, self.id))
+
+    def setaslistener(self, yesorno):
+        """ La entidad sera el punto de escucha del jugador.
+        """
+        self.__listener = yesorno
+        for sound in self._sndfx.itervalues():
+                sound.relative_to_listener = not self.__listener
+
+    def islistener(self):
+        """ Es la entidad el punto de escucha?
+        """
+        return self.__listener
 
     def _updatesoundfxpos(self):
         """ Actualiza la posición espacial de los efectos de sonido.
