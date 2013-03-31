@@ -238,6 +238,7 @@ class MusicManager:
 class SoundFXManager:
 
     buffers = {}
+    _scenesounds = {}
     
     def __init__(self):
         raise UserWarning, "No me instancies!"
@@ -265,30 +266,31 @@ class SoundFXManager:
     @classmethod
     def setentitysndfx(cls, entity):
         """ Establece todos los efectos de sonido que una entidad necesite.
-
-        Las entidades que quieran efectos de sonido, deben poseer la propiedad
-        entity._sndfx el cual es un diccionario. Las palabras claves del
-        diccionario son los nombres de los efectos de sonido y los valores
-        son objetos SFML Sound. Todos los objetos SFML Sound de cada entidad
-        comparten la posición espacial de entity.sprite
         """
-        if hasattr(entity, "_sndfx"):
-            for soundname in entity._sndfx.iterkeys():
-                try:
-                    entity._sndfx[soundname] = sfml.Sound(
-                        cls.buffers[soundname])
-                    # Estableciendo la posición del sonido con respecto a la
-                    # posición del sprite de la entidad.
-                    entityposx, entityposy = entity.sprite.position
-                    entity._sndfx[soundname].position = sfml.Vector3(entityposx,
-                    entityposy,
-                    0.0)
-                except KeyError:
-                    logging.error("Buffer {0} aun no a sido cargado. "
+        for soundname in entity.listsoundfx():
+            try:
+                entity.addsoundfx(soundname, sfml.Sound(cls.buffers[soundname]))
+            except KeyError:
+                logging.error("Buffer {0} aun no a sido cargado. "
                         "No se puede crear el sonido para"
                         " la entidad {1}".format(soundname, entity.id))
-                    raise UserWarning, ("No se pudo cargar un sonido"
-                                    " para la entidad {0}".format(entity.id))
-        else:
-            logging.info("La entidad {0} no requiere de sonidos".format(
-            entity.id))
+
+    @classmethod
+    def addscenesoundfx(cls, soundname, soundobject):
+        """ Agrega un efecto de sonido que se usa sin una entidad.
+        """
+        try:
+            cls._scenesounds[soundname] = sfml.Sound(cls.buffers[soundname])
+        except KeyError:
+            raise KeyError, "sonido {0} no fue cargado previamente.".format(
+                soundname)
+
+    @classmethod
+    def updatescenesoundfxpos(cls, soundname, position=(0.0, 0.0, 0.0)):
+        """ Actualiza la posición de un efecto de sonido en el escenario
+        """
+        try:
+            cls._scenesounds[soundname] = position
+        except KeyError:
+            raise KeyError, "sonido {0} no fue cargado previamente.".format(
+                soundname)

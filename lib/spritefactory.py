@@ -69,6 +69,7 @@ class Entity:
             self.sprite = sfml.Sprite(texture)
 
         self.id = id
+        self._sndfx = {}
         self.__window = window
         self.clock = sfml.Clock()
         if spritedatafile:
@@ -83,6 +84,36 @@ class Entity:
         self.__actualoop = None
         self.zindex = None
         self.__controllers = {}
+
+    def listsoundfx(self):
+        """ Devuelve una lista iterable con los nombres de los efectos de sonido
+        """
+        return self._sndfx.iterkeys()
+
+    def addsoundfx(self, soundfxname, soundfxobject):
+        """ Asigna un efecto de sonido para la entidad.
+        """
+        self._sndfx[soundfxname] = soundfxobject
+        entityposx, entityposy = self.sprite.position
+        self._sndfx[soundname].position = sfml.Vector3(entityposx,
+                                                        entityposy,
+                                                        0.0)
+
+    def removesoundfx(self, soundname):
+        """ Elimina un efecto de sonido de la entidad.
+        """
+        try:
+            del(self._sndfx[soundname])
+        except KeyError:
+            logging.error("El sonido {0} no existe en la entidad {1}".format(
+                soundname, self.id))
+
+    def _updatesoundfxpos(self):
+        """ Actualiza la posición espacial de los efectos de sonido.
+        """
+        entityposx, entityposy = self.sprite.position
+        for sound in self._sndfx.iteritems():
+            sound.position = sfml.Vector3(entityposx, entityposy, 0.0)
 
     def addcontroller(self, func):
         """ Agrega un controlador para la entidad.
