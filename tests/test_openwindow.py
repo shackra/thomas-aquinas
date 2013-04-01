@@ -17,6 +17,7 @@
 #                       veni, Sancte Spiritus.
 
 import nose
+from nose.tools import eq_, ok_
 import logging
 import sfml
 
@@ -26,10 +27,9 @@ from lib.scenemanager import Director
 class Scene(AbstractScene):
     def __init__(self, scenemanager):
         AbstractScene.__init__(self, scenemanager)
-        self.loadmap() # Cargamos ningun mapa
         self.clock = sfml.Clock()
         self.timelapsed = 0
-        
+
     def on_draw(self, window):
         window.draw(self)
         self.timelapsed += self.clock.restart().milliseconds
@@ -38,9 +38,9 @@ class Scene(AbstractScene):
 
     def on_event(self, event):
         pass
-    
+
     def __str__(self):
-        return "<Scene: Vacia>"
+        return "<Scene: Vacía>"
 
 class TestOpenwindow:
     @classmethod
@@ -53,12 +53,27 @@ class TestOpenwindow:
 
     @classmethod
     def teardown_class(cls):
-        print ("Limpiando la configuracion de la prueba")
+        print ("Limpiando la configuración de la prueba")
         # del(director)
         # del(scene)
 
     @nose.tools.timed(4)
     def test_openwindow(self):
+        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        scene.loadmapimages()
+        scene.loadmapobjects()
+        scene.posvertexs()
         director.changescene(scene)
         print ("Una ventana debe abrirse durante tres segundos")
         director.loop()
+
+    def test_loadmaptiles(self):
+        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        eq_(len(scene.tmxdata.images), 5)
+        ok_(isinstance(scene.tmxdata.images[0], int), ("El primer valor de la "
+                                                        "lista no es del tipo"
+                                                        " int"))
+
+    def test_loadmapimages(self):
+        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        scene.loadmapimages()

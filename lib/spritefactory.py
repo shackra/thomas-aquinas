@@ -17,8 +17,8 @@
 #                       veni, Sancte Spiritus.
 
 import logging
-import common
-import media
+import lib.common
+from lib import media
 import sfml
 from math import sqrt
 import cjson as json
@@ -37,7 +37,7 @@ class Entity:
     Una propiedad de la entidad, use del(entidad.propiedad).
     así de fácil. De ahí que `AbstractSprite` carezca de interfaces
     para agregar o eliminar propiedades. Python ya las provee.
-    
+
     Cada sprite debe poseer un archivo de configuración que defina
     sus propiedades. Las dos más importantes, hasta el momento, son
     'animation' y 'rectangles'. Ambas son diccionarios.
@@ -69,9 +69,11 @@ class Entity:
             self.sprite = sfml.Sprite(texture)
 
         self.id = id
+        self._sndfx = {}
+        self.__listener = False
         self.__window = window
+        self.clock = sfml.Clock()
         if spritedatafile:
-            self.clock = sfml.Clock()
             self.__deltatime = 0
             self.__machinestate = None
             self.__actualmachinestate = None
@@ -84,11 +86,54 @@ class Entity:
         self.zindex = None
         self.__controllers = {}
 
+    def listsoundfx(self):
+        """ Devuelve una lista iterable con los nombres de los efectos de sonido
+        """
+        return self._sndfx.iterkeys()
+
+    def addsoundfx(self, soundfxname, soundfxobject):
+        """ Asigna un efecto de sonido para la entidad.
+        """
+        self._sndfx[soundfxname] = soundfxobject
+        entityposx, entityposy = self.sprite.position
+        self._sndfx[soundname].position = sfml.Vector3(entityposx,
+                                                        entityposy,
+                                                        0.0)
+        self._sndfx[soundname].relative_to_listener = not self.__listener
+
+    def removesoundfx(self, soundname):
+        """ Elimina un efecto de sonido de la entidad.
+        """
+        try:
+            del(self._sndfx[soundname])
+        except KeyError:
+            logging.error("El sonido {0} no existe en la entidad {1}".format(
+                soundname, self.id))
+
+    def setaslistener(self, yesorno):
+        """ La entidad sera el punto de escucha del jugador.
+        """
+        self.__listener = yesorno
+        for sound in self._sndfx.itervalues():
+                sound.relative_to_listener = not self.__listener
+
+    def islistener(self):
+        """ Es la entidad el punto de escucha?
+        """
+        return self.__listener
+
+    def _updatesoundfxpos(self):
+        """ Actualiza la posición espacial de los efectos de sonido.
+        """
+        entityposx, entityposy = self.sprite.position
+        for sound in self._sndfx.iteritems():
+            sound.position = sfml.Vector3(entityposx, entityposy, 0.0)
+
     def addcontroller(self, func):
         """ Agrega un controlador para la entidad.
         """
         self.__controllers[func.func_name] = func
-        
+
     def delcontroller(self, funcname):
         """ Borra un controlador para la entidad.
         """
@@ -131,7 +176,7 @@ class Entity:
         Este metodo devuelve un diccionario con todos los objetos python
         correspondientes.
         """
-        with open(common.settings.fromrootfolderget(filepath)) as fileopen:
+        with open(common.Conf.fromrootfolderget(filepath)) as fileopen:
             tmpdict = json.decode(fileopen.read())
             parsedata = {"animation": []}
             for state in tmpdict["animation"]:
@@ -223,7 +268,7 @@ class Entity:
         "Dibuja al sprite"
         if self.__spritedata:
             self.__animate() # Es correcto colocar la llamada al metodo acá?
-        
+
     def addrectangle(self, name, size, position):
         """ Agrega un rectangulo en determinada posicion.
 

@@ -49,11 +49,11 @@ class TestLoadstuff:
     @nose.tools.raises(IOError, media.TAUnknownFileFormatException)
     def test_fail_loadtex(self):
         tex1 = media.loadmedia("uniteststuff/file.fail", toram=False)
-        
+
     @nose.tools.raises(IOError)
     def test_fail_loadimg(self):
         tex2 = media.loadimg("uniteststuff/sound.flac")
-        
+
     @nose.tools.raises(IOError)
     def test_fail_loadsnd(self):
         snd = media.loadsound("uniteststuff/imgtex.png")

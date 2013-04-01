@@ -21,26 +21,26 @@ import common
 import sfml
 import media
 import scenefactory
-from thirdparty.pytweener import pytweener
+from thirdparty.pitweener.src import PiTweener as pytweener
 
 class TAGlobalVariableException(Exception): pass
 class TAAttrIsNotScene(Exception): pass
 
 class Director:
     """Objeto principal del juego.
-    
+
     Aquí es donde sucede toda la magia. Dibujamos, actualizamos
-    y propagamos eventos entre clases derivadas de 
+    y propagamos eventos entre clases derivadas de
     la clase AbstractScene.
-    
+
     El diseño de esta clase esta fuertemente basada en director.py
     del proyecto Asadetris desarrollado por Hugo de LosersJuegos"""
-    
+
     def __init__(self, icon=None):
         self.window = sfml.RenderWindow(sfml.VideoMode(
-            common.settings.getscreensize()[0], 
-            common.settings.getscreensize()[1]),
-                                        common.settings.getscreentitle())
+            common.Conf.getscreensize()[0],
+            common.Conf.getscreensize()[1]),
+                                        common.Conf.getscreentitle())
         self.defaulteasing = pytweener.Easing.Quad.easeOut
         self.tweener = pytweener.Tweener()
         self.window.framerate_limit = 60
@@ -48,9 +48,9 @@ class Director:
         self.framerate = 0
         self.__deltatime = 0
         self.window.vertical_synchronization = True
-        if icon: 
+        if icon:
             self.window.icon = media.loadmedia(icon).pixels
-            
+
         self.__actualscene = None
         self.__fullscreenmode = False
         self.__exitgame = False
@@ -59,41 +59,41 @@ class Director:
         self.__camera = customView()
         # Reiniciamos la cámara al tamaño de la pantalla.
         self.__camera.reset(sfml.Rectangle((0, 0),
-                                           common.settings.getscreensize()))
-        
+                                           common.Conf.getscreensize()))
+
         # Iniciamos algunas variables globales
         self.setglobalvariable("game title",
-                               common.settings.getscreentitle())
+                               common.Conf.getscreentitle())
         self.__text = sfml.Text()
         self.__text.font = sfml.Font.get_default_font()
         self.__text.color = sfml.Color.BLUE
         self.__text.style = sfml.Text.BOLD
         self.__text.character_size = 30
         self.__text.string = "{0} fps".format(self.framerate)
-        
+
     def __getitem__(self, item):
         return self.__globalvariables[str(item)]
-    
+
     def __iter__(self):
         return self.__globalvariables.items()
-    
+
     def movecamera(self, playerx, playery, withplayer=True):
         """ Mueve la cámara del juego.
-        
+
         Esta es la forma más sencilla de realizar la técnica del
         'screen scrolling'. Nos hemos basado en los cálculos realizados
         por CodingMadeEasy y en el uso de objetos sfml.View.
-        
+
         Para mover la cámara de acuerdo al movimiento del jugador
         Siendo que 'withplayer' sea True, este método debe ser llamado
         en algún momento dentro de una instancia de la clase AbstractScene
         con las coordenadas del sprite origen.
         """
-        screensizex, screensizey = common.settings.getscreensize()
+        screensizex, screensizey = common.Conf.getscreensize()
         if withplayer:
             camerax = -(screensizex / 2) + playerx
             cameray = -(screensizey / 2) + playery
-            
+
             if camerax < 0: camerax = 0
             if cameray < 0: cameray = 0
             self.__camera.viewport = sfml.Rectangle((camerax, cameray),
@@ -105,20 +105,20 @@ class Director:
                                   tweenTime=5, tweenType=self.defaulteasing)
             self.tweener.addTween(self.__camera, setcentery=playery,
                                   tweenTime=5, tweenType=self.defaulteasing)
-            
+
     def convertcoords(self, coords, view=None):
         """Retorna las coordenadas de un punto relativo a la camara.
         """
         if not isinstance(view, sfml.View):
             view = self.window.view
-            
+
         return self.window.convert_coords(coords, view)
-    
+
     def loop(self):
         "¡El juego se pone en marcha!"
-        
+
         self.clock = sfml.Clock()
-        
+
         while not self.__exitgame:
             # actualizamos el tweener
             self.tweener.update(60 / 1000.0)
@@ -128,14 +128,14 @@ class Director:
                 self.framerate = self.__framecount
                 self.__text.string = "{0} fps".format(self.framerate)
                 self.__framecount = 0
-                
+
             # propagación de eventos
             for event in self.window.events:
                 if type(event) is sfml.CloseEvent:
                     self.__exitgame = True
                     logging.info("Cerrando el programa...")
                     logging.info("Salvando la configuración...")
-                    common.settings.saveconf()
+                    common.Conf.saveconf()
                     logging.info("Configuración del juego salvada!")
                     # logging.info("Guardando las variables globales...")
                     # pass
@@ -145,7 +145,7 @@ class Director:
                     if event.code is sfml.Keyboard.F3:
                         # alternamos entre modo pantalla completa y modo ventana
                         self.alternatefullscreenmode()
-                        
+
                 # Le pasamos el evento a la escena para que haga algo
                 try:
                     self.__actualscene.on_event(event)
@@ -156,7 +156,7 @@ class Director:
                 ## TODO:
                 # Le pasamos el evento al dialogo para que haga algo
                 #self.__widgetmanager.on_event(event)
-                
+
             # actualizamos la escena
             # try:
             #     self.__actualscene.on_update(event)
@@ -164,7 +164,7 @@ class Director:
             #     raise TAAttrIsNotScene, ("Sucedió un error en "
             #                              "alguna parte del bucle:"
             #                              " {0}".format(e))
-                
+
             # dibujamos la escena
             self.window.clear(sfml.Color.BLACK)
             try:
@@ -173,13 +173,13 @@ class Director:
                 raise TAAttrIsNotScene, ("Sucedió un error en "
                                          "alguna parte del bucle:"
                                          " {0}".format(e))
-            
+
             # Cambiamos el view de nuestra ventana por el que esta por defecto
             # Para dibujar los elementos de la UI. Puede que algunos elementos
             # de la UI necesiten ser dibujados dentro de
             # nuestro sfml.View regular
             self.window.view = self.window.default_view
-            self.window.draw(self.__text)
+            #self.window.draw(self.__text)
             # TODO: crear un sistema de widgets personalisable
             #   con CSS.
             # TODO: Dibujamos los widgets
@@ -188,16 +188,16 @@ class Director:
             self.__framecount += 1
             # Restablecemos el view de nuestra ventana al sfml.View regular
             self.window.view = self.__camera
-            # La aplicación ya es dormida en cada llamada a 
+            # La aplicación ya es dormida en cada llamada a
             # window.display(), de ahí que no necesitemos más
             # llamadas a sfml.sleep()
-            
+
         ## GAME OVER!
         self.window.close()
-        
+
     def changescene(self, scene):
         "Cambia la escena actual."
-        
+
         if isinstance(scene, scenefactory.AbstractScene):
             logging.info("Cambiando de escena: {0}".format(scene))
             self.__actualscene = scene
@@ -205,35 +205,35 @@ class Director:
             raise TAAttrIsNotScene, ("El objeto {0} no es instancia "
                                      "de scenefactory."
                                      "AbstractScene".format(type(scene)))
-        
+
     def alternatefullscreenmode(self):
         "Alterna entre modo pantalla completa y modo ventana"
-        
+
         # FIXME: existe un error al cambiar a modo pantalla
         # completa con una resolución de pantalla pequeña.
         if not self.__fullscreenmode:
             self.window.recreate(
                 sfml.VideoMode(self.window.width,
-                               self.window.height), 
+                               self.window.height),
                 self.getglobalvariable("game title"),
                 sfml.Style.FULLSCREEN)
             self.__fullscreenmode = True
         else:
             self.window.recreate(
                 sfml.VideoMode(self.window.width,
-                               self.window.height), 
+                               self.window.height),
                 self.getglobalvariable("game title"))
             self.__fullscreenmode = False
-            
+
     def setglobalvariable(self, name, value):
         """ Crea una variable global a la cual cualquier escena puede acceder.
-        
+
         es algo difícil compartir datos entre escenas, por ello se usara la
         clase Director para almacenar variables que luego puedan ser usadas
         por otras escenas.
         """
         self.__globalvariables[str(name)] = value
-        
+
     def getglobalvariable(self, name):
         """ Retorna alguna el valor de alguna variable global.
         """
@@ -242,13 +242,13 @@ class Director:
         else:
             raise TAGlobalVariableException, "{0} variable no definida".format(
                 name)
-        
+
     def delglobalvariable(self, name):
         """ Borra una variable global previamente definida.
         """
         if self.__globalvariables.has_key(str(name)):
             self.__globalvariables.pop(str(name))
-            
+
     def getcameraposition(self):
         """Retorna la posicion de la camara.
         """
@@ -258,36 +258,36 @@ class Director:
         """Nos saca del loop del juego
         """
         self.__exitgame = True
-    
+
 class customView(sfml.View):
     """"Clase personalizada para el manejo de una cámara. La inexistencia
     de setters/getters en esta clase la hace difícil de usar en conjunto
     con pytweener, de ahí la necesidad de escribir esta clase.
     """
-    
+
     def __init__(self):
         sfml.View.__init__(self)
-        
+
     def setcenterx(self, x):
         """Establece el valor del centro de la cámara en el eje X.
         """
         self.center = sfml.Vector2(x, self.center.y)
-        
+
     def setcentery(self, y):
         """Establece el valor del centro de la cámara en el eje Y.
         """
         self.center = sfml.Vector2(self.center.x, y)
-        
+
     def getcenterx(self):
         """Retorna el valor del centro de la cámara en el eje X.
         """
         return self.center.x
-    
+
     def getcentery(self):
         """Retorna el valor del centro de la cámara en el eje X.
         """
         return self.center.y
-    
+
     def getcenterxy(self):
         """Retorna las coordenadas X y Y del centro de la camara.
         """
