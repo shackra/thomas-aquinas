@@ -2,7 +2,7 @@
 <body>
 <div>
 <h1>Report</h1>
-<p>740 statements analysed.</p><div>
+<p>736 statements analysed.</p><div>
 <h2>Statistics by type</h2>
 <table>
 <tr class="header">
@@ -70,8 +70,8 @@
 </tr>
 <tr class="even">
 <td>warning</td>
+<td>33</td>
 <td>34</td>
-<td>35</td>
 <td>-1.00</td>
 </tr>
 <tr class="odd">
@@ -95,35 +95,35 @@
 <tr class="even">
 <td>lib.spritefactory</td>
 <td>40.00</td>
-<td>26.47</td>
+<td>27.27</td>
 <td>45.45</td>
 <td>15.00</td>
 </tr>
 <tr class="odd">
 <td>lib.scenemanager</td>
 <td>30.00</td>
-<td>23.53</td>
+<td>24.24</td>
 <td>18.18</td>
 <td>25.00</td>
 </tr>
 <tr class="even">
 <td>lib.common</td>
 <td>30.00</td>
-<td>11.76</td>
+<td>12.12</td>
 <td>9.09</td>
 <td>22.50</td>
 </tr>
 <tr class="odd">
 <td>lib.scenefactory</td>
 <td>0.00</td>
-<td>35.29</td>
+<td>33.33</td>
 <td>27.27</td>
 <td>25.00</td>
 </tr>
 <tr class="even">
 <td>lib.media</td>
 <td>0.00</td>
-<td>2.94</td>
+<td>3.03</td>
 <td>0.00</td>
 <td>10.00</td>
 </tr>
@@ -154,7 +154,7 @@
 </tr>
 <tr class="even">
 <td>W0201</td>
-<td>6</td>
+<td>5</td>
 </tr>
 <tr class="odd">
 <td>C0301</td>
@@ -232,8 +232,19 @@
 </div>
 <div>
 <h2>Global evaluation</h2>
-Your code has been rated at 8.18/10 (previous run: 8.16/10)
+Your code has been rated at 8.18/10 (previous run: 8.18/10)
 That's pretty good. Good work mate.</div>
+<div>
+<h2>External dependencies</h2>
+<pre>chardet (lib.common)
+cjson (lib.spritefactory)
+sfml (lib.scenemanager,lib.scenefactory,lib.spritefactory,lib.media)
+thirdparty 
+  \-pitweener 
+  | \-src 
+  |   \-PiTweener (lib.scenemanager,lib.media)
+  \-pytmx 
+    \-tmxloader (lib.scenefactory)</pre></div>
 <div>
 <h2>Duplication</h2>
 <table>
@@ -258,17 +269,6 @@ That's pretty good. Good work mate.</div>
 </table>
 </div>
 <div>
-<h2>External dependencies</h2>
-<pre>chardet (lib.common)
-cjson (lib.spritefactory)
-sfml (lib.scenemanager,lib.scenefactory,lib.spritefactory,lib.media)
-thirdparty 
-  \-pitweener 
-  | \-src 
-  |   \-PiTweener (lib.scenemanager,lib.media)
-  \-pytmx 
-    \-tmxloader (lib.scenefactory)</pre></div>
-<div>
 <h2>Raw metrics</h2>
 <table>
 <tr class="header">
@@ -280,31 +280,31 @@ thirdparty
 </tr>
 <tr class="even">
 <td>code</td>
+<td>886</td>
+<td>52.09</td>
 <td>890</td>
-<td>52.14</td>
-<td>890</td>
-<td>=</td>
+<td>-4.00</td>
 </tr>
 <tr class="odd">
 <td>docstring</td>
+<td>447</td>
+<td>26.28</td>
 <td>448</td>
-<td>26.24</td>
-<td>448</td>
-<td>=</td>
+<td>-1.00</td>
 </tr>
 <tr class="even">
 <td>comment</td>
 <td>190</td>
-<td>11.13</td>
+<td>11.17</td>
 <td>190</td>
 <td>=</td>
 </tr>
 <tr class="odd">
 <td>empty</td>
+<td>178</td>
+<td>10.46</td>
 <td>179</td>
-<td>10.49</td>
-<td>179</td>
-<td>=</td>
+<td>-1.00</td>
 </tr>
 </table>
 </div>
@@ -691,7 +691,7 @@ thirdparty
 <td>C0301</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>69</td>
+<td>71</td>
 <td>0</td>
 <td>Line too long (82/80)</td>
 </tr>
@@ -699,7 +699,7 @@ thirdparty
 <td>C0301</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>216</td>
+<td>218</td>
 <td>0</td>
 <td>Line too long (95/80)</td>
 </tr>
@@ -707,7 +707,7 @@ thirdparty
 <td>W0511</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>157</td>
+<td>159</td>
 <td>0</td>
 <td>TODO: sacarnos del juego.</td>
 </tr>
@@ -715,7 +715,7 @@ thirdparty
 <td>W0511</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>160</td>
+<td>162</td>
 <td>0</td>
 <td>FIXME: no deben tomarse en cuenta sets de baldosas</td>
 </tr>
@@ -723,7 +723,7 @@ thirdparty
 <td>W0511</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>291</td>
+<td>284</td>
 <td>0</td>
 <td>FIXME: usar valores correctos para esta clase de orientacion</td>
 </tr>
@@ -731,7 +731,7 @@ thirdparty
 <td>W0511</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>328</td>
+<td>321</td>
 <td>0</td>
 <td>FIXME: No dibuja correctamente</td>
 </tr>
@@ -739,7 +739,7 @@ thirdparty
 <td>W0511</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>350</td>
+<td>343</td>
 <td>0</td>
 <td>TODO: implementar el posicionamiento de mapas isometricos</td>
 </tr>
@@ -747,7 +747,7 @@ thirdparty
 <td>W0511</td>
 <td>lib.scenefactory</td>
 <td>&#160;</td>
-<td>392</td>
+<td>385</td>
 <td>0</td>
 <td>FIXME: mejorar transversion de la lista para</td>
 </tr>
@@ -779,7 +779,7 @@ thirdparty
 <td>R0914</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.loadmaptiles</td>
-<td>72</td>
+<td>74</td>
 <td>4</td>
 <td>Too many local variables (19/15)</td>
 </tr>
@@ -787,7 +787,7 @@ thirdparty
 <td>C0103</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.loadmaptiles</td>
-<td>115</td>
+<td>117</td>
 <td>12</td>
 <td>Invalid name "p" for type variable (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
@@ -795,7 +795,7 @@ thirdparty
 <td>R0914</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>232</td>
+<td>234</td>
 <td>4</td>
 <td>Too many local variables (25/15)</td>
 </tr>
@@ -803,7 +803,7 @@ thirdparty
 <td>W0106</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>302</td>
+<td>295</td>
 <td>16</td>
 <td>Expression "[visibledata.extend(x[rcoordx:rwidth]) for x in layerdata[rcoordy:rheight]]" is assigned to nothing</td>
 </tr>
@@ -811,7 +811,7 @@ thirdparty
 <td>C0103</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>315</td>
+<td>308</td>
 <td>16</td>
 <td>Invalid name "v1" for type variable (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
@@ -819,7 +819,7 @@ thirdparty
 <td>C0103</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>315</td>
+<td>308</td>
 <td>20</td>
 <td>Invalid name "v2" for type variable (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
@@ -827,7 +827,7 @@ thirdparty
 <td>C0103</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>315</td>
+<td>308</td>
 <td>24</td>
 <td>Invalid name "v3" for type variable (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
@@ -835,7 +835,7 @@ thirdparty
 <td>C0103</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>315</td>
+<td>308</td>
 <td>28</td>
 <td>Invalid name "v4" for type variable (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
@@ -843,17 +843,33 @@ thirdparty
 <td>R0915</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene.__refreshvisibletiles</td>
-<td>232</td>
+<td>234</td>
 <td>4</td>
-<td>Too many statements (58/50)</td>
+<td>Too many statements (52/50)</td>
 </tr>
 <tr class="even">
 <td>W0201</td>
 <td>lib.scenefactory</td>
-<td>AbstractScene.__refreshvisibletiles</td>
-<td>261</td>
-<td>12</td>
-<td>Attribute '__oldviewcenter' defined outside __init__</td>
+<td>AbstractScene.loadmaptiles</td>
+<td>90</td>
+<td>8</td>
+<td>Attribute 'sprites' defined outside __init__</td>
+</tr>
+<tr class="odd">
+<td>W0201</td>
+<td>lib.scenefactory</td>
+<td>AbstractScene.loadmapimages</td>
+<td>180</td>
+<td>8</td>
+<td>Attribute 'scenetileset' defined outside __init__</td>
+</tr>
+<tr class="even">
+<td>W0201</td>
+<td>lib.scenefactory</td>
+<td>AbstractScene.loadmaptiles</td>
+<td>85</td>
+<td>8</td>
+<td>Attribute '__tmxmapfile' defined outside __init__</td>
 </tr>
 <tr class="odd">
 <td>W0201</td>
@@ -861,33 +877,9 @@ thirdparty
 <td>AbstractScene.loadmaptiles</td>
 <td>88</td>
 <td>8</td>
-<td>Attribute 'sprites' defined outside __init__</td>
-</tr>
-<tr class="even">
-<td>W0201</td>
-<td>lib.scenefactory</td>
-<td>AbstractScene.loadmapimages</td>
-<td>178</td>
-<td>8</td>
-<td>Attribute 'scenetileset' defined outside __init__</td>
-</tr>
-<tr class="odd">
-<td>W0201</td>
-<td>lib.scenefactory</td>
-<td>AbstractScene.loadmaptiles</td>
-<td>83</td>
-<td>8</td>
-<td>Attribute '__tmxmapfile' defined outside __init__</td>
-</tr>
-<tr class="even">
-<td>W0201</td>
-<td>lib.scenefactory</td>
-<td>AbstractScene.loadmaptiles</td>
-<td>86</td>
-<td>8</td>
 <td>Attribute 'tmxdata' defined outside __init__</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>C0301</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -895,7 +887,7 @@ thirdparty
 <td>0</td>
 <td>Line too long (82/80)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>C0301</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -903,7 +895,7 @@ thirdparty
 <td>0</td>
 <td>Line too long (81/80)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>W0511</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -911,7 +903,7 @@ thirdparty
 <td>0</td>
 <td>FIXME: En la comprobación de colisiones/contacto puede que el uso de bucles</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>W0511</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -919,7 +911,7 @@ thirdparty
 <td>0</td>
 <td>FIXME: la cantidad de cuadros por seguno</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>W0511</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -927,7 +919,7 @@ thirdparty
 <td>0</td>
 <td>TODO: soportar tipos de ciclos de animacion, como linear</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>W0511</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -935,7 +927,7 @@ thirdparty
 <td>0</td>
 <td>TODO: itertools.cycle puede ser una gran herramienta, aun así</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>W0511</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -943,7 +935,7 @@ thirdparty
 <td>0</td>
 <td>FIXME: posible area de overhead</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>W0511</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -951,7 +943,7 @@ thirdparty
 <td>0</td>
 <td>FIXME: Actualmente esto no sirve así como esta...</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>C0111</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -959,7 +951,7 @@ thirdparty
 <td>0</td>
 <td>Missing docstring</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>R0902</td>
 <td>lib.spritefactory</td>
 <td>Entity</td>
@@ -967,7 +959,7 @@ thirdparty
 <td>0</td>
 <td>Too many instance attributes (14/7)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>C0103</td>
 <td>lib.spritefactory</td>
 <td>Entity.__init__</td>
@@ -975,7 +967,7 @@ thirdparty
 <td>8</td>
 <td>Invalid name "id" for type attribute (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>R0913</td>
 <td>lib.spritefactory</td>
 <td>Entity.__init__</td>
@@ -983,7 +975,7 @@ thirdparty
 <td>4</td>
 <td>Too many arguments (6/5)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>W0622</td>
 <td>lib.spritefactory</td>
 <td>Entity.__init__</td>
@@ -991,7 +983,7 @@ thirdparty
 <td>23</td>
 <td>Redefining built-in 'id'</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>C0103</td>
 <td>lib.spritefactory</td>
 <td>Entity.__init__</td>
@@ -999,7 +991,7 @@ thirdparty
 <td>4</td>
 <td>Invalid name "id" for type argument (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>C0103</td>
 <td>lib.spritefactory</td>
 <td>Entity.__init__</td>
@@ -1007,7 +999,7 @@ thirdparty
 <td>23</td>
 <td>Invalid name "id" for type variable (should match [a-z_][a-z0-9_]{2,30}$)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>E0602</td>
 <td>lib.spritefactory</td>
 <td>Entity.addsoundfx</td>
@@ -1015,7 +1007,7 @@ thirdparty
 <td>20</td>
 <td>Undefined variable 'soundname'</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>E0602</td>
 <td>lib.spritefactory</td>
 <td>Entity.addsoundfx</td>
@@ -1023,7 +1015,7 @@ thirdparty
 <td>20</td>
 <td>Undefined variable 'soundname'</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>R0201</td>
 <td>lib.spritefactory</td>
 <td>Entity.__tupletorect</td>
@@ -1031,7 +1023,7 @@ thirdparty
 <td>4</td>
 <td>Method could be a function</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>E0602</td>
 <td>lib.spritefactory</td>
 <td>Entity.__loadspritedata</td>
@@ -1039,7 +1031,7 @@ thirdparty
 <td>18</td>
 <td>Undefined variable 'common'</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>R0201</td>
 <td>lib.spritefactory</td>
 <td>Entity.__loadspritedata</td>
@@ -1047,7 +1039,7 @@ thirdparty
 <td>4</td>
 <td>Method could be a function</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>E1101</td>
 <td>lib.spritefactory</td>
 <td>Entity.addrectangle</td>
@@ -1055,7 +1047,7 @@ thirdparty
 <td>24</td>
 <td>Instance of 'Entity' has no 'position' member</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>W0611</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -1063,7 +1055,7 @@ thirdparty
 <td>0</td>
 <td>Unused import lib</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>W0611</td>
 <td>lib.spritefactory</td>
 <td>&#160;</td>
@@ -1071,7 +1063,7 @@ thirdparty
 <td>0</td>
 <td>Unused import media</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>R0921</td>
 <td>lib.scenefactory</td>
 <td>AbstractScene</td>

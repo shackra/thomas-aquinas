@@ -46,6 +46,8 @@ class AbstractScene(sfml.Drawable):
         sfml.Drawable.__init__(self)
         self.scenemanager = scenemanager
         self.__vertexarraytodraw = []
+        self.__oldviewcenter = sfml.View().center
+        self.__oldviewcenter += sfml.Vector2(1000.0, 1000.0)
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
@@ -237,15 +239,6 @@ class AbstractScene(sfml.Drawable):
         actual es mayor al ancho y alto de una baldosa (en los ejes positivos
         y negativos).
         """
-        try:
-            assert self.__oldviewcenter
-        except AttributeError:
-            # FIRST time!
-            logging.debug("La propiedad '__oldviewcenter'"
-                          " no existe, creándola...")
-            self.__oldviewcenter = currentview.center
-            self.__oldviewcenter += sfml.Vector2(1000.0, 1000.0)
-
         # obtenemos la diferencia entre los centros de cada view
         currentdiff = self.__oldviewcenter - currentview.center
 
