@@ -45,7 +45,7 @@ class AbstractScene(sfml.Drawable):
     def __init__(self, scenemanager):
         sfml.Drawable.__init__(self)
         self.scenemanager = scenemanager
-        self.__vertexarraylist = []
+        self.__vertexarraytodraw = []
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
@@ -85,21 +85,18 @@ class AbstractScene(sfml.Drawable):
             )
         self.tmxdata = tmxloader.load_tmx(self.__tmxmapfile)
         self.tmxdata.dontdrawtiles = dontdrawtiles
-        self.__vertexarraytodraw = []
         self.sprites = []
         self.tmxdata.images = [0] * self.tmxdata.maxgid
         tileimgheight = 0
 
         logging.info("Cargando las baldosas del escenerio...")
-        for firstgid, tile in sorted((tile.firstgid, tile)
+        for tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
-
             # agregamos una lista como capa para los sprites
             self.sprites.append([])
             # agregamos un VertexArray como capa para los vertexs
             self.__vertexarraytodraw.append(sfml.VertexArray(
-                    sfml.PrimitiveType.QUADS)
-                                            )
+                    sfml.PrimitiveType.QUADS))
             realgid = tile.firstgid - 1
             logging.debug("GID del set de baldosas: {0}".format(tile.firstgid))
 
@@ -166,7 +163,7 @@ class AbstractScene(sfml.Drawable):
         imagewidth = sorted(tile.width for tile in self.tmxdata.tilesets)[-1]
         imagetmp = sfml.Image.create(imagewidth, imageheight, sfml.Color.WHITE)
 
-        for firstgid, tile in sorted((tile.firstgid, tile)
+        for tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
             tilefilepath = common.Conf.joinpaths(
                 common.Conf.getrootfolder(),
@@ -205,14 +202,13 @@ class AbstractScene(sfml.Drawable):
                     objectgroup.drawbefore)
                 # miramos en qué indice esta la capa de patrones
                 layerindex = self.tmxdata.tilelayers.index(tilelayer)
-                tilewidth, tileheight = (self.tmxdata.tilewidth,
-                                         self.tmxdata.tileheight)
+                #tilewidth, tileheight = (self.tmxdata.tilewidth,
+                #                         self.tmxdata.tileheight)
             # repasamos el grupo de objetos
             for entity in objectgroup:
                 # todas las entidades cuyo tipo sea None, son objetos del
                 # juego.
                 if not entity.type:
-                    entitygid = self.tmxdata.mapGID(entity.gid)
                     entityimgrect = self.tmxdata.images[entity.gid]
                     logging.debug("Tipo: {0}".format(type(entityimgrect)))
                     entityobj = Entity(
@@ -261,9 +257,6 @@ class AbstractScene(sfml.Drawable):
                                                (-tileheight >= currentdiff.y)):
             logging.debug("El centro del view de Window"
                           " a cambiado, diferencia: {0}".format(currentdiff))
-            # sencillamente limpiamos de vertexs cada vertexarray
-            for vertexarray in self.__vertexarraytodraw:
-                vertexarray.clear()
             # Sí se ha movido el centro de forma significativa!
             self.__oldviewcenter = currentview.center
             # Creamos un rectángulo que representa la zona visible del escenario
@@ -273,101 +266,96 @@ class AbstractScene(sfml.Drawable):
                                   )
 
             logging.debug("Recreando baldosas visibles...")
-            for array, arrayindex, xarrayrange in self.__vertexarrayranges:
-                for vertex in xarrayrange:
-                    if (rect.contains(array[vertex].position) or
-                        rect.contains(array[vertex + 1].position) or
-                        rect.contains(array[vertex + 2].position) or
-                        rect.contains(array[vertex + 3].position)):
-                        # Esta baldosa existe!
-                        self.__vertexarraytodraw[arrayindex].append(
-                            array[vertex])
-                        self.__vertexarraytodraw[arrayindex].append(
-                            array[vertex + 1])
-                        self.__vertexarraytodraw[arrayindex].append(
-                            array[vertex + 2])
-                        self.__vertexarraytodraw[arrayindex].append(
-                            array[vertex + 3])
+            rcoordx, rcoordy, rheight, rwidth = (rect.left, rect.top,
+                                                 rect.height, rect.width)
 
-    def posvertexs(self):
-        """ Posiciona los vértices y los guarda en la lista de VertexArrays.
+            # normalizamos las coordenadas X y Y del rectangulo
+            if rcoordx < 0:
+                rcoordx = rcoordx * -1
+            elif rcoordy < 0:
+                rcoordy = rcoordy * -1
 
-        Lo ideal es llamar a esta función una vez luego de cargado el mapa.
-        Así tendremos posicionados todos los vértices dentro de sus vertexarrays
-        """
-        # Obtenemos el alto y ancho de las baldosas
-        height, width = (self.tmxdata.tileheight,
-                         self.tmxdata.tilewidth)
-        tiles = product(
-            xrange(len(self.tmxdata.tilelayers)),
-            xrange(self.tmxdata.width),
-            xrange(self.tmxdata.height - 1, -1, -1) \
-                if self.tmxdata.orientation == "isometric"\
-                else xrange(self.tmxdata.height))
+            # pasamos las coordenadas de pixeles a baldosas
+            rcoordx, rwidth = (int(rcoordx / tilewidth),
+                               int(rwidth / tilewidth))
+            rcoordy, rheight = (int(rcoordy / tileheight),
+                                int(rheight / tileheight))
 
-        vertexarraylist = []
-        for i in xrange(0, len(self.tmxdata.tilelayers)):
-            vertexarraylist.append(
-                sfml.VertexArray(sfml.PrimitiveType.QUADS))
+            # creamos un producto cartesiano y nos ahorramos overhead ;)
+            orentation = self.tmxmapdata.orientation
+            if orentation == "orthogonal":
+                heightxrange = xrange(rcoordy, rheight+1)
+            elif orentation == "isometric":
+                heightxrange = xrange(rheight, rcoordy+1, -1)
+            elif orentation == "staggered":
+                # FIXME: usar valores correctos para esta clase de orientacion
+                heightxrange = xrange(rheight, rcoordy+1, -1)
+                
+            cartprod = product(xrange(len(self.tmxdata.tilelayers)),
+                               xrange(rcoordx, rwidth+1),
+                               heightxrange)
 
-        for layer, x, y in tiles:
-            quad = self.tmxdata.getTileImage(x, y, layer)
-            if quad:
-                # Tenemos dos formas de dibujar la baldosa
-                # si es ortográfica, entonces se coloca de
-                # la siguiente forma: (x * width, y * height)
-                # Si es isometrica, entonces de la siguiente
-                # forma: ((x * width / 2) + (y * width / 2),
-                # (y * height / 2) - (x * height /2))
+            layersvisibledata = []
+            for layer in xrange(len(self.tmxdata.tilelayers)):
+                layerdata = self.tmxdata.getLayerData(layer)
+                visibledata = []
+                [visibledata.extend(x[rcoordx:rwidth])
+                                    for x in layerdata[rcoordy:rheight]]
+                layersvisibledata.append(visibledata)
+                self.__vertexarraytodraw[layer].clear()
 
-                # Desempacamos los Vertexs
+            # Esto deberia juntar todas las listas (1 por capa) en un
+            # sólo objeto iterable.
+            layersvisibledata = chain.from_iterable(layersvisibledata)
+
+            for layer, coordx, coordy in cartprod:
+                # obtenemos la imagen de la baldosa
+                tilerect = self.tmxmapdata.images[layersvisibledata.next()]
+                # creamos algunos vertices
                 v1, v2, v3, v4 = (sfml.Vertex(),
                                   sfml.Vertex(),
                                   sfml.Vertex(),
                                   sfml.Vertex())
 
                 # mapeamos correctamente el vertice en la textura
-                v1.tex_coords = (quad.left, quad.top)
-                v2.tex_coords = (quad.right, quad.top)
-                v3.tex_coords = (quad.right, quad.bottom)
-                v4.tex_coords = (quad.left, quad.bottom)
+                v1.tex_coords = (tilerect.left, tilerect.top)
+                v2.tex_coords = (tilerect.right, tilerect.top)
+                v3.tex_coords = (tilerect.right, tilerect.bottom)
+                v4.tex_coords = (tilerect.left, tilerect.bottom)
 
-                if self.tmxdata.orientation == "isometric":
-                    # posicionamos el vertice con respecto a la pantalla
+                # posicionamos el vertice en la pantalla
+                if orentation == "isometric":
+                    # FIXME: No dibuja correctamente
                     v1.position = sfml.Vector2(
-                        float((x * width / 2) + (y * width / 2)),
-                        float((y * height / 2) - (y * height / 2)))
+                        float((coordx * tilewidth / 2) + \
+                             (coordy * tilewidth / 2)),
+                        float((coordy * tileheight / 2) - \
+                             (coordy * tileheight / 2)))
                     v2.position = sfml.Vector2(
-                        v1.position.x + width, v1.position.y)
+                        v1.position.x + tilewidth, v1.position.y)
                     v3.position = sfml.Vector2(
-                        v1.position.x + width, v1.position.y + height)
+                        v1.position.x + tilewidth, v1.position.y + tileheight)
                     v4.position = sfml.Vector2(
-                        v1.position.x, v1.position.y + height)
-                else:
+                        v1.position.x, v1.position.y + tileheight)
+                elif orentation == "orthogonal":
                     v1.position = sfml.Vector2(
-                        float(x * width), float(y * height))
-                    v2.position = sfml.Vector2(v1.position.x + width,
+                        float(coordx * tilewidth), float(coordy * tileheight))
+                    v2.position = sfml.Vector2(v1.position.x + tilewidth,
                                                v1.position.y)
-                    v3.position = sfml.Vector2(v1.position.x + width,
-                                               v1.position.y + height)
+                    v3.position = sfml.Vector2(v1.position.x + tilewidth,
+                                               v1.position.y + tileheight)
                     v4.position = sfml.Vector2(v1.position.x,
-                                               v1.position.y + height)
+                                               v1.position.y + tileheight)
+                elif orentation == "staggered":
+                    # TODO: implementar el posicionamiento de mapas isometricos
+                    # escalonados.
+                    pass
 
-
-                # agregamos los vertices a su respectivo VertexArray
-                vertexarraylist[layer].append(v1)
-                vertexarraylist[layer].append(v2)
-                vertexarraylist[layer].append(v3)
-                vertexarraylist[layer].append(v4)
-
-        # Generamos una comprensión de lista, necesitaremos
-        # una de estas porque van a ser accedida muchas veces
-        # durante la visualización del escenario.
-        self.__vertexarrayranges = [(array,
-                                     vertexarraylist.index(array),
-                                     xrange(0, len(array), 4))
-                                    for array in
-                                    vertexarraylist]
+                # Agregamos el vertice a su VertexArray correspondiente
+                self.__vertexarraytodraw[layer].append(v1)
+                self.__vertexarraytodraw[layer].append(v2)
+                self.__vertexarraytodraw[layer].append(v3)
+                self.__vertexarraytodraw[layer].append(v4)
 
     def addsprite(self, entity):
         """ Agrega un sprite para ser dibujado en el escenario.

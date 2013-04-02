@@ -115,7 +115,7 @@ class Entity:
         """
         self.__listener = yesorno
         for sound in self._sndfx.itervalues():
-                sound.relative_to_listener = not self.__listener
+            sound.relative_to_listener = not self.__listener
 
     def islistener(self):
         """ Es la entidad el punto de escucha?
