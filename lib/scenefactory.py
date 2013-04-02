@@ -283,7 +283,7 @@ class AbstractScene(sfml.Drawable):
             elif orentation == "staggered":
                 # FIXME: usar valores correctos para esta clase de orientacion
                 heightxrange = xrange(rheight, rcoordy+1, -1)
-                
+
             cartprod = product(xrange(len(self.tmxdata.tilelayers)),
                                xrange(rcoordx, rwidth+1),
                                heightxrange)
