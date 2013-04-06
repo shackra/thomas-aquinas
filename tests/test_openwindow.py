@@ -25,15 +25,15 @@ from lib.scenefactory import AbstractScene
 from lib.scenemanager import Director
 
 class Scene(AbstractScene):
-    def __init__(self, scenemanager):
-        AbstractScene.__init__(self, scenemanager)
+    def __init__(self, scenemanager, initialmapfile):
+        AbstractScene.__init__(self, scenemanager, initialmapfile)
         self.clock = sfml.Clock()
         self.timelapsed = 0
 
     def on_draw(self, window):
         window.draw(self)
         self.timelapsed += self.clock.restart().milliseconds
-        if self.timelapsed >= 3000.0:
+        if self.timelapsed >= 10000.0:
             self.scenemanager.exitgame()
 
     def on_event(self, event):
@@ -49,31 +49,33 @@ class TestOpenwindow:
         global director
         global scene
         director = Director()
-        scene = Scene(director)
+        scene = Scene(director, None)
 
-    @classmethod
-    def teardown_class(cls):
-        print ("Limpiando la configuración de la prueba")
-        # del(director)
-        # del(scene)
-
-    @nose.tools.timed(4)
+    @nose.tools.timed(11)
     def test_openwindow(self):
-        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        scene = Scene(director, None)
+        director.changescene(scene)
+        print ("Una ventana debe abrirse durante 10 segundos")
+        director.loop()
+
+    @nose.tools.timed(11)
+    def test_minimapa(self):
+        scene = Scene(director, "/uniteststuff/minimap.tmx")
+        scene.loadmaptiles()
         scene.loadmapimages()
         scene.loadmapobjects()
-        scene.posvertexs()
         director.changescene(scene)
-        print ("Una ventana debe abrirse durante tres segundos")
         director.loop()
 
     def test_loadmaptiles(self):
-        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        scene.loadanothermap("/uniteststuff/4tilesmap.tmx")
+        scene.loadmaptiles()
         eq_(len(scene.tmxdata.images), 5)
         ok_(isinstance(scene.tmxdata.images[0], int), ("El primer valor de la "
                                                         "lista no es del tipo"
                                                         " int"))
 
     def test_loadmapimages(self):
-        scene.loadmaptiles("/uniteststuff/4tilesmap.tmx")
+        scene.loadanothermap("/uniteststuff/4tilesmap.tmx")
+        scene.loadmaptiles()
         scene.loadmapimages()

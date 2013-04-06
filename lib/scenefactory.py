@@ -42,15 +42,30 @@ class AbstractScene(sfml.Drawable):
     en sus subclases!
     """
 
-    def __init__(self, scenemanager):
+    def __init__(self, scenemanager, initialmapfile):
         sfml.Drawable.__init__(self)
         self.scenemanager = scenemanager
+        if isinstance(initialmapfile, unicode) or isinstance(initialmapfile, str):
+            self.tmxdata = tmxloader.load_tmx(
+                       common.Conf.fromrootfolderget(initialmapfile))
+            self.tmxdata.images = [0] * self.tmxdata.maxgid
+            self.dontdrawtiles = False
+        else:
+            self.tmxdata = None
+        self.sprites = []
         self.__vertexarraytodraw = []
         self.__oldviewcenter = sfml.View().center
         self.__oldviewcenter += sfml.Vector2(1000.0, 1000.0)
         # Para cambiar una escena puede hacer lo siguiente:
         #     self.scenemanager.changescene(nuevaescena)
         # Y eso es todo :)
+
+    def drawtiles(self, status=True):
+        """ Indicamos si deseamos o no dibujar las baldosas del mapa.
+
+        Los objetos del mapa y las entidades no resultan afectados.
+        """
+        self.dontdrawtiles = not status
 
     def updatesprites(self, event):
         """ Se actualiza el estado de todos los sprites.
@@ -71,28 +86,36 @@ class AbstractScene(sfml.Drawable):
         "El manejador de escenas llamara este método cuando aya que dibujar algo."
         raise NotImplementedError("Implemente el método on_draw.")
 
-    def loadmaptiles(self, tmxfile, dontdrawtiles=False):
+    def loadanothermap(self, tmxfile, dontdrawtiles=False):
+        """ Carga los datos de otro mapa.
+
+        Algunos mapas comparten datos, como por ejemplo, las imagenes usadas
+        como texturas para las baldosas.
+        """
+        if self.tmxdata:
+            self.tmxdata.filename = common.Conf.fromrootfolderget(tmxfile)
+            self.tmxdata.load()
+        else:
+            self.tmxdata = tmxloader.load_tmx(
+                           common.Conf.fromrootfolderget(tmxfile))
+        self.dontdrawtiles = dontdrawtiles
+
+    def loadmaptiles(self):
         """ Carga los rectangulos de un mapa TMX.
 
         Este metodo SOLAMENTE cargara todos los rectangulos
         de cada imagen del juego. Para cargar las imagenes
         usadas en el mapa usa loadmapimages().
-
-        La bandera 'dontdrawtiles' nos dice si quieremos dibujar
-        o no las baldosas del escenario. Util cuando se quiere
-        dibujar solamente los objetos del escenario.
         """
-        self.__tmxmapfile = common.Conf.joinpaths(
-            common.Conf.getrootfolder(), tmxfile
-            )
-        self.tmxdata = tmxloader.load_tmx(self.__tmxmapfile)
-        self.tmxdata.dontdrawtiles = dontdrawtiles
-        self.sprites = []
-        self.tmxdata.images = [0] * self.tmxdata.maxgid
-        tileimgheight = 0
+        if not self.tmxdata:
+            logging.info("Ningun mapa a sido cargado."
+            " Omitiendo ejecución de {0}".format(self.loadmaptiles.func_name))
+            return
 
+        tileimgheight = 0
+        self.tmxdata.images = [0] * self.tmxdata.maxgid
         logging.info("Cargando las baldosas del escenerio...")
-        for tile in sorted((tile.firstgid, tile)
+        for firstgid, tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
             # agregamos una lista como capa para los sprites
             self.sprites.append([])
@@ -150,6 +173,11 @@ class AbstractScene(sfml.Drawable):
         en algunas tarjetas graficas más modernas esto puede aumentar.
         En tarjetas de video viejas el limite es 512 pixeles.
         """
+        if not self.tmxdata:
+            logging.info("Ningun mapa a sido cargado."
+            " Omitiendo ejecución de {0}".format(self.loadmapimages.func_name))
+            return
+
         maximumsize = sfml.Texture.get_maximum_size()
         if maximumsize <= 512:
             logging.critical("La tarjeta de video es poco "
@@ -165,7 +193,7 @@ class AbstractScene(sfml.Drawable):
         imagewidth = sorted(tile.width for tile in self.tmxdata.tilesets)[-1]
         imagetmp = sfml.Image.create(imagewidth, imageheight, sfml.Color.WHITE)
 
-        for tile in sorted((tile.firstgid, tile)
+        for firstgid, tile in sorted((tile.firstgid, tile)
                                      for tile in self.tmxdata.tilesets):
             tilefilepath = common.Conf.joinpaths(
                 common.Conf.getrootfolder(),
@@ -193,6 +221,11 @@ class AbstractScene(sfml.Drawable):
         ya que necesitamos los gid de cada una de ellas para armar nuestro
         objeto.
         """
+        if not self.tmxdata:
+            logging.info("Ningun mapa a sido cargado."
+            " Omitiendo ejecución de {0}".format(self.loadmapobjects.func_name))
+            return
+
         ## Cada grupo de objetos contiene la propiedad 'drawbefore'
         ## cuyo valor es el nombre de la capa de patrones.
         # repasamos los grupos de objetos
@@ -239,116 +272,130 @@ class AbstractScene(sfml.Drawable):
         actual es mayor al ancho y alto de una baldosa (en los ejes positivos
         y negativos).
         """
+        if not self.tmxdata:
+            logging.info("Ningun mapa a sido cargado."
+            " Omitiendo ejecución "
+            "de {0}".format(self.____refreshvisibletiles.func_name))
+            return
+
         # obtenemos la diferencia entre los centros de cada view
         currentdiff = self.__oldviewcenter - currentview.center
 
         tileheight, tilewidth = (self.tmxdata.tileheight,
                                  self.tmxdata.tilewidth)
 
-        if ((tilewidth <= currentdiff.x) or
+        if (((tilewidth <= currentdiff.x) or
             (-tilewidth >= currentdiff.x)) or ((tileheight <= currentdiff.y) or
-                                               (-tileheight >= currentdiff.y)):
-            logging.debug("El centro del view de Window"
-                          " a cambiado, diferencia: {0}".format(currentdiff))
-            # Sí se ha movido el centro de forma significativa!
-            self.__oldviewcenter = currentview.center
-            # Creamos un rectángulo que representa la zona visible del escenario
-            rect = sfml.Rectangle(currentview.center - currentview.size / 2.0,
-                                  currentview.size + sfml.Vector2(tilewidth,
-                                                                  tileheight)
-                                  )
+            (-tileheight >= currentdiff.y))):
+                logging.debug("El centro del view de Window"
+                              " a cambiado, diferencia: {0}".format(currentdiff))
+                # Sí se ha movido el centro de forma significativa!
+                self.__oldviewcenter = currentview.center
+                # Creamos un rectángulo que representa la zona visible del escenario
+                rect = sfml.Rectangle(currentview.center - currentview.size / 2.0,
+                                      currentview.size + sfml.Vector2(tilewidth,
+                                                                      tileheight))
 
-            logging.debug("Recreando baldosas visibles...")
-            rcoordx, rcoordy, rheight, rwidth = (rect.left, rect.top,
-                                                 rect.height, rect.width)
+                logging.debug("Recreando baldosas visibles...")
+                rcoordx, rcoordy, rheight, rwidth = (rect.left, rect.top,
+                                                     rect.height, rect.width)
 
-            # normalizamos las coordenadas X y Y del rectangulo
-            if rcoordx < 0:
-                rcoordx = rcoordx * -1
-            elif rcoordy < 0:
-                rcoordy = rcoordy * -1
+                # normalizamos las coordenadas X y Y del rectangulo
+                if rcoordx < 0:
+                    rcoordx = rcoordx * -1
+                elif rcoordy < 0:
+                    rcoordy = rcoordy * -1
 
-            # pasamos las coordenadas de pixeles a baldosas
-            rcoordx, rwidth = (int(rcoordx / tilewidth),
-                               int(rwidth / tilewidth))
-            rcoordy, rheight = (int(rcoordy / tileheight),
-                                int(rheight / tileheight))
+                # pasamos las coordenadas de pixeles a baldosas
+                # FIXME: rwidth y rheight se pasan por dos unidades de más
+                rcoordx, rwidth = (int(rcoordx / tilewidth),
+                                   int(rwidth / tilewidth))
+                rcoordy, rheight = (int(rcoordy / tileheight),
+                                    int(rheight / tileheight))
 
-            # creamos un producto cartesiano y nos ahorramos overhead ;)
-            orentation = self.tmxmapdata.orientation
-            if orentation == "orthogonal":
-                heightxrange = xrange(rcoordy, rheight+1)
-            elif orentation == "isometric":
-                heightxrange = xrange(rheight, rcoordy+1, -1)
-            elif orentation == "staggered":
-                # FIXME: usar valores correctos para esta clase de orientacion
-                heightxrange = xrange(rheight, rcoordy+1, -1)
-
-            cartprod = product(xrange(len(self.tmxdata.tilelayers)),
-                               xrange(rcoordx, rwidth+1),
-                               heightxrange)
-
-            layersvisibledata = []
-            for layer in xrange(len(self.tmxdata.tilelayers)):
-                layerdata = self.tmxdata.getLayerData(layer)
-                visibledata = []
-                [visibledata.extend(x[rcoordx:rwidth])
-                                    for x in layerdata[rcoordy:rheight]]
-                layersvisibledata.append(visibledata)
-                self.__vertexarraytodraw[layer].clear()
-
-            # Esto deberia juntar todas las listas (1 por capa) en un
-            # sólo objeto iterable.
-            layersvisibledata = chain.from_iterable(layersvisibledata)
-
-            for layer, coordx, coordy in cartprod:
-                # obtenemos la imagen de la baldosa
-                tilerect = self.tmxmapdata.images[layersvisibledata.next()]
-                # creamos algunos vertices
-                v1, v2, v3, v4 = (sfml.Vertex(),
-                                  sfml.Vertex(),
-                                  sfml.Vertex(),
-                                  sfml.Vertex())
-
-                # mapeamos correctamente el vertice en la textura
-                v1.tex_coords = (tilerect.left, tilerect.top)
-                v2.tex_coords = (tilerect.right, tilerect.top)
-                v3.tex_coords = (tilerect.right, tilerect.bottom)
-                v4.tex_coords = (tilerect.left, tilerect.bottom)
-
-                # posicionamos el vertice en la pantalla
-                if orentation == "isometric":
-                    # FIXME: No dibuja correctamente
-                    v1.position = sfml.Vector2(
-                        float((coordx * tilewidth / 2) + \
-                             (coordy * tilewidth / 2)),
-                        float((coordy * tileheight / 2) - \
-                             (coordy * tileheight / 2)))
-                    v2.position = sfml.Vector2(
-                        v1.position.x + tilewidth, v1.position.y)
-                    v3.position = sfml.Vector2(
-                        v1.position.x + tilewidth, v1.position.y + tileheight)
-                    v4.position = sfml.Vector2(
-                        v1.position.x, v1.position.y + tileheight)
-                elif orentation == "orthogonal":
-                    v1.position = sfml.Vector2(
-                        float(coordx * tilewidth), float(coordy * tileheight))
-                    v2.position = sfml.Vector2(v1.position.x + tilewidth,
-                                               v1.position.y)
-                    v3.position = sfml.Vector2(v1.position.x + tilewidth,
-                                               v1.position.y + tileheight)
-                    v4.position = sfml.Vector2(v1.position.x,
-                                               v1.position.y + tileheight)
+                # creamos un producto cartesiano y nos ahorramos overhead ;)
+                # FIXME: existe un desface con las baldosas desde la capa 2
+                # hasta la capa n+2.
+                orentation = self.tmxdata.orientation
+                if orentation == "orthogonal":
+                    heightxrange = xrange(rcoordy,
+                        rcoordy+self.tmxdata.height)
+                elif orentation == "isometric":
+                    heightxrange = xrange(rheight, rcoordy+1, -1)
                 elif orentation == "staggered":
-                    # TODO: implementar el posicionamiento de mapas isometricos
-                    # escalonados.
-                    pass
+                    # FIXME: usar valores correctos para esta clase de orientacion
+                    heightxrange = xrange(rheight, rcoordy+1, -1)
 
-                # Agregamos el vertice a su VertexArray correspondiente
-                self.__vertexarraytodraw[layer].append(v1)
-                self.__vertexarraytodraw[layer].append(v2)
-                self.__vertexarraytodraw[layer].append(v3)
-                self.__vertexarraytodraw[layer].append(v4)
+                cartprod = product(xrange(len(self.tmxdata.tilelayers)),
+                                   heightxrange,
+                                   xrange(rcoordx,
+                                    rcoordx+self.tmxdata.width))
+                layersvisibledata = []
+                for layer in xrange(len(self.tmxdata.tilelayers)):
+                    layerdata = self.tmxdata.getLayerData(layer)
+                    visibledata = []
+                    [visibledata.extend(x[rcoordx:rwidth])
+                                        for x in layerdata[rcoordy:rheight]]
+                    layersvisibledata.append(visibledata)
+                    self.__vertexarraytodraw[layer].clear()
+
+                # Esto deberia juntar todas las listas (1 por capa) en un
+                # sólo objeto iterable.
+                layersvisibledata = chain.from_iterable(layersvisibledata)
+
+                for layer, coordy, coordx in cartprod:
+                    # obtenemos la imagen de la baldosa
+                    tilegid = layersvisibledata.next()
+                    tilerect = self.tmxdata.images[tilegid]
+                    if isinstance(tilerect, int):
+                        # Necesitamos un espacio en blanco dentro del mapa
+                        continue
+
+                    # creamos algunos vertices
+                    v1, v2, v3, v4 = (sfml.Vertex(),
+                                      sfml.Vertex(),
+                                      sfml.Vertex(),
+                                      sfml.Vertex())
+
+                    # mapeamos correctamente el vertice en la textura
+                    v1.tex_coords = (tilerect.left, tilerect.top)
+                    v2.tex_coords = (tilerect.right, tilerect.top)
+                    v3.tex_coords = (tilerect.right, tilerect.bottom)
+                    v4.tex_coords = (tilerect.left, tilerect.bottom)
+
+                    # posicionamos el vertice en la pantalla
+                    if orentation == "isometric":
+                        # FIXME: No dibuja correctamente
+                        v1.position = sfml.Vector2(
+                            float((coordx * tilewidth / 2) + \
+                                 (coordy * tilewidth / 2)),
+                            float((coordy * tileheight / 2) - \
+                                 (coordy * tileheight / 2)))
+                        v2.position = sfml.Vector2(
+                            v1.position.x + tilewidth, v1.position.y)
+                        v3.position = sfml.Vector2(
+                            v1.position.x + tilewidth, v1.position.y + tileheight)
+                        v4.position = sfml.Vector2(
+                            v1.position.x, v1.position.y + tileheight)
+                    elif orentation == "orthogonal":
+                        v1.position = sfml.Vector2(
+                            float(coordx * tilewidth), float(coordy * tileheight))
+                        v2.position = sfml.Vector2(v1.position.x + tilewidth,
+                                                   v1.position.y)
+                        v3.position = sfml.Vector2(v1.position.x + tilewidth,
+                                                   v1.position.y + tileheight)
+                        v4.position = sfml.Vector2(v1.position.x,
+                                                   v1.position.y + tileheight)
+                    elif orentation == "staggered":
+                        # TODO: implementar el posicionamiento de mapas isometricos
+                        # escalonados.
+                        pass
+
+                    # Agregamos el vertice a su VertexArray correspondiente
+                    self.__vertexarraytodraw[layer].append(v1)
+                    self.__vertexarraytodraw[layer].append(v2)
+                    self.__vertexarraytodraw[layer].append(v3)
+                    self.__vertexarraytodraw[layer].append(v4)
 
     def addsprite(self, entity):
         """ Agrega un sprite para ser dibujado en el escenario.
@@ -400,11 +447,14 @@ class AbstractScene(sfml.Drawable):
         deberá de tener un método on_draw que llamara al método on_draw
         de cada uno de los sprites dentro del grupo.
         """
-        if self.__tmxmapfile:
+        if self.tmxdata:
+            #if self.dontdrawtiles:
             self.__refreshvisibletiles(self.scenemanager.window.view)
             states.texture = self.scenetileset
             drawables = chain.from_iterable(
                 izip_longest(self.__vertexarraytodraw, self.sprites))
+            # Limpiamos la pantalla antes de dibujar nada.
+            target.clear(sfml.Color.BLACK)
             for drawable in drawables:
                 if isinstance(drawable, list):
                     drawable.sort(key=lambda entity: entity.sprite.position.y)
@@ -414,11 +464,14 @@ class AbstractScene(sfml.Drawable):
                 elif isinstance(drawable, sfml.VertexArray):
                     target.draw(drawable, states)
         else:
+            # Ningun mapa se cargo. No se dibuja las baldosas.
             target.clear(sfml.Color.WHITE)
-            self.sprites[-1].sort(key=lambda entity: entity.sprite.position.y)
-            for entity in self.sprites[-1]:
-                entity.on_draw()
-                target.draw(entity.sprite, states)
+            if self.sprites:
+                self.sprites[-1].sort(
+                    key=lambda entity: entity.sprite.position.y)
+                for entity in self.sprites[-1]:
+                    entity.on_draw()
+                    target.draw(entity.sprite, states)
 
     def getmappixelsize(self):
         """Retorna las dimensiones del mapa en pixeles.

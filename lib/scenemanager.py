@@ -41,8 +41,8 @@ class Director:
             common.Conf.getscreensize()[0],
             common.Conf.getscreensize()[1]),
                                         common.Conf.getscreentitle())
-        self.defaulteasing = pytweener.Easing.Quad.easeOut
         self.tweener = pytweener.Tweener()
+        self.defaulteasing = self.tweener.OUT_QUAD
         self.window.framerate_limit = 60
         self.__framecount = 0
         self.framerate = 0
@@ -101,10 +101,10 @@ class Director:
                                                      cameray + screensizey))
         else:
             # Creamos un par de tweeners para la camara.
-            self.tweener.addTween(self.__camera, setcenterx=playerx,
-                                  tweenTime=5, tweenType=self.defaulteasing)
-            self.tweener.addTween(self.__camera, setcentery=playery,
-                                  tweenTime=5, tweenType=self.defaulteasing)
+            self.tweener.add_tween(self.__camera, setcenterx=playerx,
+                                  tween_time=5, tween_type=self.defaulteasing)
+            self.tweener.add_tween(self.__camera, setcentery=playery,
+                                  tween_time=5, tween_type=self.defaulteasing)
 
     def convertcoords(self, coords, view=None):
         """Retorna las coordenadas de un punto relativo a la camara.
