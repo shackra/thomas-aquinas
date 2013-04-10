@@ -34,7 +34,7 @@ class Director:
     la clase AbstractScene.
 
     El diseño de esta clase esta fuertemente basada en director.py
-    del proyecto Asadetris desarrollado por Hugo de LosersJuegos"""
+    del proyecto Asadetris desarrollado por Hugo de LosersJuegos."""
 
     def __init__(self, icon=None):
         self.window = sfml.RenderWindow(sfml.VideoMode(
