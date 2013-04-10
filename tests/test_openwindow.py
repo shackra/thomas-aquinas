@@ -20,6 +20,7 @@ import nose
 from nose.tools import eq_, ok_
 import logging
 import sfml
+from time import sleep
 
 from lib.scenefactory import AbstractScene
 from lib.scenemanager import Director
@@ -39,43 +40,82 @@ class Scene(AbstractScene):
     def on_event(self, event):
         pass
 
+    def reset(self):
+        self.timelapsed = 0
+
     def __str__(self):
         return "<Scene: Vacía>"
 
-class TestOpenwindow:
-    @classmethod
-    def setup_class(cls):
-        print ("Configurando la prueba...")
-        global director
-        global scene
-        director = Director()
-        scene = Scene(director, None)
+class SceneMove(AbstractScene):
+    def __init__(self, scenemanager, initialmapfile):
+        AbstractScene.__init__(self, scenemanager, initialmapfile)
+        self.clock = sfml.Clock()
+        self.timelapsed = 0
+        self.moving = False
 
-    @nose.tools.timed(11)
-    def test_openwindow(self):
-        scene = Scene(director, None)
-        director.changescene(scene)
-        print ("Una ventana debe abrirse durante 10 segundos")
-        director.loop()
+    def on_draw(self, window):
+        if not self.moving:
+            self.moving = True
+            self.startmoving()
 
-    @nose.tools.timed(11)
-    def test_minimapa(self):
-        scene = Scene(director, "/uniteststuff/minimap.tmx")
-        scene.loadmaptiles()
-        scene.loadmapimages()
-        scene.loadmapobjects()
-        director.changescene(scene)
-        director.loop()
+        window.draw(self)
+        self.timelapsed += self.clock.restart().milliseconds
+        if self.timelapsed >= 20000.0:
+            self.scenemanager.exitgame()
 
-    def test_loadmaptiles(self):
-        scene.loadanothermap("/uniteststuff/4tilesmap.tmx")
-        scene.loadmaptiles()
-        eq_(len(scene.tmxdata.images), 5)
-        ok_(isinstance(scene.tmxdata.images[0], int), ("El primer valor de la "
-                                                        "lista no es del tipo"
-                                                        " int"))
+    def on_event(self, event):
+        pass
 
-    def test_loadmapimages(self):
-        scene.loadanothermap("/uniteststuff/4tilesmap.tmx")
-        scene.loadmaptiles()
-        scene.loadmapimages()
+    def startmoving(self):
+        """ movemos la camara atraves del escenario.
+        """
+        self.scenemanager.movecamera(18*32, 12*32, False, 16)
+
+    def __str__(self):
+        return "<Scene: Vacía>"
+
+def setup_func():
+    global director
+    global scene
+    director = Director()
+    scene = Scene(director, None)
+
+def setup_func2():
+    global director
+    global scene
+    director = Director()
+    scene = SceneMove(director, None)
+
+def teardown_func():
+    director.changescene(scene)
+    director.loop()
+    sleep(1)
+
+def teardown_func2():
+    sleep(1)
+
+@nose.with_setup(setup_func, teardown_func)
+def test_openwindow():
+    director.changescene(scene)
+
+@nose.with_setup(setup_func, teardown_func)
+def test_minimapa():
+    scene.loadanothermap("/uniteststuff/minimap.tmx")
+    scene.loadmaptiles()
+    scene.loadmapimages()
+    scene.loadmapobjects()
+
+@nose.with_setup(setup_func, teardown_func)
+def test_bigmapa():
+    scene.loadanothermap("/uniteststuff/bigmap.tmx")
+    scene.loadmaptiles()
+    scene.loadmapimages()
+    scene.loadmapobjects()
+
+@nose.with_setup(setup_func2, teardown_func)
+def test_movebigmapa():
+    scene.loadanothermap("/uniteststuff/bigmap.tmx")
+    scene.loadmaptiles()
+    scene.loadmapimages()
+    scene.loadmapobjects()
+

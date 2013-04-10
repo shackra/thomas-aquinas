@@ -17,10 +17,10 @@
 #                       veni, Sancte Spiritus.
 
 import logging
-import common
+from lib import common
+from lib import media
+from lib import scenefactory
 import sfml
-import media
-import scenefactory
 from thirdparty.pitweener.src import PiTweener as pytweener
 
 class TAGlobalVariableException(Exception): pass
@@ -77,7 +77,7 @@ class Director:
     def __iter__(self):
         return self.__globalvariables.items()
 
-    def movecamera(self, playerx, playery, withplayer=True):
+    def movecamera(self, playerx, playery, withplayer=True, tween_time=1):
         """ Mueve la cámara del juego.
 
         Esta es la forma más sencilla de realizar la técnica del
@@ -102,9 +102,8 @@ class Director:
         else:
             # Creamos un par de tweeners para la camara.
             self.tweener.add_tween(self.__camera, setcenterx=playerx,
-                                  tween_time=5, tween_type=self.defaulteasing)
-            self.tweener.add_tween(self.__camera, setcentery=playery,
-                                  tween_time=5, tween_type=self.defaulteasing)
+                                    setcentery=playery, tween_time=tween_time,
+                                    tween_type=self.defaulteasing)
 
     def convertcoords(self, coords, view=None):
         """Retorna las coordenadas de un punto relativo a la camara.

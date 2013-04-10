@@ -284,118 +284,126 @@ class AbstractScene(sfml.Drawable):
         tileheight, tilewidth = (self.tmxdata.tileheight,
                                  self.tmxdata.tilewidth)
 
-        if (((tilewidth <= currentdiff.x) or
-            (-tilewidth >= currentdiff.x)) or ((tileheight <= currentdiff.y) or
-            (-tileheight >= currentdiff.y))):
-                logging.debug("El centro del view de Window"
-                              " a cambiado, diferencia: {0}".format(currentdiff))
-                # Sí se ha movido el centro de forma significativa!
-                self.__oldviewcenter = currentview.center
-                # Creamos un rectángulo que representa la zona visible del escenario
-                rect = sfml.Rectangle(currentview.center - currentview.size / 2.0,
-                                      currentview.size + sfml.Vector2(tilewidth,
-                                                                      tileheight))
+        if (((tilewidth <= currentdiff.x) or (-tilewidth >= currentdiff.x)) or
+         ((tileheight <= currentdiff.y) or (-tileheight >= currentdiff.y))):
+            # Sí se ha movido el centro de forma significativa!
+            self.__oldviewcenter = currentview.center
+            # Creamos un rectángulo que representa la zona visible del escenario
+            rect = sfml.Rectangle(currentview.center - currentview.size / 2.0,
+                                  currentview.size)
 
-                logging.debug("Recreando baldosas visibles...")
-                rcoordx, rcoordy, rheight, rwidth = (rect.left, rect.top,
-                                                     rect.height, rect.width)
+            # un rectangulo en notación baldosa sin valores negativos
+            rlst = sfml.Rectangle(
+                (round(rect.left/tilewidth) if rect.left > 0 else 0,
+                round(rect.top/tileheight) if rect.top > 0 else 0),
+                (round(rect.right/tilewidth) if rect.right > 0 else 0,
+                round(rect.bottom/tileheight) if rect.bottom > 0 else 0)
+                )
+                
+            rlst = sfml.Rectangle((int(rlst.left), int(rlst.top)),
+                                (int(rlst.right), int(rlst.bottom)))
 
-                # normalizamos las coordenadas X y Y del rectangulo
-                if rcoordx < 0:
-                    rcoordx = rcoordx * -1
-                elif rcoordy < 0:
-                    rcoordy = rcoordy * -1
+            maprealwidth = 0
+            maprealheight = 0
+            mapgotrealsize = False
 
-                # pasamos las coordenadas de pixeles a baldosas
-                # FIXME: rwidth y rheight se pasan por dos unidades de más
-                rcoordx, rwidth = (int(rcoordx / tilewidth),
-                                   int(rwidth / tilewidth))
-                rcoordy, rheight = (int(rcoordy / tileheight),
-                                    int(rheight / tileheight))
+            layersvisibledata = []
+            for layer in xrange(len(self.tmxdata.tilelayers)):
+                layerdata = self.tmxdata.getLayerData(layer)
+                if not mapgotrealsize:
+                    maprealheight = len(layerdata[rlst.top:rlst.bottom])
+                    maprealwidth = len(layerdata[-1][rlst.left:rlst.right])
+                    mapgotrealsize = True
 
-                # creamos un producto cartesiano y nos ahorramos overhead ;)
-                # FIXME: existe un desface con las baldosas desde la capa 2
-                # hasta la capa n+2.
-                orentation = self.tmxdata.orientation
-                if orentation == "orthogonal":
-                    heightxrange = xrange(rcoordy,
-                        rcoordy+self.tmxdata.height)
-                elif orentation == "isometric":
-                    heightxrange = xrange(rheight, rcoordy+1, -1)
-                elif orentation == "staggered":
-                    # FIXME: usar valores correctos para esta clase de orientacion
-                    heightxrange = xrange(rheight, rcoordy+1, -1)
+                visibledata = []
+                [visibledata.extend(x[rlst.left:rlst.right])
+                        for x in layerdata[rlst.top:rlst.bottom]]
+                layersvisibledata.append(visibledata)
+                self.__vertexarraytodraw[layer].clear()
 
-                cartprod = product(xrange(len(self.tmxdata.tilelayers)),
-                                   heightxrange,
-                                   xrange(rcoordx,
-                                    rcoordx+self.tmxdata.width))
-                layersvisibledata = []
-                for layer in xrange(len(self.tmxdata.tilelayers)):
-                    layerdata = self.tmxdata.getLayerData(layer)
-                    visibledata = []
-                    [visibledata.extend(x[rcoordx:rwidth])
-                                        for x in layerdata[rcoordy:rheight]]
-                    layersvisibledata.append(visibledata)
-                    self.__vertexarraytodraw[layer].clear()
+            # Esto deberia juntar todas las listas (1 por capa) en un
+            # sólo objeto iterable.
+            layersvisibledata = chain.from_iterable(layersvisibledata)
 
-                # Esto deberia juntar todas las listas (1 por capa) en un
-                # sólo objeto iterable.
-                layersvisibledata = chain.from_iterable(layersvisibledata)
+            # creamos un producto cartesiano y nos ahorramos overhead ;)
+            if self.tmxdata.orientation == "orthogonal":
+                heightxrange = xrange(rlst.top, rlst.top+maprealheight)
+            elif self.tmxdata.orientation == "isometric":
+                heightxrange = xrange(rlst.top+maprealheight,
+                                    rlst.top+1, -1)
+            elif self.tmxdata.orientation == "staggered":
+                # FIXME: usar valores correctos para
+                # esta clase de orientacion
+                heightxrange = xrange(rlst.top+maprealheight,
+                                    rlst.top+1, -1)
 
-                for layer, coordy, coordx in cartprod:
-                    # obtenemos la imagen de la baldosa
-                    tilegid = layersvisibledata.next()
-                    tilerect = self.tmxdata.images[tilegid]
-                    if isinstance(tilerect, int):
-                        # Necesitamos un espacio en blanco dentro del mapa
-                        continue
+            cartprod = product(xrange(len(self.tmxdata.tilelayers)),
+                               heightxrange,
+                               xrange(rlst.left, rlst.left+maprealwidth))
 
-                    # creamos algunos vertices
-                    v1, v2, v3, v4 = (sfml.Vertex(),
-                                      sfml.Vertex(),
-                                      sfml.Vertex(),
-                                      sfml.Vertex())
+            for layer, coordy, coordx in cartprod:
+                # obtenemos la imagen de la baldosa
+                tilegid = layersvisibledata.next()
+                tilerect = self.tmxdata.images[tilegid]
+                if isinstance(tilerect, int):
+                    # Necesitamos un espacio en blanco dentro del mapa
+                    continue
 
-                    # mapeamos correctamente el vertice en la textura
-                    v1.tex_coords = (tilerect.left, tilerect.top)
-                    v2.tex_coords = (tilerect.right, tilerect.top)
-                    v3.tex_coords = (tilerect.right, tilerect.bottom)
-                    v4.tex_coords = (tilerect.left, tilerect.bottom)
+                # creamos algunos vertices
+                v1, v2, v3, v4 = (sfml.Vertex(),
+                                  sfml.Vertex(),
+                                  sfml.Vertex(),
+                                  sfml.Vertex())
 
-                    # posicionamos el vertice en la pantalla
-                    if orentation == "isometric":
-                        # FIXME: No dibuja correctamente
-                        v1.position = sfml.Vector2(
-                            float((coordx * tilewidth / 2) + \
-                                 (coordy * tilewidth / 2)),
-                            float((coordy * tileheight / 2) - \
-                                 (coordy * tileheight / 2)))
-                        v2.position = sfml.Vector2(
-                            v1.position.x + tilewidth, v1.position.y)
-                        v3.position = sfml.Vector2(
-                            v1.position.x + tilewidth, v1.position.y + tileheight)
-                        v4.position = sfml.Vector2(
-                            v1.position.x, v1.position.y + tileheight)
-                    elif orentation == "orthogonal":
-                        v1.position = sfml.Vector2(
-                            float(coordx * tilewidth), float(coordy * tileheight))
-                        v2.position = sfml.Vector2(v1.position.x + tilewidth,
-                                                   v1.position.y)
-                        v3.position = sfml.Vector2(v1.position.x + tilewidth,
-                                                   v1.position.y + tileheight)
-                        v4.position = sfml.Vector2(v1.position.x,
-                                                   v1.position.y + tileheight)
-                    elif orentation == "staggered":
-                        # TODO: implementar el posicionamiento de mapas isometricos
-                        # escalonados.
-                        pass
+                # mapeamos correctamente el vertice en la textura
+                v1.tex_coords = (tilerect.left, tilerect.top)
+                v2.tex_coords = (tilerect.right, tilerect.top)
+                v3.tex_coords = (tilerect.right, tilerect.bottom)
+                v4.tex_coords = (tilerect.left, tilerect.bottom)
 
-                    # Agregamos el vertice a su VertexArray correspondiente
-                    self.__vertexarraytodraw[layer].append(v1)
-                    self.__vertexarraytodraw[layer].append(v2)
-                    self.__vertexarraytodraw[layer].append(v3)
-                    self.__vertexarraytodraw[layer].append(v4)
+                placedvertexs = self.__placevertex((v1, v2, v3, v4),
+                                                    coordx, coordy)
+
+                # Agregamos el vertice a su VertexArray correspondiente
+                self.__vertexarraytodraw[layer].append(placedvertexs[0])
+                self.__vertexarraytodraw[layer].append(placedvertexs[1])
+                self.__vertexarraytodraw[layer].append(placedvertexs[2])
+                self.__vertexarraytodraw[layer].append(placedvertexs[3])
+
+    def __placevertex(self, (v1, v2, v3, v4), coordx, coordy):
+        """ devuelve los vertexs posicionados según la orientación del mapa.
+        """
+        tileheight, tilewidth = (self.tmxdata.tileheight,
+                                 self.tmxdata.tilewidth)
+        # posicionamos el vertice en la pantalla
+        if self.tmxdata.orientation == "isometric":
+            # FIXME: No dibuja correctamente
+            v1.position = sfml.Vector2(
+                float((coordx * tilewidth / 2) + \
+                     (coordy * tilewidth / 2)),
+                float((coordy * tileheight / 2) - \
+                     (coordy * tileheight / 2)))
+            v2.position = sfml.Vector2(
+                v1.position.x + tilewidth, v1.position.y)
+            v3.position = sfml.Vector2(
+                v1.position.x + tilewidth, v1.position.y + tileheight)
+            v4.position = sfml.Vector2(
+                v1.position.x, v1.position.y + tileheight)
+        elif self.tmxdata.orientation == "orthogonal":
+            v1.position = sfml.Vector2(
+                float(coordx * tilewidth), float(coordy * tileheight))
+            v2.position = sfml.Vector2(v1.position.x + tilewidth,
+                                       v1.position.y)
+            v3.position = sfml.Vector2(v1.position.x + tilewidth,
+                                       v1.position.y + tileheight)
+            v4.position = sfml.Vector2(v1.position.x,
+                                       v1.position.y + tileheight)
+        elif self.tmxdata.orientation == "staggered":
+            # TODO: implementar el posicionamiento de mapas isometricos
+            # escalonados.
+            pass
+
+        return (v1, v2, v3, v4)
 
     def addsprite(self, entity):
         """ Agrega un sprite para ser dibujado en el escenario.
