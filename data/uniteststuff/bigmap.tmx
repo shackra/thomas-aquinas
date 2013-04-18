@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="18" height="12" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="inside" tilewidth="32" tileheight="32">
+  <image source="../maps/tilesets/LPC Base Assets/tiles/inside.png" width="320" height="320"/>
+ </tileset>
+ <tileset firstgid="101" name="kitchen" tilewidth="32" tileheight="32">
+  <image source="../maps/tilesets/LPC Base Assets/tiles/kitchen.png" width="64" height="128"/>
+ </tileset>
+ <tileset firstgid="109" name="country" tilewidth="32" tileheight="32">
+  <image source="../maps/tilesets/LPC Base Assets/tiles/country.png" width="160" height="128"/>
+ </tileset>
+ <tileset firstgid="129" name="cabinets" tilewidth="32" tileheight="32">
+  <image source="../maps/tilesets/LPC Base Assets/tiles/cabinets.png" width="192" height="416"/>
+ </tileset>
+ <layer name="patrones test" width="18" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYKIQMwMxNxDzUIh5gVgUiMUoxOJArDmKR/EgwAAoiBx7
+  </data>
+ </layer>
+ <layer name="capa 2" width="18" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgwmwADETDsxMojk8ODAvEFcCcR0Q5wNxCZSGsSuRxAiZk49kViWSOcjmlUDNEcOBxaH665DsLkEytwSJ5iPgb5gbYOZUIomVINESBMxBDxuY2+rQ+EoEzAEAbikYqg==
+  </data>
+ </layer>
+ <layer name="Capa de patrones 3" width="18" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKANmI5HjosEc+bikRMhwZzFJKhFB60U6B1OoBmIp0DZnGTozwXiPCDuBOJZUDFhMswpAuJiIO4H4gVk6IeBciCuwCJeR4GZ6AAApO0JLQ==
+  </data>
+ </layer>
+ <objectgroup name="objetos test" width="18" height="12">
+  <object gid="101" x="32" y="32"/>
+  <object gid="103" x="32" y="64"/>
+  <object gid="105" x="32" y="96"/>
+  <object gid="107" x="32" y="128"/>
+  <object gid="106" x="64" y="96"/>
+  <object gid="112" x="192" y="96"/>
+  <object gid="117" x="192" y="128"/>
+  <object gid="112" x="224" y="96"/>
+  <object gid="117" x="224" y="128"/>
+  <object gid="112" x="160" y="96"/>
+  <object gid="117" x="160" y="128"/>
+  <object gid="144" x="96" y="128"/>
+  <object gid="138" x="96" y="96"/>
+  <object gid="132" x="96" y="64"/>
+ </objectgroup>
+</map>
