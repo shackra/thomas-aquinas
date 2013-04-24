@@ -26,7 +26,7 @@ import logging
 
 platos = platform.system()
 arch = str(ctypes.sizeof(ctypes.c_voidp) * 8)
-libnames = {"gnu": ("libsfml-audio.so.2.0", "libsfml-system.so.2.0"),
+libnames = {"gnu": ("libcsfml-audio.so.2.0", "libcsfml-system.so.2.0"),
             "osx": ("libcsfml-audio.2.0.dylib", "libcsfml-system.2.0.dylib"),
             "win": ("csfml-audio-2.dll", "csfml-system-2.dll")}
 
@@ -52,14 +52,20 @@ elif platos in ("Linux", "FreeBSD"):
     __os = "gnu"
 
 # cargamos las librerías propiamente dichas
+# primero revisamos si existen ya en el sistema.
 try:
-    __path = os.path.join(__libpath, "lib", __os, arch)
-    _audio = __xdll.LoadLibrary(os.path.join(__path, libnames[__os][0]))
-    _system = __xdll.LoadLibrary(os.path.join(__path, libnames[__os][1]))
-except (WindowsError, OSError) as e:
-    logging.critical("{} or {} do not exists or "
-                     "were changed for other(s) file(s) "
-                     "or is corrupted, details: {}".format(libnames[__os][0],
-                                                           libnames[__os][1],
-                                                           e))
-    raise
+    _audio = __xdll.LoadLibrary(libnames[__os][0])
+    _system = __xdll.LoadLibrary(libnames[__os][1])
+except (WindowsError, OSError):
+    try:
+        # de otra forma, usamos las que vienen con el juego.
+        __path = os.path.join(__libpath, "lib", __os, arch)
+        _audio = __xdll.LoadLibrary(os.path.join(__path, libnames[__os][0]))
+        _system = __xdll.LoadLibrary(os.path.join(__path, libnames[__os][1]))
+    except (WindowsError, OSError) as e:
+        logging.critical("{} or {} do not exists or "
+                         "were changed for other(s) file(s) "
+                         "or is corrupted, details: {}".format(libnames[__os][0],
+                                                               libnames[__os][1],
+                                                               e))
+        raise
