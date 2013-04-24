@@ -22,10 +22,13 @@ from vector import Vector3f
 from libs import _audio
 
 
-class Listener:
+class Listener(object):
     """
     Define la posición de escucha.
     """
+
+    __singleton = None
+
     _audio.sfListener_setGlobalVolume.argtypes = [ctypes.c_float]
     _audio.sfListener_setPosition.argtypes = [Vector3f]
     _audio.sfListener_setDirection.argtypes = [Vector3f]
@@ -34,18 +37,20 @@ class Listener:
     _audio.sfListener_getPosition.restype = Vector3f
     _audio.sfListener_getDirection.restype = Vector3f
 
-    def __init__(self):
-        raise UserWarning("No me instancies!")
+    def __new__(cls):
+        if cls.__singleton is None:
+            cls.__singleton = super(Listener, cls).__new__(cls)
+        return cls.__singleton
 
-    @classmethod
-    def getVolume(cls):
+    @property
+    def volume(self):
         """
         Retorna el volumen global.
         """
         return _audio.sfListener_getGlobalVolume()
 
-    @classmethod
-    def setVolume(cls, volume):
+    @volume.setter
+    def volume(self, volume):
         """
         Cambia el volumen global de todos los sonidos y la musica
         el volumen es un numero entre 0 y 100; es combinado con el
@@ -54,15 +59,15 @@ class Listener:
         """
         _audio.sfListener_setGlobalVolume(float(volume))
 
-    @classmethod
-    def getPosition(cls):
+    @property
+    def position(self):
         """
         Obtiene la posición actual del escucha en la escena.
         """
         return _audio.sfListener_getPosition()
 
-    @classmethod
-    def setPosition(cls, position):
+    @position.setter
+    def position(self, position):
         """
         Define la posición del escucha en la escena.
 
@@ -70,15 +75,15 @@ class Listener:
         """
         _audio.sfListener_setPostion(position)
 
-    @classmethod
-    def getDirection(cls):
+    @property
+    def direction(self):
         """
         Obtiene la orientación actual del escucha en la escena.
         """
         return _audio.sfListener_getDirection()
 
-    @classmethod
-    def setDirection(cls, orentation):
+    @direction.setter
+    def direction(self, orentation):
         """
         Establece la orientación del escucha en la escena.
 
