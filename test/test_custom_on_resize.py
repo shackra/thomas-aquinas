@@ -33,7 +33,7 @@ def resize():
 
 class AutocenteredBackgroundLayer(summa.layer.Layer):
     """
-    An unusual CocosNode that auto centers in the window when a resize happens.
+    An unusual SummaNode that auto centers in the window when a resize happens.
     For doing that, it registers to the event on_cocos_resize and repositions
     itself whenever the event happens.
     """

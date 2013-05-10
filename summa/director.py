@@ -163,7 +163,7 @@ class DefaultHandler( object ):
             pause_sc = pause.get_pause_scene()
             if pause:
                 director.push( pause_sc )
-            return True
+                return True
 
         elif symbol == pyglet.window.key.W and (modifiers & pyglet.window.key.MOD_ACCEL):
 #            import wired
@@ -179,8 +179,8 @@ class DefaultHandler( object ):
                 glPolygonMode(GL_FRONT, GL_FILL);
                 glPolygonMode(GL_BACK, GL_FILL);
                 self.wired = False
-#                wired.wired.uninstall()
-            return True
+                #                wired.wired.uninstall()
+                return True
 
         elif symbol == pyglet.window.key.X and (modifiers & pyglet.window.key.MOD_ACCEL):
             director.show_FPS = not director.show_FPS
@@ -193,12 +193,12 @@ class DefaultHandler( object ):
                 if director.python_interpreter == None:
                     director.python_interpreter = summa.scene.Scene( PythonInterpreterLayer() )
                     director.python_interpreter.enable_handlers( True )
-                director.python_interpreter.on_enter()
-                director.show_interpreter = True
-            else:
-                director.python_interpreter.on_exit()
-                director.show_interpreter= False
-            return True
+                    director.python_interpreter.on_enter()
+                    director.show_interpreter = True
+                else:
+                    director.python_interpreter.on_exit()
+                    director.show_interpreter= False
+                    return True
 
         elif symbol == pyglet.window.key.S and (modifiers & pyglet.window.key.MOD_ACCEL):
             import time
@@ -220,7 +220,7 @@ class Director(event.EventDispatcher):
 
        to access the only one Director instance.
        """
-    #: a dict with locals for the interactive python interpreter (fill with what you need)
+#: a dict with locals for the interactive python interpreter (fill with what you need)
     interpreter_locals = {}
 
     def init(self, *args, **kwargs):
@@ -330,10 +330,10 @@ class Director(event.EventDispatcher):
         else:
             resize_handler = self.scaled_resize_window
             self.set_projection = self.set_projection3D
-        # the offsets and size for the viewport will be proper after this
-        self._resize_no_events = True
-        resize_handler(self.window.width, self.window.height)
-        self._resize_no_events = False
+            # the offsets and size for the viewport will be proper after this
+            self._resize_no_events = True
+            resize_handler(self.window.width, self.window.height)
+            self._resize_no_events = False
 
         self.window.push_handlers(on_resize=resize_handler)
 
@@ -348,15 +348,15 @@ class Director(event.EventDispatcher):
         # Environment variable COCOS2d_NOSOUND=1 overrides audio settings
         if getenv('COCOS2D_NOSOUND', None) == '1' or audio_backend == 'pyglet':
             audio_settings = None
-        # if audio is not working, better to not work at all. Except if
-        # explicitely instructed to continue
-        if not summa.audio._working and audio_settings is not None:
-            from summa.audio.exceptions import NoAudioError
-            msg = "summa.audio isn't able to work without needed dependencies. " \
-                  "Try installing pygame for fixing it, or forcing no audio " \
-                  "mode by calling director.init with audio=None, or setting the " \
-                  "COCOS2D_NOSOUND=1 variable in your env."
-            raise NoAudioError(msg)
+            # if audio is not working, better to not work at all. Except if
+            # explicitely instructed to continue
+            if not summa.audio._working and audio_settings is not None:
+                from summa.audio.exceptions import NoAudioError
+                msg = "summa.audio isn't able to work without needed dependencies. " \
+                      "Try installing pygame for fixing it, or forcing no audio " \
+                      "mode by calling director.init with audio=None, or setting the " \
+                      "COCOS2D_NOSOUND=1 variable in your env."
+                raise NoAudioError(msg)
 
         # Audio setup:
         #TODO: reshape audio to not screw unittests
@@ -375,7 +375,7 @@ class Director(event.EventDispatcher):
             self.fps_display = None
 
     show_FPS = property(lambda self: self.fps_display is not None,
-        set_show_FPS)
+                        set_show_FPS)
 
     def run(self, scene):
         """Runs a scene, entering in the Director's main loop.
@@ -661,7 +661,7 @@ class Director(event.EventDispatcher):
         gluLookAt( vw/2.0, vh/2.0, vh/1.1566,   # eye
                    vw/2.0, vh/2.0, 0,           # center
                    0.0, 1.0, 0.0                # up vector
-                   )
+        )
 
 
     def set_projection2D(self):
@@ -698,13 +698,14 @@ class Director(event.EventDispatcher):
 event_loop = pyglet.app.event_loop
 if not hasattr(event_loop, "event"):
     event_loop = pyglet.app.EventLoop()
+
 director = Director()
 director.event = event_loop.event
 """The singleton; check `summa.director.Director` for details on usage.
 Don't instantiate Director(). Just use this singleton."""
 
 director.interpreter_locals["director"] = director
-director.interpreter_locals["cocos"] = cocos
+director.interpreter_locals["summa"] = summa
 
 Director.register_event_type('on_push')
 Director.register_event_type('on_pop')

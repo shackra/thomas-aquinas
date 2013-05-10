@@ -11,7 +11,7 @@ import pyglet
 assert pyglet.mock_level == 1 
 
 from summa.director import director
-from summa.summanode import CocosNode
+from summa.summanode import SummaNode
 import summa.actions as ac
 
 import sys
@@ -61,7 +61,7 @@ class Test_Repeat_Action:
 
     def test_target_set(self):
         global rec, next_done
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         a1 = UAction(name1)
         composite = ac.Repeat(a1)
@@ -72,7 +72,7 @@ class Test_Repeat_Action:
 
     def test_target_set_next_time(self):
         global rec, next_done
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         a1 = UAction(name1)
         composite = ac.Repeat(a1)
@@ -89,7 +89,7 @@ class Test_Repeat_Action:
         next_done=0
         name1 = '1'
         a1 = UAction(name1)
-        node = CocosNode()
+        node = SummaNode()
         composite = ac.Repeat(a1)
         
         #1st start

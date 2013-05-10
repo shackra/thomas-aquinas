@@ -6,9 +6,9 @@ include LICENSE.euclid
 include LICENSE.grossini
 include LICENSE.python_interpreter
 
-include cocos/audio/AUTHORS
-include cocos/audio/LICENSE.pygame-ctypes
-include cocos/resources *
+include summa/audio/AUTHORS
+include summa/audio/LICENSE.pygame-ctypes
+include summa/resources *
 
 recursive-include benchmarks *
 recursive-include test *

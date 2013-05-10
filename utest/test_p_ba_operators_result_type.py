@@ -11,7 +11,7 @@ import pyglet
 assert pyglet.mock_level == 1 
 
 from summa.director import director
-from summa.summanode import CocosNode
+from summa.summanode import SummaNode
 import summa.actions as ac
 
 import sys

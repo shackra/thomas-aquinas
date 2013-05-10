@@ -15,7 +15,7 @@ import pyglet
 
 class Dummy:
     """
-    A CocosNode proxy that only offers the members a particular action needs
+    A SummaNode proxy that only offers the members a particular action needs
     and prints to stdout the changes made for the action in those members.
 
     Here is special cased to Rotate.
@@ -40,7 +40,7 @@ class TestLayer(summa.layer.Layer):
         self.sprite.do( Rotate(90, 3), Dummy() )
 
 description = """
-Shows in the console the changes in a CocosNode instance produced by the a
+Shows in the console the changes in a SummaNode instance produced by the a
 Rotate action.
 
 The node (grossini sprite) does not rotate on screen as a side effect of

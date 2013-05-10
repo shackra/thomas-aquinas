@@ -11,7 +11,7 @@ import pyglet
 assert pyglet.mock_level == 1 
 
 from summa.director import director
-from summa.summanode import CocosNode
+from summa.summanode import SummaNode
 import summa.actions as ac
 
 import sys
@@ -61,7 +61,7 @@ class Test_Sequence_Action:
     def test_start(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -78,7 +78,7 @@ class Test_Sequence_Action:
     def test_target_set(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -93,7 +93,7 @@ class Test_Sequence_Action:
     def test_step_before_done1(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -111,7 +111,7 @@ class Test_Sequence_Action:
     def test_step_setting_done1(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -131,7 +131,7 @@ class Test_Sequence_Action:
     def test_step_after_done1_before_done2(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -154,7 +154,7 @@ class Test_Sequence_Action:
     def test_reaching_done2(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -179,7 +179,7 @@ class Test_Sequence_Action:
     def test_receiving_stop_async_before_done1(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)
@@ -195,7 +195,7 @@ class Test_Sequence_Action:
     def test_receiving_stop_async_after_done1_before_done2(self):
         global rec, next_done
         next_done=0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         name2 = '2'
         a1 = UAction(name1)

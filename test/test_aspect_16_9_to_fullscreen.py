@@ -15,7 +15,7 @@ width = 768
 height = 480
 assert abs(width/float(height)-16/10.0)<0.0001
 
-class ProbeRect(summa.summanode.CocosNode):
+class ProbeRect(summa.summanode.SummaNode):
     def __init__(self, width, height, color4):
         super(ProbeRect,self).__init__()
         self.color4 = color4

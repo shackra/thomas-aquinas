@@ -13,7 +13,7 @@ from summa.sprite import Sprite
 import pyglet
 from pyglet.gl import *
 
-class Quad(summa.summanode.CocosNode):
+class Quad(summa.summanode.SummaNode):
     def __init__(self, color, size):
         super(Quad, self).__init__()
         self.size = size

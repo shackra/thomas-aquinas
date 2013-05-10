@@ -32,7 +32,7 @@ view_height = 480
 world_width = 1000 + 4*98 #1392
 world_height = 1000
 
-class ProbeQuad(summa.summanode.CocosNode):
+class ProbeQuad(summa.summanode.SummaNode):
     def __init__(self, r, color4):
         super(ProbeQuad,self).__init__()
         self.color4 = color4

@@ -16,7 +16,7 @@ w_ini = 640
 h_ini = 480
 assert abs(w_ini/float(h_ini)-4/3.0)<0.0001
 
-class ProbeRect(summa.summanode.CocosNode):
+class ProbeRect(summa.summanode.SummaNode):
     def __init__(self, w_ini, h_ini, color4):
         super(ProbeRect,self).__init__()
         self.color4 = color4

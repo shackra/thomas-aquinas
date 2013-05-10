@@ -23,7 +23,7 @@ from pyglet.gl import *
 fastness_green = 60.0
 fastness_bullet = 80.0
 
-class ProbeQuad(summa.summanode.CocosNode):
+class ProbeQuad(summa.summanode.SummaNode):
     def __init__(self, r, color4):
         super(ProbeQuad,self).__init__()
         self.color4 = color4
@@ -136,7 +136,7 @@ class TestLayer(summa.layer.Layer):
 
 def main():
     director.init()
-    a = summa.summanode.CocosNode()
+    a = summa.summanode.SummaNode()
     class A(object):
         def __init__(self, x):
             self.x = x

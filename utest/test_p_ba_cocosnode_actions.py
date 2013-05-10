@@ -11,7 +11,7 @@ import pyglet
 assert pyglet.mock_level == 1 
 
 from summa.director import director
-from summa.summanode import CocosNode
+from summa.summanode import SummaNode
 import summa.actions as ac
 
 import sys
@@ -46,14 +46,14 @@ class UAction(ac.Action):
 
 class Test_summanode_actions_functionality:
     def test_initial_actions_container_empty(self):
-        node = CocosNode()
+        node = SummaNode()
         assert len(node.actions)==0
 
     def test_do_inmediate_effects1(self):
         # do called without an explicit target
         global rec, next_done
         next_done = 0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         action = UAction(name1)
         rec = []
@@ -68,7 +68,7 @@ class Test_summanode_actions_functionality:
         # do called with an explicit target
         global rec, next_done
         next_done = 0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         action = UAction(name1)
         my_target = 'zptx'
@@ -83,7 +83,7 @@ class Test_summanode_actions_functionality:
     def test_actions_stepping_without_completion(self):
         global rec, next_done
         next_done = 0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         action1 = UAction(name1)
         name2 = '2'
@@ -107,7 +107,7 @@ class Test_summanode_actions_functionality:
     def test_remove_action(self):
         global rec, next_done
         next_done = 0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         action1 = UAction(name1)
         name2 = '2'
@@ -133,7 +133,7 @@ class Test_summanode_actions_functionality:
     def test_node_stop_calls_remove_and_not_anything_in_action(self):
         global rec, next_done
         next_done = 0
-        node = CocosNode()
+        node = SummaNode()
         name1 = '1'
         action1 = UAction(name1)
         name2 = '2'

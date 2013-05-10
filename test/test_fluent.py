@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 #
 
 testinfo = "s, q"
-tags = "CocosNode, child"
+tags = "SummaNode, child"
 
 import summa
 from summa.director import director

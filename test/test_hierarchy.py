@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 #
 
 testinfo = "s, t 1, s, t 2.5, s, t 5, s, t 7.5, s, t 10.1, s, q"
-tags = "CocosNode, Sprite, child, rotation, position, Rotate, ScaleBy"
+tags = "SummaNode, Sprite, child, rotation, position, Rotate, ScaleBy"
 
 import summa
 from summa.director import director

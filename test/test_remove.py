@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 #
 
 testinfo = "s, t 5.1, s, q"
-tags = "CocosNode.remove"
+tags = "SummaNode.remove"
 
 import summa
 from summa.director import director

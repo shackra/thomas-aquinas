@@ -12,7 +12,7 @@ import pyglet
 assert pyglet.mock_level == 1 
 
 from summa.director import director
-from summa.summanode import CocosNode
+from summa.summanode import SummaNode
 import summa.actions as ac
 
 fe = 1.0e-6 # used to compare floats; a==b <-> abs(a-b)<fe
@@ -56,7 +56,7 @@ class Test_AccelDeccel:
         original_action = UIntervalAction('original', duration)
         modified_action = ac.AccelDeccel(original_action)
 
-        node = CocosNode()
+        node = SummaNode()
         node.do(modified_action)
         dt = duration * 1.0
         rec = []

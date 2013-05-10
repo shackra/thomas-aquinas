@@ -18,7 +18,7 @@ class TestNoBatch(summa.layer.Layer):
     def __init__(self):
         super( TestNoBatch, self ).__init__()
         x,y = director.get_window_size()
-        self.batch = summa.summanode.CocosNode()
+        self.batch = summa.summanode.SummaNode()
         self.batch.position = 50, 100
         self.add( self.batch )
         for i in range(216):

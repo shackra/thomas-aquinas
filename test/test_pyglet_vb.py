@@ -71,7 +71,7 @@ class MeshSprite:
 
 description = """
 A prof of concept: using pyglet vertex lists to deform a sprite.
-The entity is not a CocosNode, and some details should be adjusted: by
+The entity is not a SummaNode, and some details should be adjusted: by
 example at rest the top of grossini sprite is not visible.
 """
 

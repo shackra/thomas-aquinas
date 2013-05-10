@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 #
 
 testinfo = "s, t 1.25, s, t 3, s, t 5, s, q"
-tags = "CocosNode, transform_anchor"
+tags = "SummaNode, transform_anchor"
 
 import summa
 from summa.director import director
@@ -14,7 +14,7 @@ from summa.layer import *
 
 description = """
 Demostrates:
-    CocosNode transform_anchor role (defines point to rotate around / zoom in
+    SummaNode transform_anchor role (defines point to rotate around / zoom in
     or out)
 
 You should see:
