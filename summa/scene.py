@@ -54,7 +54,7 @@ class EventHandlerMixin(object):
 
         if (    scene._handlers_enabled and
                 scene.is_running and
-                isinstance(child, cocos.layer.Layer)
+                isinstance(child, summa.layer.Layer)
                 ):
             child.push_all_handlers()
 
@@ -67,7 +67,7 @@ class EventHandlerMixin(object):
 
         if (    scene._handlers_enabled and
                 scene.is_running and
-                isinstance(child, cocos.layer.Layer)
+                isinstance(child, summa.layer.Layer)
                 ):
             child.remove_all_handlers()
 
@@ -109,25 +109,25 @@ class Scene(cocosnode.CocosNode, EventHandlerMixin):
             c.parent = self
         super(Scene, self).on_enter()
         if self.music is not None:
-            cocos.audio.music.control.load(self.music)
+            summa.audio.music.control.load(self.music)
         if self.music_playing:
-            cocos.audio.music.control.play()
+            summa.audio.music.control.play()
 
     def on_exit(self):
         super(Scene, self).on_exit()
         # _apply_music after super, because is_running must be already False
         if self.music_playing:
-            cocos.audio.music.control.stop()
+            summa.audio.music.control.stop()
 
 
     def push_all_handlers(self):
         for child in self.get_children():
-            if isinstance(child, cocos.layer.Layer):
+            if isinstance(child, summa.layer.Layer):
                 child.push_all_handlers()
 
     def remove_all_handlers(self):
         for child in self.get_children():
-            if isinstance(child, cocos.layer.Layer):
+            if isinstance(child, summa.layer.Layer):
                 child.remove_all_handlers()
 
     def enable_handlers(self, value=True):
@@ -167,9 +167,9 @@ class Scene(cocosnode.CocosNode, EventHandlerMixin):
         self.music_playing = False
         if self.is_running:
             if filename is not None:
-                cocos.audio.music.control.load(filename)
+                summa.audio.music.control.load(filename)
             else:
-                cocos.audio.music.control.stop()
+                summa.audio.music.control.stop()
 
     def play_music(self):
         """Enable music playback for this scene. Nothing happens if music was already playing
@@ -180,7 +180,7 @@ class Scene(cocosnode.CocosNode, EventHandlerMixin):
         if self.music is not None and not self.music_playing:
             self.music_playing = True
             if self.is_running:
-                cocos.audio.music.control.play()
+                summa.audio.music.control.play()
 
     def stop_music(self):
         """Stops music playback for this scene.

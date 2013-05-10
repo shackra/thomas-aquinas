@@ -32,7 +32,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''
-cocos.director.director is the singleton that creates and handles the main ``Window``
+summa.director.director is the singleton that creates and handles the main ``Window``
 and manages the logic behind the ``Scenes``.
 
 Initializing
@@ -124,7 +124,7 @@ from pyglet import clock
 #from pyglet import media
 from pyglet.gl import *
 
-import summa, cocos.audio, cocos.custom_clocks
+import summa, summa.audio, summa.custom_clocks
 
 if hasattr(sys, 'is_epydoc') and sys.is_epydoc:
     __all__ = ['director', 'Director', 'DefaultHandler']
@@ -174,7 +174,7 @@ class DefaultHandler( object ):
 
             if not director.show_interpreter:
                 if director.python_interpreter == None:
-                    director.python_interpreter = cocos.scene.Scene( PythonInterpreterLayer() )
+                    director.python_interpreter = summa.scene.Scene( PythonInterpreterLayer() )
                     director.python_interpreter.enable_handlers( True )
                 director.python_interpreter.on_enter()
                 director.show_interpreter = True
@@ -333,9 +333,9 @@ class Director(event.EventDispatcher):
             audio_settings = None
         # if audio is not working, better to not work at all. Except if
         # explicitely instructed to continue
-        if not cocos.audio._working and audio_settings is not None:
+        if not summa.audio._working and audio_settings is not None:
             from summa.audio.exceptions import NoAudioError
-            msg = "cocos.audio isn't able to work without needed dependencies. " \
+            msg = "summa.audio isn't able to work without needed dependencies. " \
                   "Try installing pygame for fixing it, or forcing no audio " \
                   "mode by calling director.init with audio=None, or setting the " \
                   "COCOS2D_NOSOUND=1 variable in your env."
@@ -345,7 +345,7 @@ class Director(event.EventDispatcher):
         #TODO: reshape audio to not screw unittests
         import os
         if not os.environ.get('cocos_utest', False):
-            cocos.audio.initialize(audio_settings)
+            summa.audio.initialize(audio_settings)
 
         return self.window
 
@@ -385,8 +385,8 @@ class Director(event.EventDispatcher):
             `duration`: float
                 the amount of seconds to record, or 0 for infinite
         '''
-        clock = cocos.custom_clocks.get_recorder_clock(framerate, template, duration)
-        cocos.custom_clocks.set_app_clock(clock)
+        clock = summa.custom_clocks.get_recorder_clock(framerate, template, duration)
+        summa.custom_clocks.set_app_clock(clock)
 
 
     def on_draw( self ):
@@ -683,7 +683,7 @@ if not hasattr(event_loop, "event"):
     event_loop = pyglet.app.EventLoop()
 director = Director()
 director.event = event_loop.event
-"""The singleton; check `cocos.director.Director` for details on usage.
+"""The singleton; check `summa.director.Director` for details on usage.
 Don't instantiate Director(). Just use this singleton."""
 
 director.interpreter_locals["director"] = director

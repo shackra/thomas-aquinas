@@ -158,7 +158,7 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
 
 
     def get_rect(self):
-        '''Get a cocos.rect.Rect for this sprite.
+        '''Get a summa.rect.Rect for this sprite.
 
         Note that this rect's position is most likely NOT the same
         as the Sprite's position - in fact by default the rect's
@@ -171,7 +171,7 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
             rect.midbottom = (0, 100)
             sprite.position = rect.center
 
-        Returns a cocos.rect.Rect instance.
+        Returns a summa.rect.Rect instance.
         '''
         x, y = self.position
         x -= self.image_anchor_x
@@ -181,7 +181,7 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
     def get_AABB(self):
         '''Returns a local-coordinates Axis aligned Bounding Box
 
-        Returns a cocos.rect.Rect instance.
+        Returns a summa.rect.Rect instance.
         '''
         v = self._vertex_list.vertices
         x = v[0], v[2], v[4], v[6]

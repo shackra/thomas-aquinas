@@ -62,13 +62,13 @@ from summa import layer
 class ScrollableLayer(layer.ScrollableLayer):
     def __init__(self, parallax=1):
         import warnings
-        warnings.warn('ScrollableLayer been has moved to cocos.layer',
+        warnings.warn('ScrollableLayer been has moved to summa.layer',
             DeprecationWarning, stacklevel=2)
         super(ScrollableLayer, self).__init__(parallax=parallax)
 class ScrollingManager(layer.ScrollingManager):
     def __init__(self, viewport=None):
         import warnings
-        warnings.warn('ScrollingManager been has moved to cocos.layer',
+        warnings.warn('ScrollingManager been has moved to summa.layer',
             DeprecationWarning, stacklevel=2)
         super(ScrollingManager, self).__init__(viewport=viewport)
 

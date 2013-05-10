@@ -113,7 +113,7 @@ class PythonInterpreterLayer(ColorLayer):
     def on_enter(self):
         super(PythonInterpreterLayer, self).on_enter()
 
-        vw,vh = cocos.director.director.get_window_size()
+        vw,vh = summa.director.director.get_window_size()
 
         # format the code
         self.document = document.FormattedDocument(self.content)

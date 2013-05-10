@@ -42,7 +42,7 @@ from pyglet.gl import *
 
 import copy
 
-class Skin(cocos.cocosnode.CocosNode):
+class Skin(summa.summanode.CocosNode):
     def __init__(self, skeleton):
         super(Skin, self).__init__()
         self.skeleton = skeleton
@@ -168,7 +168,7 @@ class BitmapSkin(Skin):
         self.regenerate()
         self.skeleton = self.skeleton.flipped()
         
-class Animate(cocos.actions.IntervalAction):
+class Animate(summa.actions.IntervalAction):
     def init(self, animation, recenter=False, recenter_x=False, recenter_y=False):
         if recenter:
             recenter_x = recenter_y = True

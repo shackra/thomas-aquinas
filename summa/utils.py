@@ -34,7 +34,7 @@
 # Ideas borrowed from:
 #    Artificial Ineptitude : http://www.pyweek.org/e/0AI/
 #
-"""Here are a bunch of utilities to use with cocos.
+"""Here are a bunch of utilities to use with summa.
 
 utils
 =====

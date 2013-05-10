@@ -52,7 +52,7 @@ forced_point_sprites = None
 def point_sprites_available():
     """returns a bool telling if point sprites are available
 
-    For development and diagonostic cocos.particle.forced_point_sprites could
+    For development and diagonostic summa.particle.forced_point_sprites could
     be set to force the desired return value
     """
     if forced_point_sprites is not None:

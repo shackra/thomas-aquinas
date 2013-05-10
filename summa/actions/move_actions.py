@@ -36,7 +36,7 @@ acceleration.
 
 The simplest usage:
 
-    sprite = cocos.sprite.Sprite('ship.png')
+    sprite = summa.sprite.Sprite('ship.png')
     sprite.velocity = (100, 100)
     sprite.do(Move())
 
