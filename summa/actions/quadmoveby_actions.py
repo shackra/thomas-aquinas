@@ -40,8 +40,8 @@ __docformat__ = 'restructuredtext'
 
 import math
 
-from cocos.director import director
-from cocos.euclid import *
+from summa.director import director
+from summa.euclid import *
 from basegrid_actions import *
 
 __all__ = ['QuadMoveBy',

@@ -40,7 +40,7 @@ Initializing
 
 The first thing to do, is to initialize the ``director``::
 
-    from cocos.director import director
+    from summa.director import director
     director.init( parameters )
 
 This will initialize the director, and will create a display area
@@ -124,7 +124,7 @@ from pyglet import clock
 #from pyglet import media
 from pyglet.gl import *
 
-import cocos, cocos.audio, cocos.custom_clocks
+import summa, cocos.audio, cocos.custom_clocks
 
 if hasattr(sys, 'is_epydoc') and sys.is_epydoc:
     __all__ = ['director', 'Director', 'DefaultHandler']
@@ -199,7 +199,7 @@ class Director(event.EventDispatcher):
        
        You should not directly instantiate the class, instead you do::
        
-            from cocos.director import director 
+            from summa.director import director 
 
        to access the only one Director instance.
        """
@@ -334,7 +334,7 @@ class Director(event.EventDispatcher):
         # if audio is not working, better to not work at all. Except if
         # explicitely instructed to continue
         if not cocos.audio._working and audio_settings is not None:
-            from cocos.audio.exceptions import NoAudioError
+            from summa.audio.exceptions import NoAudioError
             msg = "cocos.audio isn't able to work without needed dependencies. " \
                   "Try installing pygame for fixing it, or forcing no audio " \
                   "mode by calling director.init with audio=None, or setting the " \

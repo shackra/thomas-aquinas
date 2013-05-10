@@ -61,9 +61,9 @@ __docformat__ = 'restructuredtext'
 
 from pyglet.gl import *
 
-from cocos.grid import Grid3D, TiledGrid3D
-from cocos.director import director
-from cocos.euclid import *
+from summa.grid import Grid3D, TiledGrid3D
+from summa.director import director
+from summa.euclid import *
 from base_actions import *
 
 __all__ = [ 'GridException',            # Grid Exceptions

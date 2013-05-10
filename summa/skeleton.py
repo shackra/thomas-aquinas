@@ -34,8 +34,8 @@
 import math
 import cPickle
 
-import cocos
-from cocos import euclid
+import summa
+from summa import euclid
 
 import pyglet
 from pyglet.gl import *

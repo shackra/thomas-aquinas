@@ -31,8 +31,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-from cocos import actions
-from cocos import audio
+from summa import actions
+from summa import audio
 
 class PlayAction(actions.InstantAction):
     def init(self, sound):

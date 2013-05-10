@@ -36,7 +36,7 @@ your cocos applications; but instead use the music control functions in the
 Scene class
 """
 
-from cocos import audio
+from summa import audio
 try:
     import pygame.music
 except ImportError:

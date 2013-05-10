@@ -40,10 +40,10 @@ __all__ = ['Scene']
 
 from pyglet.gl import *
 
-import cocos
-from cocos.director import director
-import cocos.cocosnode as cocosnode
-import cocos.audio.music
+import summa
+from summa.director import director
+import summa.cocosnode as cocosnode
+import summa.audio.music
 
 class EventHandlerMixin(object):
     def add(self, child, *args, **kwargs):

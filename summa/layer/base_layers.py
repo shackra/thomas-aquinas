@@ -45,9 +45,9 @@ the event and accepts it.
 
 __docformat__ = 'restructuredtext'
 
-from cocos.director import *
-from cocos import cocosnode
-from cocos import scene
+from summa.director import *
+from summa import summanode
+from summa import scene
 
 __all__ = [ 'Layer', 'MultiplexLayer']
 

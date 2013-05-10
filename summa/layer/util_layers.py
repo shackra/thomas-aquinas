@@ -48,9 +48,9 @@ __docformat__ = 'restructuredtext'
 import pyglet
 from pyglet.gl import *
 
-from cocos.director import *
+from summa.director import *
 from base_layers import Layer
-import cocos.cocosnode
+import summa.cocosnode
 
 __all__ = ['ColorLayer']
 

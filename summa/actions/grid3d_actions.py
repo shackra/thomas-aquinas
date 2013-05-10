@@ -38,8 +38,8 @@ __docformat__ = 'restructuredtext'
 import math
 import random
 
-from cocos.director import director
-from cocos.euclid import *
+from summa.director import director
+from summa.euclid import *
 from basegrid_actions import *
 
 rr = random.randrange

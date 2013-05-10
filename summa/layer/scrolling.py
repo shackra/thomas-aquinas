@@ -68,8 +68,8 @@ Two methods are available for setting the map focus:
 
 __docformat__ = 'restructuredtext'
 
-from cocos.director import director
-from cocos.layer.base_layers import Layer
+from summa.director import director
+from summa.layer.base_layers import Layer
 import pyglet
 from pyglet.gl import *
 

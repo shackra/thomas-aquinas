@@ -43,7 +43,7 @@ import copy
 import numpy
 import ctypes
 
-from cocosnode import CocosNode
+from summanode import CocosNode
 from euclid import Point2
 
 # for dev and diagnostic, None means real automatic, True / False means

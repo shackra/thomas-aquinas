@@ -38,11 +38,11 @@ __docformat__ = 'restructuredtext'
 import pyglet
 from pyglet.gl import *
 
-from cocos.actions import *
-import cocos.scene as scene
-from cocos.director import director
-from cocos.layer import ColorLayer
-from cocos.sprite import Sprite
+from summa.actions import *
+import summa.scene as scene
+from summa.director import director
+from summa.layer import ColorLayer
+from summa.sprite import Sprite
 
 __all__ = [ 'TransitionScene',
             'RotoZoomTransition','JumpZoomTransition',

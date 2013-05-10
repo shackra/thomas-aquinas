@@ -33,7 +33,7 @@
 # ----------------------------------------------------------------------------
 __all__ = ['SDL', 'pygame']
 
-import cocos
+import summa
 _working = True
 
 try:

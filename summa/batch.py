@@ -42,7 +42,7 @@ Batches allow you to optimize the number of gl calls using pyglets batch
 
 __docformat__ = 'restructuredtext'
 
-import cocosnode
+import summanode
 from batch import *
 
 import pyglet

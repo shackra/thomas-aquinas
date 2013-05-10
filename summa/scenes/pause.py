@@ -35,9 +35,9 @@
 
 __docformat__ = 'restructuredtext'
 
-from cocos.director import director
-from cocos.layer import Layer, ColorLayer
-from cocos.scene import Scene
+from summa.director import director
+from summa.layer import Layer, ColorLayer
+from summa.scene import Scene
 
 import pyglet
 

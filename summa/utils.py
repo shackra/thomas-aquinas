@@ -43,9 +43,9 @@ This module provides classes or functions that were useful to us while doing gam
 """
 
 __docformat__ = 'restructuredtext'
-from cocos.layer import *
-from cocos.scene import Scene
-from cocos.director import director
+from summa.layer import *
+from summa.scene import Scene
+from summa.director import director
 
 class SequenceScene(Scene):
     """SequenceScene is used when you want to load more than one scene to the director.

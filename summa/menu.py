@@ -60,7 +60,7 @@ import pyglet.graphics
 
 from layer import *
 from director import *
-from cocosnode import *
+from summanode import *
 from actions import *
 from sprite import Sprite
 import rect

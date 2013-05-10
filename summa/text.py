@@ -42,7 +42,7 @@ provided by the member 'element' , which is the underlying pyglet object.
 __docformat__ = 'restructuredtext'
 
 from director import director
-import cocosnode
+import summanode
 from batch import *
 
 import pyglet

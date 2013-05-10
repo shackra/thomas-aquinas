@@ -36,9 +36,9 @@
 __docformat__ = 'restructuredtext'
 
 import random
-from cocos.euclid import *
+from summa.euclid import *
 from basegrid_actions import *
-from cocos.director import director
+from summa.director import director
 
 rr = random.randrange
 

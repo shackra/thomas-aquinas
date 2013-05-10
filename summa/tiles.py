@@ -52,13 +52,13 @@ except ImportError:
 import pyglet
 from pyglet import gl
 
-import cocos
-from cocos.director import director
-from cocos.rect import Rect
+import summa
+from summa.director import director
+from summa.rect import Rect
 
 # Implement these classes for backwards compatibility; some older code
 # expects ScrollableLayer and ScrollingManager to be in the tiles module.
-from cocos import layer
+from summa import layer
 class ScrollableLayer(layer.ScrollableLayer):
     def __init__(self, parallax=1):
         import warnings

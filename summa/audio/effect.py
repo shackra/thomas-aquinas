@@ -33,9 +33,9 @@
 # ----------------------------------------------------------------------------
 __docformat__ = 'restructuredtext'
 
-from cocos import audio
+from summa import audio
 try:
-    from cocos.audio.pygame.mixer import Sound
+    from summa.audio.pygame.mixer import Sound
 except ImportError:
     audio._working = False
 

@@ -36,7 +36,7 @@ __docformat__ = 'restructuredtext'
 
 import operator as op
 import math
-import cocos.euclid as eu
+import summa.euclid as eu
 
 ###### interfaces, abstract base clases ######################################
 

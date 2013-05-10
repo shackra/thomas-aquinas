@@ -49,8 +49,8 @@ from pyglet import graphics
 from pyglet import text
 from pyglet.text import caret, document, layout
 
-import cocos
-from cocos.director import director
+import summa
+from summa.director import director
 from base_layers import Layer
 from util_layers import ColorLayer
 

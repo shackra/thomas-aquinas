@@ -38,8 +38,8 @@ Actions that moves the OpenGL camera.
 
 __docformat__ = 'restructuredtext'
 
-from cocos.director import director
-from cocos.euclid import *
+from summa.director import director
+from summa.euclid import *
 from base_actions import *
 
 import math

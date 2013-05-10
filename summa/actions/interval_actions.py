@@ -103,7 +103,7 @@ import copy
 import math
 
 from base_actions import *
-from cocos.euclid import *
+from summa.euclid import *
 
 __all__ = [  'Lerp',                            # interpolation
             'MoveTo','MoveBy',                  # movement actions

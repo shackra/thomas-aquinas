@@ -247,7 +247,7 @@ a 'winning' one. It entirely depends on the implementation from each action.
 It is possible to write actions than in a fight will show additive behavoir,
 by example::
 
-    import cocos.euclid as eu
+    import summa.euclid as eu
     class MoveByAdditive(ac.Action):
         def init( self, delta_pos, duration ):
             try:
@@ -925,7 +925,7 @@ class Spawn_IntervalAction(IntervalAction):
     """
 
     def init(self, one, two):
-        from cocos.actions.interval_actions import Delay
+        from summa.actions.interval_actions import Delay
 
         one = copy.deepcopy(one)
         two = copy.deepcopy(two)

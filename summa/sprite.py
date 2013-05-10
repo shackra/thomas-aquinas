@@ -70,7 +70,7 @@ import pyglet
 from pyglet import image
 from pyglet.gl import *
 
-import cocosnode
+import summanode
 from batch import *
 import rect
 
