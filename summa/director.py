@@ -714,7 +714,7 @@ Don't instantiate Director(). Just use this singleton."""
 director.interpreter_locals["director"] = director
 director.interpreter_locals["cocos"] = summa
 
-Director().register_event_type('on_push')
-Director().register_event_type('on_pop')
-Director().register_event_type('on_resize')
-Director().register_event_type('on_cocos_resize')
+director.register_event_type('on_push')
+director.register_event_type('on_pop')
+director.register_event_type('on_resize')
+director.register_event_type('on_cocos_resize')
