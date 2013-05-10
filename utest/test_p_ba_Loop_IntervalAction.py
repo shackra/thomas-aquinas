@@ -11,9 +11,9 @@ sys.path.insert(0,'pyglet_mockup1')
 import pyglet
 assert pyglet.mock_level == 1 
 
-from summa.director import director
-from summa.summanode import SummaNode
-import summa.actions as ac
+from cocos.director import director
+from cocos.cocosnode import CocosNode
+import cocos.actions as ac
 
 fe = 1.0e-6 # used to compare floats; a==b <-> abs(a-b)<fe
 
@@ -59,7 +59,7 @@ class Test_Loop_IntervalAction:
 
     def test_target_set(self):
         global rec
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         duration1 = 3.0
         times = 2
@@ -77,7 +77,7 @@ class Test_Loop_IntervalAction:
         duration1 = 3.0
         times = 2
         a1 = UIntervalAction(name1, duration1)
-        node = SummaNode()
+        node = CocosNode()
         composite = ac.loop(a1, times)
         elapsed = 0.0
         

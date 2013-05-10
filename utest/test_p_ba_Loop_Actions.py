@@ -10,9 +10,9 @@ sys.path.insert(0,'pyglet_mockup1')
 import pyglet
 assert pyglet.mock_level == 1 
 
-from summa.director import director
-from summa.summanode import SummaNode
-import summa.actions as ac
+from cocos.director import director
+from cocos.cocosnode import CocosNode
+import cocos.actions as ac
 
 import sys
 
@@ -62,7 +62,7 @@ class Test_Loop_Action:
     def test_target_set(self):
         global rec, next_done
         next_done=0
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         times = 2
         a1 = UAction(name1)
@@ -78,7 +78,7 @@ class Test_Loop_Action:
         name1 = '1'
         times = 2
         a1 = UAction(name1)
-        node = SummaNode()
+        node = CocosNode()
         composite = ac.loop(a1, times)
         
         #1st start

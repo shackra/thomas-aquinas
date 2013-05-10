@@ -11,9 +11,9 @@ import pyglet
 assert pyglet.mock_level == 1 
 
 import unittest
-from summa.director import director
-from summa.summanode import SummaNode
-import summa.actions as ac
+from cocos.director import director
+from cocos.cocosnode import CocosNode
+import cocos.actions as ac
 
 import sys
 
@@ -21,7 +21,7 @@ director.init()
 
 class Actions1(unittest.TestCase):
     def test_remove_action(self):
-        node = SummaNode()
+        node = CocosNode()
         self.assertTrue(len(node.actions)==0)
         action = ac.Action()
         a_copy = node.do(action)

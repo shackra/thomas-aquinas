@@ -1,8 +1,8 @@
 # collision_model tests
 
 # circles1 test
-import summa.collision_model as cm
-import summa.euclid as eu
+import cocos.collision_model as cm
+import cocos.euclid as eu
 from math import sin, cos, radians
 
 class Obj_with_shape(object):
@@ -148,7 +148,7 @@ def test_collman_circles(variant, ctor_args, offset):
     collision manager.
 
     'variant' is the class name to use, and the class definition is assumed
-    to be in the module summa.collision_model
+    to be in the module cocos.collision_model
     """
     emptyset = set()
     (center_circle, ring_touching, ring_near, ring_far,

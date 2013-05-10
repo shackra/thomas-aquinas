@@ -10,10 +10,10 @@ sys.path.insert(0,'pyglet_mockup1')
 import pyglet
 assert pyglet.mock_level == 1 
 
-import summa
-from summa.director import director
-from summa.summanode import SummaNode
-import summa.actions as ac
+import cocos
+from cocos.director import director
+from cocos.cocosnode import CocosNode
+import cocos.actions as ac
 
 import sys
 
@@ -72,7 +72,7 @@ class Test_sequence:
     """
     def test_InstantAction_duration0_action(self):
         global rec
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         duration1 = 0.0

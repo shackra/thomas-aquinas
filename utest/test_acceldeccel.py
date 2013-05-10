@@ -11,9 +11,9 @@ sys.path.insert(0,'pyglet_mockup1')
 import pyglet
 assert pyglet.mock_level == 1 
 
-from summa.director import director
-from summa.summanode import SummaNode
-import summa.actions as ac
+from cocos.director import director
+from cocos.cocosnode import CocosNode
+import cocos.actions as ac
 
 fe = 1.0e-6 # used to compare floats; a==b <-> abs(a-b)<fe
 
@@ -56,7 +56,7 @@ class Test_AccelDeccel:
         original_action = UIntervalAction('original', duration)
         modified_action = ac.AccelDeccel(original_action)
 
-        node = SummaNode()
+        node = CocosNode()
         node.do(modified_action)
         dt = duration * 1.0
         rec = []

@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import unittest
 
-from summa.tiles import Rect, RectCell, RectMap, HexCell, HexMap, Tile
+from cocos.tiles import Rect, RectCell, RectMap, HexCell, HexMap, Tile
 
 rmd = [
    [ {'meta': x} for x in m ] for m in ['ad', 'be', 'cf']

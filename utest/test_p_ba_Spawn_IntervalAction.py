@@ -13,9 +13,9 @@ sys.path.insert(0,'pyglet_mockup1')
 import pyglet
 assert pyglet.mock_level == 1 
 
-from summa.director import director
-from summa.summanode import SummaNode
-import summa.actions as ac
+from cocos.director import director
+from cocos.cocosnode import CocosNode
+import cocos.actions as ac
 
 fe = 1.0e-6 # used to compare floats; a==b <-> abs(a-b)<fe
 
@@ -79,7 +79,7 @@ class Test_Spawn_IntervalAction:
 
     def test_start(self, duration1, duration2):
         global rec
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -93,7 +93,7 @@ class Test_Spawn_IntervalAction:
 
     def test_target_set(self, duration1, duration2):
         global rec
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -121,7 +121,7 @@ class Test_Spawn_IntervalAction:
             # the test dont make sense for the parameters received, skip
             return
 
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -159,7 +159,7 @@ class Test_Spawn_IntervalAction:
         if not need_test:
             return
         
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -215,7 +215,7 @@ class Test_Spawn_IntervalAction:
             # the test dont make sense for the parameters received, skip
             return
 
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -262,7 +262,7 @@ class Test_Spawn_IntervalAction:
         # next_elapsed > max(duration1, duration2)
         global rec
 
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -304,7 +304,7 @@ class Test_Spawn_IntervalAction:
             # the test dont make sense for the parameters received, skip
             return
 
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -342,7 +342,7 @@ class Test_Spawn_IntervalAction:
         if not need_test:
             return
 
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)
@@ -386,7 +386,7 @@ class Test_Spawn_IntervalAction:
         if not need_test:
             return
 
-        node = SummaNode()
+        node = CocosNode()
         name1 = '1'
         name2 = '2'
         a1 = UIntervalAction(name1, duration1)

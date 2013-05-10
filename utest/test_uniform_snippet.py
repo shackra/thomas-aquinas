@@ -14,7 +14,7 @@ from uniform_snippet import  get_start_line, get_endplus_line, SnipetCompliance
 
 def test_start_1st_line_match():
     target = 'classBackgroundLayer('
-    should_match = 'class BackgroundLayer(summa.layer.Layer)'
+    should_match = 'class BackgroundLayer(cocos.layer.Layer)'
     filling = '\n'.join([
         'this is a line',
         'this is another'
@@ -51,7 +51,7 @@ def test_start_last_line_match():
 
 def test_start_inner_line_match():
     target = 'classBackgroundLayer('
-    should_match = 'class BackgroundLayer(summa.layer.Layer)'
+    should_match = 'class BackgroundLayer(cocos.layer.Layer)'
     filling = '\n'.join([
         'this is a line',
         'this is another'
@@ -154,7 +154,7 @@ def test_endplus_hitting_EOF():
 # aqui habria que empezar a hacer tests para la clase
 
 ##reference = """
-##class BackgroundLayer(summa.layer.Layer):
+##class BackgroundLayer(cocos.layer.Layer):
 ##    def __init__(self):
 ##        super(BackgroundLayer, self).__init__()
 ##        self.img = pyglet.resource.image('background_image.png')
@@ -170,7 +170,7 @@ def test_endplus_hitting_EOF():
 ##text_0 = """
 ###one up
 ##
-##class BackgroundLayer(summa.layer.Layer):
+##class BackgroundLayer(cocos.layer.Layer):
 ##    def __init__(self):
 ##        super(BackgroundLayer, self).__init__()
 ##        self.img = pyglet.resource.image('background_image.png')
