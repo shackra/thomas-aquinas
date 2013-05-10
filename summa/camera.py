@@ -51,7 +51,7 @@ class Camera(object):
     If the object is transformed by any of the scale, rotation or
     position attributes, then they will override the camera.
     """
-    
+
     def __init__(self):
         self.restore()
 
@@ -117,7 +117,7 @@ class Camera(object):
         self.dirty = True
 
     eye = property(_get_eye, _set_eye, doc='''Eye of the camera in x,y,z coordinates
-    
+
     :type: flaat,float,float
     ''')
 
@@ -129,7 +129,7 @@ class Camera(object):
         self.dirty = True
 
     center = property(_get_center, _set_center, doc='''Center of the camera in x,y,z coordinates
-    
+
     :type: flaat,float,float
     ''')
 
@@ -141,6 +141,6 @@ class Camera(object):
         self.dirty = True
 
     up_vector = property(_get_up_vector, _set_up_vector, doc='''Up vector of the camera in x,y,z coordinates
-    
+
     :type: flaat,float,float
     ''')
