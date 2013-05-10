@@ -46,7 +46,7 @@ def main():
     layer_green = ColorLayer(32,255,0,255)
     scene_green.add(layer_green)
     scene_green.do(ac.Delay(2.0) + ac.CallFunc(push_sequence_scene))
-    # pyglet 1.1.4 needs this to timely pump actions 
+    # pyglet 1.1.4 needs this to timely pump actions
     pyglet.clock.schedule(lambda dt: None)
     director.run(scene_green)
 
