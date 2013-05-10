@@ -12,8 +12,8 @@ assert pyglet.mock_level == 1
 
 import pytest
 
-from cocos.director import director, Director
-from cocos.scene import Scene
+from summa.director import director, Director
+from summa.scene import Scene
 director.init()
 
 rec = []

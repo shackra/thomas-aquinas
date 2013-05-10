@@ -1,4 +1,4 @@
-import cocos.euclid as eu
+import summa.euclid as eu
 import unittest
 
 class Test_Vectors(unittest.TestCase):

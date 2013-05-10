@@ -1,7 +1,7 @@
 # tests implementation details
 
-import cocos.collision_model as cm
-import cocos.euclid as eu
+import summa.collision_model as cm
+import summa.euclid as eu
 
 fe = 1.0e-4
 

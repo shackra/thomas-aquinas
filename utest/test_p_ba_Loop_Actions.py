@@ -10,9 +10,9 @@ sys.path.insert(0,'pyglet_mockup1')
 import pyglet
 assert pyglet.mock_level == 1 
 
-from cocos.director import director
-from cocos.cocosnode import CocosNode
-import cocos.actions as ac
+from summa.director import director
+from summa.summanode import CocosNode
+import summa.actions as ac
 
 import sys
 
