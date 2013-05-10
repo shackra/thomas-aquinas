@@ -8,15 +8,15 @@ testinfo = "s, q"
 tags = "aspect ratio, resize"
 
 from pyglet.gl import *
-import cocos
-from cocos.director import director
-from cocos.actions import Delay, CallFunc, Repeat
+import summa
+from summa.director import director
+from summa.actions import Delay, CallFunc, Repeat
 
 w_ini = 640
 h_ini = 480
 assert abs(w_ini/float(h_ini)-4/3.0)<0.0001
 
-class ProbeRect(cocos.cocosnode.CocosNode):
+class ProbeRect(summa.summanode.CocosNode):
     def __init__(self, w_ini, h_ini, color4):
         super(ProbeRect,self).__init__()
         self.color4 = color4
@@ -34,7 +34,7 @@ class ProbeRect(cocos.cocosnode.CocosNode):
         glEnd()
         glPopMatrix()
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super(TestLayer, self).__init__()
         self.add( ProbeRect(w_ini, h_ini, (0,0,255,255)), z=1)
@@ -75,7 +75,7 @@ When the aspect ratio is not 4:3, padding borders in black can be seen.
 def main():
     print description
     director.init( width=w_ini, height=h_ini, resizable=False )
-    scene = cocos.scene.Scene()
+    scene = summa.scene.Scene()
     scene.add(TestLayer())
     director.run( scene )
 

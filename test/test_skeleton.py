@@ -7,15 +7,15 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, q"
 tags = "skeleton, animation"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos import skeleton
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa import skeleton
 import pyglet
 
 import sample_skeleton
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -29,8 +29,8 @@ class TestLayer(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = TestLayer()
-    bg_layer = cocos.layer.ColorLayer(255,255,255,255)
-    main_scene = cocos.scene.Scene()
+    bg_layer = summa.layer.ColorLayer(255,255,255,255)
+    main_scene = summa.scene.Scene()
     main_scene.add(bg_layer, z=-10)
     main_scene.add(test_layer, z=10)
     director.run(main_scene)

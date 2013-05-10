@@ -7,10 +7,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "dt 0.1, q"
 tags = "debugging"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import *
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import *
 import pyglet
 
 class Dummy:
@@ -20,14 +20,14 @@ class Dummy:
 
     Here is special cased to Rotate.
 
-    Notice that changes produced by the action don't reachs the cocosnode
+    Notice that changes produced by the action don't reachs the summanode
     """
     rotation = 0
 
     def __setattr__(self, attr, value):
         print "set", attr, "to", value
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -53,7 +53,7 @@ def main():
     print description
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
     print description
 

@@ -8,13 +8,13 @@ testinfo = "s, t 1, s, q"
 tags = "director.init, do_not_scale"
 autotest = 0
 
-import cocos
-from cocos.director import director
-from cocos.actions import MoveTo, Delay, CallFunc
-from cocos.sprite import Sprite
+import summa
+from summa.director import director
+from summa.actions import MoveTo, Delay, CallFunc
+from summa.sprite import Sprite
 import pyglet
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -38,7 +38,7 @@ def main():
     print description
     director.init(width=300, height=300, do_not_scale=True)
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

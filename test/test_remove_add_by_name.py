@@ -9,9 +9,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 # So no testinfo here
 tags = "name"
 
-import cocos
-from cocos.director import director
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.layer import *
 
 def main():
     print "expected to fail"
@@ -19,7 +19,7 @@ def main():
 
     director.init( resizable=True )
 
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
     color = ColorLayer(255,0,0,255)
     main_scene.add( color, name='color' )
 

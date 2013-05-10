@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 2.1, s, t 4.1, s, t 6.1, s, q"
 tags = "SequenceScene, CallFunc"
 
-from cocos.director import director
-from cocos.scene import Scene
-from cocos.sprite import *
-from cocos.utils import SequenceScene
-from cocos.text import *
-from cocos.layer import *
-import cocos.actions as ac
+from summa.director import director
+from summa.scene import Scene
+from summa.sprite import *
+from summa.utils import SequenceScene
+from summa.text import *
+from summa.layer import *
+import summa.actions as ac
 
 from pyglet import font
 from pyglet.window import key

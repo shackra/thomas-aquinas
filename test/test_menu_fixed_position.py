@@ -10,10 +10,10 @@ tags = "menu, layout_strategy, fixedPositionMenuLayout"
 from pyglet import font
 from pyglet.app import exit
 
-from cocos.director import director
-from cocos.menu import Menu, MenuItem, fixedPositionMenuLayout
-from cocos.menu import shake, shake_back
-from cocos.scene import Scene
+from summa.director import director
+from summa.menu import Menu, MenuItem, fixedPositionMenuLayout
+from summa.menu import shake, shake_back
+from summa.scene import Scene
 
 class MainMenu(Menu):
     def __init__( self ):

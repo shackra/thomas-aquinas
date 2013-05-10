@@ -7,16 +7,16 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 1.7, s, t 3.7, s, t 6.7, s, t 9.7, s, t 12, s, q"
 tags = "Sprites, Waves, Twirl, WavesTiles3D, TurnOffTiles, StopGrid"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import *
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import *
 
 import pyglet
 from pyglet.gl import *
 
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -28,7 +28,7 @@ class BackgroundLayer(cocos.layer.Layer):
         self.img.blit(0,0)
         glPopMatrix()
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -51,7 +51,7 @@ def main():
     director.init()
     background = BackgroundLayer()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene ()
+    main_scene = summa.scene.Scene ()
 
     main_scene.add( background, z=0 )
     main_scene.add( test_layer, z=1 )

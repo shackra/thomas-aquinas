@@ -10,25 +10,25 @@ autotest = 0
 
 
 import pyglet
-import cocos
-from cocos.actions import *
-from cocos.director import director
+import summa
+from summa.actions import *
+from summa.director import director
 
 key = pyglet.window.key
 
-class DebugLabel(cocos.text.Label):
+class DebugLabel(summa.text.Label):
     def draw(self):
         sprite = self.parent.sprite
         self.element.text = "* (%.0f, %.0f) %.0f" % (sprite.position
                                                      + (sprite.rotation,))
         super(DebugLabel, self).draw()
 
-class Logo(cocos.layer.Layer):
+class Logo(summa.layer.Layer):
     is_event_handler = True
     def __init__(self):
         super(Logo, self).__init__()
         self.wx, self.wy = director.get_window_size()
-        self.sprite = cocos.sprite.Sprite('grossini.png')
+        self.sprite = summa.sprite.Sprite('grossini.png')
         self.sprite.position = self.wx/2, self.wy/2
         self.label = DebugLabel()
         self.add(self.label)
@@ -45,7 +45,7 @@ class Logo(cocos.layer.Layer):
 def main():
     print "press space to initiate action"
     director.init(fullscreen=0, width=800, height=600)
-    scene = cocos.scene.Scene()
+    scene = summa.scene.Scene()
     scene.add(Logo())
     director.run(scene)
 

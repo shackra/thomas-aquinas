@@ -11,13 +11,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 2, s, t 5.1, s, q"
 tags = "StopGrid"
 
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
 import pyglet
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -38,7 +38,7 @@ by StopGrid.
 def main():
     print description
     director.init( resizable=True )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     main_scene.add( BackgroundLayer(), z=0 )
 

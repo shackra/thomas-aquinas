@@ -8,15 +8,15 @@ testinfo = "t 0.1, s, t 2, s, t 4, s, t 6, s, t 8, s, t 10, s, t 12, s, t 14, s,
 tags = "OrbitCamera"
 
 import pyglet
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
 
 from pyglet.gl import *
 
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -32,7 +32,7 @@ def main():
     director.init( resizable=True )
     #director.set_depth_test()
 
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     background = BackgroundLayer()
     color = ColorLayer(255,32,32,128)

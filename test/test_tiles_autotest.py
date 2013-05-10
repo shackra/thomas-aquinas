@@ -11,13 +11,13 @@ import pyglet
 pyglet.resource.path.append(pyglet.resource.get_script_home())
 pyglet.resource.reindex()
 
-import cocos
-from cocos import tiles, layer
-from cocos.actions import CallFunc, ScaleTo, Delay
-from cocos.director import director
+import summa
+from summa import tiles, layer
+from summa.actions import CallFunc, ScaleTo, Delay
+from summa.director import director
 
 
-class TestScene(cocos.scene.Scene):
+class TestScene(summa.scene.Scene):
     def __init__(self):
         super(TestScene, self).__init__()
         scroller = layer.ScrollingManager()

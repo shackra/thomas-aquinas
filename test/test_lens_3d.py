@@ -9,11 +9,11 @@ tags = "Lens3D, StopGrid"
 
 import pyglet
 from pyglet.gl import glColor4ub, glPushMatrix, glPopMatrix 
-import cocos
-from cocos.director import director
-from cocos.actions import *
+import summa
+from summa.director import director
+from summa.actions import *
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -38,7 +38,7 @@ def main():
     director.init( resizable=True )
     director.set_depth_test()
 
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     main_scene.add( BackgroundLayer(), z=0 )
 

@@ -7,10 +7,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 1.25, s, t 3, s, t 5, s, q"
 tags = "CocosNode, transform_anchor"
 
-import cocos
-from cocos.director import director
-import cocos.actions as ac
-from cocos.layer import *
+import summa
+from summa.director import director
+import summa.actions as ac
+from summa.layer import *
 
 description = """
 Demostrates:
@@ -42,35 +42,35 @@ def get_test_scene():
                          )
 
     w, h = director.get_window_size()
-    world = cocos.layer.Layer()
+    world = summa.layer.Layer()
 
     # bluish square
-    bluish_square = cocos.layer.ColorLayer(0, 160, 176, 255, width=100, height=100)
+    bluish_square = summa.layer.ColorLayer(0, 160, 176, 255, width=100, height=100)
     # transform_anchor set to the center position of itself
     bluish_square.transform_anchor = (bluish_square.width/2.0, bluish_square.height/2.0)
     bluish_square.position = (w/3, h/2)
     bluish_square.do(template_action)
     world.add(bluish_square, z=2)
 
-    mark_anchor = cocos.layer.ColorLayer(161, 191, 54, 255, width=8, height=8)
+    mark_anchor = summa.layer.ColorLayer(161, 191, 54, 255, width=8, height=8)
     mark_anchor.position = (bluish_square.x + bluish_square.transform_anchor_x,
                             bluish_square.y + bluish_square.transform_anchor_y)
     world.add(mark_anchor, z=3)
 
     # redish square
-    redish_square = cocos.layer.ColorLayer(201, 43, 0, 255, width=100, height=100)
+    redish_square = summa.layer.ColorLayer(201, 43, 0, 255, width=100, height=100)
     # transform_anchor set to the bottomleft corner of itself
     redish_square.transform_anchor = (0, 0)
     redish_square.position = (w*2/3, h/2)
     redish_square.do(template_action)
     world.add(redish_square, z=2)
 
-    mark_anchor = cocos.layer.ColorLayer(161, 191, 54, 255, width=8, height=8)
+    mark_anchor = summa.layer.ColorLayer(161, 191, 54, 255, width=8, height=8)
     mark_anchor.position = (redish_square.x + redish_square.transform_anchor_x,
                             redish_square.y + redish_square.transform_anchor_y)
     world.add(mark_anchor, z=3)
 
-    scene = cocos.scene.Scene()
+    scene = summa.scene.Scene()
     scene.add(world)
     return scene
 

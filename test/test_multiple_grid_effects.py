@@ -15,12 +15,12 @@ tags = "ShuffleTiles, Flip, ShuffleTiles"
 import pyglet
 from pyglet.gl import glColor4ub, glPushMatrix, glPopMatrix 
 
-import cocos
-from cocos.director import director
-from cocos.actions import Flip, Waves3D, ShuffleTiles
-from cocos.sprite import Sprite
-from cocos.layer import Layer, ColorLayer
-from cocos.scene import Scene
+import summa
+from summa.director import director
+from summa.actions import Flip, Waves3D, ShuffleTiles
+from summa.sprite import Sprite
+from summa.layer import Layer, ColorLayer
+from summa.scene import Scene
 
 class SpriteLayer ( Layer ):
 
@@ -39,7 +39,7 @@ class SpriteLayer ( Layer ):
         self.add( sprite2 )
         self.add( sprite3 )
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')

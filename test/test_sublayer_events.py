@@ -7,17 +7,17 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "dt 0.1, q"
 tags = "window event, on_key_press"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
+import summa
+from summa.director import director
+from summa.sprite import Sprite
 import pyglet
 
-class PrintKey(cocos.layer.Layer):
+class PrintKey(summa.layer.Layer):
     is_event_handler = True
     def on_key_press (self, key, modifiers):
         print "Sublayer sees on_key_pressed:", key, modifiers
 
-class SwitchLayer(cocos.layer.Layer):
+class SwitchLayer(summa.layer.Layer):
     def __init__(self):
         super(SwitchLayer, self).__init__()
         self.other = PrintKey()
@@ -53,9 +53,9 @@ def main():
     print description
 
     director.init()
-    bg_layer = cocos.layer.ColorLayer(255,0,0,255)
+    bg_layer = summa.layer.ColorLayer(255,0,0,255)
     test_layer = SwitchLayer()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

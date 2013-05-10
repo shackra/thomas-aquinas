@@ -9,13 +9,13 @@ testinfo = "s, t 1.5, s, t 3, s, t 4.1, s, q"
 tags = "compose_actions, sequence, spawn"
 
 import pyglet
-import cocos
-from cocos.actions import ScaleTo, MoveTo, Accelerate
-from cocos.sprite import Sprite
-from cocos.director import director
-from cocos.scene import Scene
+import summa
+from summa.actions import ScaleTo, MoveTo, Accelerate
+from summa.sprite import Sprite
+from summa.director import director
+from summa.scene import Scene
 
-class Bg(cocos.layer.Layer):
+class Bg(summa.layer.Layer):
     def __init__(self):
         super(Bg, self).__init__()
         self.image = pyglet.resource.image('grossini.png')

@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "dt 0.1, q"
 tags = "actions"
 
-import cocos
-from cocos.director import director
-from cocos.actions import  *
-from cocos.sprite import Sprite
+import summa
+from summa.director import director
+from summa.actions import  *
+from summa.sprite import Sprite
 import pyglet
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
 
     def _step( self, dt ):
         super(TestLayer,self)._step(dt)
@@ -29,7 +29,7 @@ def main():
     director.init()
     test_layer = TestLayer ()
     # note test_layer is NOT in the scene
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
     test_layer.do( RotateBy(360, duration=2) )
     director.run (main_scene)
 

@@ -7,9 +7,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 # this test is not adecuate for autotest, so no testinfo added
 tags = "audio SDL"
 
-import cocos
-from cocos.director import director
-from cocos.audio.effect import Effect
+import summa
+from summa.director import director
+from summa.audio.effect import Effect
 
 def main():
     director.init(audio_backend='sdl')

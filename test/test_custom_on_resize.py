@@ -10,10 +10,10 @@ autotest = 0
 
 import pyglet
 from pyglet.gl import *
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import Delay, CallFunc
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import Delay, CallFunc
 
 description = """
 This script demonstrates:
@@ -31,7 +31,7 @@ What you should see:
 def resize():
     director.window.set_size(800, 600)
 
-class AutocenteredBackgroundLayer(cocos.layer.Layer):
+class AutocenteredBackgroundLayer(summa.layer.Layer):
     """
     An unusual CocosNode that auto centers in the window when a resize happens.
     For doing that, it registers to the event on_cocos_resize and repositions
@@ -83,7 +83,7 @@ def main():
     # telling director to not auto scale the scene when the window resizes and
     # to allow window resize, also that a 400x400 window is desired.
     director.init(width=400, height=400, do_not_scale=True, resizable=True)
-    scene = cocos.scene.Scene()
+    scene = summa.scene.Scene()
     bg = AutocenteredBackgroundLayer()
     for i in range(3):
         sp = Sprite('grossini.png', position=(140 + i*180, 120))

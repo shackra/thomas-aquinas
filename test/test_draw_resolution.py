@@ -9,11 +9,11 @@ tags = "Canvas"
 autotest = 0
 
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos import draw
-from cocos.actions import Delay, CallFunc
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa import draw
+from summa.actions import Delay, CallFunc
 import pyglet
 
 import random
@@ -34,7 +34,7 @@ class TestFigure(draw.Canvas):
         self.move_to( (x/2, y/2-line_width/2) ); self.line_to( (x/2-300,y/2-300) )
 
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     is_event_handler = True
 
     def __init__(self):
@@ -55,7 +55,7 @@ class TestLayer(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

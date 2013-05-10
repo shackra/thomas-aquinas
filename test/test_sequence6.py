@@ -7,14 +7,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 1, s, t 1.05, s, t 1.15, s, t 1.20, s, q"
 tags = "MoveBy, spawn"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import Place, MoveBy, MoveTo, Repeat, Reverse
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import Place, MoveBy, MoveTo, Repeat, Reverse
 
 import pyglet
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -29,7 +29,7 @@ class TestLayer(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

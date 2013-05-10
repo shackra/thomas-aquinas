@@ -12,8 +12,8 @@ from pyglet.window import key
 pyglet.resource.path.append(pyglet.resource.get_script_home())
 pyglet.resource.reindex()
 
-import cocos
-from cocos import tiles, actions, layer
+import summa
+from summa import tiles, actions, layer
 
 class DriveCar(actions.Driver):
     def step(self, dt):
@@ -26,11 +26,11 @@ class DriveCar(actions.Driver):
 
 def main():
     global keyboard, scroller
-    from cocos.director import director
+    from summa.director import director
     director.init(width=600, height=300, do_not_scale=True, resizable=True)
 
     car_layer = layer.ScrollableLayer()
-    car = cocos.sprite.Sprite('car.png')
+    car = summa.sprite.Sprite('car.png')
     car_layer.add(car)
     car.position = (200, 100)
     car.max_forward_speed = 200
@@ -42,7 +42,7 @@ def main():
     scroller.add(test_layer)
     scroller.add(car_layer)
 
-    main_scene = cocos.scene.Scene(scroller)
+    main_scene = summa.scene.Scene(scroller)
 
     keyboard = key.KeyStateHandler()
     director.window.push_handlers(keyboard)

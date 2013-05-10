@@ -10,11 +10,11 @@ autotest = 0
 
 
 import pyglet
-from cocos.director import *
-from cocos.menu import *
-from cocos.scene import *
-from cocos.layer import *
-from cocos.actions import Delay, CallFunc
+from summa.director import *
+from summa.menu import *
+from summa.scene import *
+from summa.layer import *
+from summa.actions import Delay, CallFunc
 
 class MainMenu(Menu):
     def __init__( self ):

@@ -10,14 +10,14 @@ tags = "FadeIn, FadeOut, ColorLayer"
 import pyglet
 from pyglet.gl import *
 
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
 
 def main():
     director.init( resizable=True )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     l = ColorLayer( 255,128,64,64 )
     main_scene.add( l, z=0 )

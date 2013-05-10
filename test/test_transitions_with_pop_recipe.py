@@ -7,11 +7,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 2.5, s, t 3, s, t 5, s, t 5.5, dt 0.016, s, q"
 tags = "transitions with pop, unschedule, schedule, on_enter, on_exit"
 
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
-from cocos.scenes import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
+from summa.scenes import *
 
 
 t0 = 0.0
@@ -118,7 +118,7 @@ description = """
     same as before the first transition initiated; that's 0 for cocos rev>1066
     """
 
-class TestScene(cocos.scene.Scene):
+class TestScene(summa.scene.Scene):
     def on_enter(self):
         super(TestScene, self).on_enter()
         self.schedule(sequencer)

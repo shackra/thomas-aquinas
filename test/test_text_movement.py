@@ -8,19 +8,19 @@ testinfo = "s, t 1.1, s, t 2.1, s, q"
 tags = "on_mouse_motion, Label"
 autotest = 0
 
-import cocos
-from cocos.actions import Delay, CallFunc 
-from cocos.director import director
+import summa
+from summa.actions import Delay, CallFunc 
+from summa.director import director
 
 
-class HelloWorld(cocos.layer.Layer):
+class HelloWorld(summa.layer.Layer):
     is_event_handler = True
     def __init__(self):
         super( HelloWorld, self ).__init__()
 
-        # a cocos.text.Label is a wrapper of pyglet.text.Label
-        # with the benefit of being a cocosnode
-        self.label = cocos.text.Label('Hi',
+        # a summa.text.Label is a wrapper of pyglet.text.Label
+        # with the benefit of being a summanode
+        self.label = summa.text.Label('Hi',
             font_name='Times New Roman',
             font_size=32,
             x=320, y=240,
@@ -55,13 +55,13 @@ def main():
     hello_layer = HelloWorld ()
 
     # A scene that contains the layer hello_layer
-    main_scene = cocos.scene.Scene (hello_layer)
+    main_scene = summa.scene.Scene (hello_layer)
 
     # And now, start the application, starting with main_scene
     director.run (main_scene)
 
     # or you could have written, without so many comments:
-    #      director.run( cocos.scene.Scene( HelloWorld() ) )
+    #      director.run( summa.scene.Scene( HelloWorld() ) )
 
 if __name__ == '__main__':
     main()

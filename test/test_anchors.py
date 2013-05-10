@@ -7,15 +7,15 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, q"
 tags = "transform_anchor, scale, zoom"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import *
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.sprite import *
+from summa.layer import *
 import pyglet
 
 def main():
     director.init( resizable=True )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     white = ColorLayer(255,255,255,255)
     red = ColorLayer(255,0,0,255)

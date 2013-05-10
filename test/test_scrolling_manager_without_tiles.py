@@ -17,11 +17,11 @@ from pyglet.gl import *
 pyglet.resource.path.append(pyglet.resource.get_script_home())
 pyglet.resource.reindex()
 
-import cocos
-from cocos import tiles, actions, layer
-from cocos.director import director
-import cocos.euclid as eu
-from cocos.actions import Delay, CallFunc, ScaleTo
+import summa
+from summa import tiles, actions, layer
+from summa.director import director
+import summa.euclid as eu
+from summa.actions import Delay, CallFunc, ScaleTo
 
 # test mode 2: no autoscale, ie do_not_scale=True
 test_mode = 2
@@ -32,7 +32,7 @@ view_height = 480
 world_width = 1000 + 4*98 #1392
 world_height = 1000
 
-class ProbeQuad(cocos.cocosnode.CocosNode):
+class ProbeQuad(summa.summanode.CocosNode):
     def __init__(self, r, color4):
         super(ProbeQuad,self).__init__()
         self.color4 = color4
@@ -49,7 +49,7 @@ class ProbeQuad(cocos.cocosnode.CocosNode):
         glPopMatrix()
 
 
-class SquareLand(cocos.layer.ScrollableLayer):
+class SquareLand(summa.layer.ScrollableLayer):
     is_event_handler = True
     def __init__(self, world_width, world_height):
         self.world_width = world_width
@@ -59,12 +59,12 @@ class SquareLand(cocos.layer.ScrollableLayer):
         self.px_height = world_height
 
         #dummy objects in the world: a big framed background and squares
-        bg = cocos.layer.ColorLayer(170,170,0,255,width=world_width, height=world_height)
+        bg = summa.layer.ColorLayer(170,170,0,255,width=world_width, height=world_height)
         self.add(bg, z=0)
         margin = int(world_width*0.01)
         #print 'margin',margin
         self.margin = margin
-        bg = cocos.layer.ColorLayer(0,170,170,255,width=world_width-2*margin,height=world_height-2*margin)
+        bg = summa.layer.ColorLayer(0,170,170,255,width=world_width-2*margin,height=world_height-2*margin)
         bg.position = (margin,margin)
         self.add(bg, z=1)
 
@@ -77,7 +77,7 @@ class SquareLand(cocos.layer.ScrollableLayer):
             while x<world_width-mod:
                 red = 55+int(200.0*x/world_width)
                 blue = 55+int(200.0*y/world_height)
-                actor = cocos.layer.ColorLayer( red, 0, blue, 255,
+                actor = summa.layer.ColorLayer( red, 0, blue, 255,
                                         width = 2*int(mod), height = 2*int(mod))
                 actor.position = x,y
                 self.marks_positions.append((x,y))
@@ -86,7 +86,7 @@ class SquareLand(cocos.layer.ScrollableLayer):
             y += 3*mod
         self.marks_positions = self.marks_positions[:3]
 
-        self.player = cocos.sprite.Sprite( 'grossinis_sister1.png' )
+        self.player = summa.sprite.Sprite( 'grossinis_sister1.png' )
         self.player.scale = 0.4
         self.player.model_width = self.player.width
         self.player.model_height = self.player.height
@@ -115,8 +115,8 @@ class SquareLand(cocos.layer.ScrollableLayer):
 
     def on_enter(self):
         super(SquareLand,self).on_enter()
-        self.scroller = self.get_ancestor(cocos.layer.ScrollingManager)
-        self.scene = self.get_ancestor(cocos.scene.Scene)
+        self.scroller = self.get_ancestor(summa.layer.ScrollingManager)
+        self.scene = self.get_ancestor(summa.scene.Scene)
         self.scene.f_refresh_marks = self.refresh_marks
 
     #tracking of keys : keys updates self.buttons, model uses buttons
@@ -191,7 +191,7 @@ class SquareLand(cocos.layer.ScrollableLayer):
         self.update_after_change()
 
 
-class TestScene(cocos.scene.Scene):
+class TestScene(summa.scene.Scene):
     def __init__(self):
         super(TestScene,self).__init__()
         self.marks = []
@@ -337,7 +337,7 @@ def main():
 
     scene = TestScene()
     world_layer = SquareLand(world_width, world_height)
-    scroller = cocos.layer.ScrollingManager()
+    scroller = summa.layer.ScrollingManager()
     if autotest:
         def resize_scroller():
             scroller.scale = 0.75

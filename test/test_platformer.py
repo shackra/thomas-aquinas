@@ -12,8 +12,8 @@ from pyglet.window import key
 pyglet.resource.path.append(pyglet.resource.get_script_home())
 pyglet.resource.reindex()
 
-import cocos
-from cocos import tiles, actions, layer
+import summa
+from summa import tiles, actions, layer
 
 
 class PlatformerController(actions.Action, tiles.RectMapCollider):
@@ -60,7 +60,7 @@ Use Left-Right arrows and space to control.
 
 def main():
     global keyboard, tilemap, scroller
-    from cocos.director import director
+    from summa.director import director
     director.init(width=800, height=600, do_not_scale=True)
 
     print description
@@ -68,7 +68,7 @@ def main():
     player_layer = layer.ScrollableLayer()
     # NOTE: the anchor for this sprite is in the CENTER (the cocos default)
     # which means all positioning must be done using the center of its rect
-    player = cocos.sprite.Sprite('witch-standing.png')
+    player = summa.sprite.Sprite('witch-standing.png')
     player_layer.add(player)
     player.do(PlatformerController())
 
@@ -89,7 +89,7 @@ def main():
     player.position = r.center
 
     # construct the scene with a background layer color and the scrolling layers
-    platformer_scene = cocos.scene.Scene()
+    platformer_scene = summa.scene.Scene()
     platformer_scene.add(layer.ColorLayer(100, 120, 150, 255), z=0)
     platformer_scene.add(scroller, z=1)
 

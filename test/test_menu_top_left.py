@@ -11,10 +11,10 @@ from pyglet import image
 from pyglet.gl import *
 from pyglet import font
 
-from cocos.director import *
-from cocos.menu import *
-from cocos.scene import *
-from cocos.layer import *
+from summa.director import *
+from summa.menu import *
+from summa.scene import *
+from summa.layer import *
 
 class MainMenu(Menu):
     def __init__( self ):

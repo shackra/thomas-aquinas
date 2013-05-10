@@ -8,12 +8,12 @@ testinfo = "s, t 7, s, t 8, s, t 10.1, s, q"
 tags = "grid_actions, AccelAmplitude, Waves3D"
 
 import pyglet
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -27,7 +27,7 @@ class BackgroundLayer(cocos.layer.Layer):
 
 def main():
     director.init( resizable=True )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
     main_scene.add( BackgroundLayer(), z=0 )
 
     # In real code after a sequence of grid actions the StopGrid() action

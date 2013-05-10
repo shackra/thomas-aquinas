@@ -8,12 +8,12 @@ testinfo = "s, t 1.1, s, t 2.1, s, t 3.1, s, q"
 tags = "parallax, set_focus, ScrollableLayer"
 autotest = 0
 
-import cocos
-from cocos.director import director
-from cocos.text import Label
-from cocos.layer import ScrollingManager, ScrollableLayer
+import summa
+from summa.director import director
+from summa.text import Label
+from summa.layer import ScrollingManager, ScrollableLayer
 from pyglet.window import key
-from cocos.actions import Delay, CallFunc
+from summa.actions import Delay, CallFunc
 
 
 def update_focus(fx, fy):
@@ -45,7 +45,7 @@ def main():
               Delay(1) + CallFunc(update_focus, 200, 200)
             )
 
-    main_scene = cocos.scene.Scene(m)
+    main_scene = summa.scene.Scene(m)
 
     keyboard = key.KeyStateHandler()
     director.window.push_handlers(keyboard)

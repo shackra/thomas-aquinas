@@ -8,13 +8,13 @@ testinfo = "s, t 2, s, t 5.1, s, q"
 tags = "ShatteredTiles3D"
 
 import pyglet
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
 
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -38,7 +38,7 @@ no change would be seen at end of action.
 def main():
     print description
     director.init( resizable=True )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     main_scene.add( BackgroundLayer(), z=0 )
 

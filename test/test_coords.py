@@ -8,10 +8,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, q"
 tags = "get_virtual_coordinates, mouse hit"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import FadeOut, FadeIn
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import FadeOut, FadeIn
 import pyglet
 
 ## the following is in case we want to get the images
@@ -21,7 +21,7 @@ import pyglet
 sw = 800;sh = 600
 #sw = 768;sh = 480
 
-class TestLayer(cocos.layer.ColorLayer):
+class TestLayer(summa.layer.ColorLayer):
     def __init__(self):
         super( TestLayer, self ).__init__(0,0,50,255)
 
@@ -58,7 +58,7 @@ class TestLayer(cocos.layer.ColorLayer):
                 sprite.do(FadeOut(.5) + FadeIn(.5))
                 break
 
-class MouseManager(cocos.layer.Layer):
+class MouseManager(summa.layer.Layer):
     is_event_handler = True
     def __init__(self, test):
         super(MouseManager, self).__init__()
@@ -77,7 +77,7 @@ resize done (including fullscreen, done with ctrl + F)
 def main():
     director.init(width=sw, height=sh, resizable=True)
     test_layer = TestLayer()
-    main_scene = cocos.scene.Scene(test_layer)
+    main_scene = summa.scene.Scene(test_layer)
     main_scene.add(MouseManager(test_layer))
     director.run(main_scene)
 

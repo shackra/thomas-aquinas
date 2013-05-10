@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, q"
 tags = "Quad"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
+import summa
+from summa.director import director
+from summa.sprite import Sprite
 import pyglet
 from pyglet.gl import *
 
-class Quad(cocos.cocosnode.CocosNode):
+class Quad(summa.summanode.CocosNode):
     def __init__(self, color, size):
         super(Quad, self).__init__()
         self.size = size
@@ -31,7 +31,7 @@ class Quad(cocos.cocosnode.CocosNode):
             ('c4B', color)
         )
 
-class MultiQuadLayer(cocos.layer.Layer):
+class MultiQuadLayer(summa.layer.Layer):
     def __init__(self):
         super(MultiQuadLayer, self).__init__()
         x, y = director.get_window_size()
@@ -46,7 +46,7 @@ class MultiQuadLayer(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = MultiQuadLayer()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

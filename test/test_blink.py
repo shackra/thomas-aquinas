@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 2.1, s, t 2.6, s, t 3.1, s, t 5.1, s, t 5.6, s, t 6.1, s, t 8.1, s, q"
 tags = "Blink"
 
-import cocos
-from cocos.director import director
-from cocos.actions import Blink, Delay
-from cocos.sprite import Sprite
+import summa
+from summa.director import director
+from summa.actions import Blink, Delay
+from summa.sprite import Sprite
 import pyglet
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -38,7 +38,7 @@ def main():
     print description
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, q"
 tags = "Scene, rotation"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.layer import *
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.layer import *
 import pyglet
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -28,7 +28,7 @@ class TestLayer(cocos.layer.Layer):
 
 def main():
     director.init()
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
     main_scene.add( ColorLayer( 255, 0, 0, 255 ) )
     l = TestLayer()
     l.rotation = 45

@@ -1,4 +1,4 @@
-from cocos.skeleton import Bone, Skeleton
+from summa.skeleton import Bone, Skeleton
 def Point2(*args): return args
 root_bone = Bone('torso', 70, -180.0, Point2(0.00, 0.00)).add(
     Bone('brazo der', 40, 152.308491558, Point2(34.00, -67.00))    .add(

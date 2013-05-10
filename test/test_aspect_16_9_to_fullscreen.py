@@ -8,14 +8,14 @@ testinfo = "s, q"
 tags = "resize, resizable, aspect ratio, set_caption"
 
 from pyglet.gl import *
-import cocos
-from cocos.director import director
+import summa
+from summa.director import director
 
 width = 768
 height = 480
 assert abs(width/float(height)-16/10.0)<0.0001
 
-class ProbeRect(cocos.cocosnode.CocosNode):
+class ProbeRect(summa.summanode.CocosNode):
     def __init__(self, width, height, color4):
         super(ProbeRect,self).__init__()
         self.color4 = color4
@@ -34,7 +34,7 @@ class ProbeRect(cocos.cocosnode.CocosNode):
         glEnd()
         glPopMatrix()
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super(TestLayer, self).__init__()
         self.add( ProbeRect(width, height, (0,0,255,255)), z=1)
@@ -62,7 +62,7 @@ def main():
     print description
     director.init( width=width, height=height, resizable=False )
     director.window.set_caption('aspect ratio and fullscreen - see console for usage')
-    scene = cocos.scene.Scene()
+    scene = summa.scene.Scene()
     scene.add(TestLayer())
     director.run( scene )
 

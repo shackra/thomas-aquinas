@@ -12,11 +12,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 1, s, t 2.1, s, t 3.2, s, t 4.1, s, q"
 tags = "Layer, Waves3D, Flip"
 
-from cocos.director import director
-from cocos.actions import Flip, Waves3D
-from cocos.sprite import Sprite
-from cocos.layer import Layer, ColorLayer
-from cocos.scene import Scene
+from summa.director import director
+from summa.actions import Flip, Waves3D
+from summa.sprite import Sprite
+from summa.layer import Layer, ColorLayer
+from summa.scene import Scene
 
 class SpriteLayer ( Layer ):
 

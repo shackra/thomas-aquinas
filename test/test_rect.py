@@ -8,15 +8,15 @@ testinfo = "s, t 3.1, s, t 6.1, s, t 9.1, s, q"
 tags = "get_rect, mouse_hit, collision"
 
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.layer import ColorLayer
-from cocos.actions import *
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.layer import ColorLayer
+from summa.actions import *
 import pyglet
 from pyglet.gl import *
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
 
     is_event_handler = True
 
@@ -38,7 +38,7 @@ class TestLayer(cocos.layer.Layer):
             Delay(2) + CallFunc(self.zoom) +
             Delay(2) + CallFunc(self.rot)
             )
-        self.mouse_mark = cocos.layer.ColorLayer(0, 0, 255, 255, 20, 20)
+        self.mouse_mark = summa.layer.ColorLayer(0, 0, 255, 255, 20, 20)
         self.add(self.mouse_mark, z=3)
 
     def show_rect(self):
@@ -109,7 +109,7 @@ def main():
     print description
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

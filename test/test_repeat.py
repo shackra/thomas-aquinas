@@ -7,13 +7,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 1, s, t 3, s, t 4, s, q"
 tags = "Repeat"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import Repeat, Rotate
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import Repeat, Rotate
 import pyglet
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -26,7 +26,7 @@ class TestLayer(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

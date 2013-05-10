@@ -9,10 +9,10 @@ tags = "Action"
 
 import random
 import math
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-import cocos.actions as ac
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+import summa.actions as ac
 import pyglet
 from pyglet.gl import *
 ## the following is in case we want to get the images
@@ -23,7 +23,7 @@ from pyglet.gl import *
 fastness_green = 60.0
 fastness_bullet = 80.0
 
-class ProbeQuad(cocos.cocosnode.CocosNode):
+class ProbeQuad(summa.summanode.CocosNode):
     def __init__(self, r, color4):
         super(ProbeQuad,self).__init__()
         self.color4 = color4
@@ -111,7 +111,7 @@ class Chase(ac.Action):
         self.chasee.do(ac.RotateBy(360, 1.0))
         self.on_bullet_hit(self.target)
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -127,7 +127,7 @@ class TestLayer(cocos.layer.Layer):
         bullet.position = (0,0)
         bullet.color = (233, 70, 0)
         chase_worker = bullet.do(Chase(fastness_bullet))
-        # workaround deepcopy can't handle a bound method nor a cocosnode
+        # workaround deepcopy can't handle a bound method nor a summanode
         chase_worker.init2(self.green_obj, self.on_bullet_hit)
         self.add(bullet)
 
@@ -136,7 +136,7 @@ class TestLayer(cocos.layer.Layer):
 
 def main():
     director.init()
-    a = cocos.cocosnode.CocosNode()
+    a = summa.summanode.CocosNode()
     class A(object):
         def __init__(self, x):
             self.x = x
@@ -146,7 +146,7 @@ def main():
     print 'a:', a
     print 'b:', b
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

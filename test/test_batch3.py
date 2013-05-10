@@ -7,19 +7,19 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, t 3.0, s, t 5.0, s, t 10.0, s, q"
 tags = "batch, BatchNode.remove"
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
+import summa
+from summa.director import director
+from summa.sprite import Sprite
 import pyglet
-from cocos.actions import MoveBy
+from summa.actions import MoveBy
 
 # Same as test_batch, but now nest sprites, and remove one
 
-class TestBatch(cocos.layer.Layer):
+class TestBatch(summa.layer.Layer):
     def __init__(self):
         super( TestBatch, self ).__init__()
         x,y = director.get_window_size()
-        self.batchnode = cocos.batch.BatchNode()
+        self.batchnode = summa.batch.BatchNode()
         self.batchnode.position = 50,100
         self.add(self.batchnode)
         for i in range(216):
@@ -38,7 +38,7 @@ class TestBatch(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = TestBatch ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.show_FPS = True
     director.run (main_scene)
 

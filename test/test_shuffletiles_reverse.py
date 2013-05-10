@@ -8,12 +8,12 @@ testinfo = "s, t 0.49, s, t 0.51, s, t 2.49, s, t 2.51, s, t 2.99, s, t 3.1, s, 
 tags = "ShuffleTiles, Reverse"
 
 import pyglet
-import cocos
-from cocos.director import director
-import cocos.actions as ac
-from cocos.layer import *
+import summa
+from summa.director import director
+import summa.actions as ac
+from summa.layer import *
 
-class BackgroundLayer(cocos.layer.Layer):
+class BackgroundLayer(summa.layer.Layer):
     def __init__(self):
         super(BackgroundLayer, self).__init__()
         self.img = pyglet.resource.image('background_image.png')
@@ -27,7 +27,7 @@ class BackgroundLayer(cocos.layer.Layer):
 
 def main():
     director.init( resizable=True, fullscreen=False )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     main_scene.add( BackgroundLayer(), z=0 )
 

@@ -8,14 +8,14 @@ testinfo = "s, t 1.1, s, t 2.1, s, t 3.1, s, q"
 tags = "Label, color, text"
 
 
-import cocos
-from cocos.director import director
-from cocos.sprite import Sprite
-from cocos.actions import Rotate, Repeat, Delay, CallFunc
-from cocos.text import Label
+import summa
+from summa.director import director
+from summa.sprite import Sprite
+from summa.actions import Rotate, Repeat, Delay, CallFunc
+from summa.text import Label
 
 
-class TestLayer(cocos.layer.Layer):
+class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
 
@@ -42,7 +42,7 @@ class TestLayer(cocos.layer.Layer):
 def main():
     director.init()
     test_layer = TestLayer ()
-    main_scene = cocos.scene.Scene (test_layer)
+    main_scene = summa.scene.Scene (test_layer)
     director.run (main_scene)
 
 if __name__ == '__main__':

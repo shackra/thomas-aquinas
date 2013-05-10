@@ -1,4 +1,4 @@
-# a test scene used to help develop collision code for cocos.
+# a test scene used to help develop collision code for summa.
 
 # This code is so you can run the samples without installing the package
 import sys
@@ -8,11 +8,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "f 10 0.033, s, f 20 0.033, s, f 30 0.033, s, f 30 0.033, s, q"
 tags = "collision"
 
-import cocos
-from cocos.director import director
-import cocos.actions as ac
-import cocos.collision_model as cm
-import cocos.euclid as eu
+import summa
+from summa.director import director
+import summa.actions as ac
+import summa.collision_model as cm
+import summa.euclid as eu
 
 import random
 
@@ -53,7 +53,7 @@ offset = half_street_width + street_to_square_width_multiplier * half_street_wid
 offset = half_street_width * (street_to_square_width_multiplier + 1)
 
 
-class Actor(cocos.sprite.Sprite):
+class Actor(summa.sprite.Sprite):
     def __init__(self, *args, **kwargs):
         """same params as Sprite plus kwargs
                 'rx', 'ry' for collision cshape
@@ -172,10 +172,10 @@ class RobotCar(Actor):
             self.update_position(eu.Vector2(x,y))
 
 
-class City(cocos.layer.Layer):
+class City(summa.layer.Layer):
     def __init__(self):
         super(City, self).__init__()
-        bg = cocos.layer.ColorLayer(*street_color,width=view_width,
+        bg = summa.layer.ColorLayer(*street_color,width=view_width,
                                     height=view_width)
         self.add(bg)
         self.add_squares()
@@ -195,7 +195,7 @@ class City(cocos.layer.Layer):
         for iy in xrange(squares_per_side):
             y = half_street_width + iy*crossing_point_separation
             for ix in xrange(squares_per_side):
-                square = cocos.layer.ColorLayer(*square_color,width=square_width,
+                square = summa.layer.ColorLayer(*square_color,width=square_width,
                                     height=square_width)
                 x = half_street_width + ix*crossing_point_separation
                 square.position = (x,y)
@@ -243,7 +243,7 @@ class City(cocos.layer.Layer):
 
 def main():
     director.init(width=view_width, height=view_height)
-    scene = cocos.scene.Scene()
+    scene = summa.scene.Scene()
     city = City()
     scene.add(city)
     director.run(scene)

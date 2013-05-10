@@ -8,12 +8,12 @@ testinfo = "f 10 0.033, s, f 20 0.033, s, f 30 0.033, s, f 30 0.033, s, q"
 tags = "particles, Sun"
 
 import pyglet
-import cocos
-from cocos.director import director
-from cocos.actions import *
-from cocos.layer import *
-from cocos.particle_systems import *
-from cocos.particle import *
+import summa
+from summa.director import director
+from summa.actions import *
+from summa.layer import *
+from summa.particle_systems import *
+from summa.particle import *
 
 class L(Layer):
     is_event_handler = True
@@ -43,7 +43,7 @@ class L(Layer):
 
 def main():
     director.init( resizable=True )
-    main_scene = cocos.scene.Scene()
+    main_scene = summa.scene.Scene()
 
     main_scene.add( L() )
 
