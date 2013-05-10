@@ -102,7 +102,7 @@ class GridBase(object):
 
 
     def after_draw( self, camera ):
-        '''Called by CocosNode when the texture is already grabbed.
+        '''Called by SummaNode when the texture is already grabbed.
         The FrameBuffer will be unbound and the texture will be drawn
 
         :Parameters:

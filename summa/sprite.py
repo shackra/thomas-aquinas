@@ -34,7 +34,7 @@
 '''
 Sprites allows to display a image in a rectangular area, which can be rotated,
 scaled and moved.
-The placement in the scene follows the standard CocosNode rules.
+The placement in the scene follows the standard SummaNode rules.
 Also, all stock actions will work with sprites.
 
 Animating a sprite
@@ -83,7 +83,7 @@ __all__ = [ 'Sprite',                     # Sprite class
 
 
 class Sprite( BatchableNode, pyglet.sprite.Sprite):
-    '''A CocosNode that displays a rectangular image.
+    '''A SummaNode that displays a rectangular image.
 
     Example::
 

@@ -180,7 +180,7 @@ class Segment:
     def reversed(self):
         return Segment(self.end, self.start, self.width)
 
-class Canvas(cocosnode.CocosNode):
+class Canvas(cocosnode.SummaNode):
     def __init__(self):
         super(Canvas, self).__init__()
         self._dirty = True

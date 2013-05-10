@@ -32,7 +32,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 """
-CocosNode: the basic element of cocos2d
+SummaNode: the basic element of cocos2d
 """
 
 __docformat__ = 'restructuredtext'
@@ -50,9 +50,9 @@ import math
 import weakref
 
 
-__all__ = ['CocosNode']
+__all__ = ['SummaNode']
 
-class CocosNode(object):
+class SummaNode(object):
     """
     Cocosnode is the main element. Anything thats gets drawn or contains things that get drawn is a cocosnode.
     The most popular cocosnodes are scenes, layers and sprites.
@@ -331,7 +331,7 @@ class CocosNode(object):
         Walks the nodes tree upwards until it finds a node of the class `klass`
         or returns None
 
-        :rtype: `CocosNode` or None
+        :rtype: `SummaNode` or None
         """
         if isinstance(self, klass):
             return self
@@ -397,14 +397,14 @@ class CocosNode(object):
         """Adds a child and if it becomes part of the active scene calls its on_enter method
 
         :Parameters:
-            `child` : CocosNode
+            `child` : SummaNode
                 object to be added
             `z` : float
                 the z index of self
             `name` : str
                 Name of the child
 
-        :rtype: `CocosNode` instance
+        :rtype: `SummaNode` instance
         :return: self
 
         """
@@ -467,7 +467,7 @@ class CocosNode(object):
     def get_children(self):
         """Return a list with the node's childs, order is back to front
 
-        :rtype: list of CocosNode
+        :rtype: list of SummaNode
         :return: childs of this node, ordered back to front
 
         """
@@ -483,7 +483,7 @@ class CocosNode(object):
             `name` : string
                 name of the reference to be get
 
-        :rtype: CocosNode
+        :rtype: SummaNode
         :return: the child named 'name'. Will raise Exception if not present
 
         Warning: if a node is added with name, then removed not by name, the name

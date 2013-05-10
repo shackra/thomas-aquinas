@@ -42,7 +42,7 @@ from pyglet.gl import *
 
 import copy
 
-class Skin(summa.summanode.CocosNode):
+class Skin(summa.summanode.SummaNode):
     def __init__(self, skeleton):
         super(Skin, self).__init__()
         self.skeleton = skeleton

@@ -59,7 +59,7 @@ def ensure_batcheable(node):
     for c in  node.get_children():
         ensure_batcheable(c)
 
-class BatchNode( cocosnode.CocosNode ):
+class BatchNode( cocosnode.SummaNode ):
     def __init__(self):
         super(BatchNode, self).__init__()
         self.batch = pyglet.graphics.Batch()
@@ -90,7 +90,7 @@ class BatchNode( cocosnode.CocosNode ):
     def draw(self):
         pass # All drawing done in visit!
 
-class BatchableNode( cocosnode.CocosNode ):
+class BatchableNode( cocosnode.SummaNode ):
     def add(self, child, z=0, name=None):
         batchnode = self.get_ancestor(BatchNode)
         if not batchnode:

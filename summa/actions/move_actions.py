@@ -168,7 +168,7 @@ class BoundedMove(Move):
 
 
 class Driver(Action):
-    """Drive a `CocosNode` object around like a car in x, y according to
+    """Drive a `SummaNode` object around like a car in x, y according to
     a direction and speed.
 
     Example::

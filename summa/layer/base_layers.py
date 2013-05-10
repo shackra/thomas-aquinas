@@ -51,8 +51,8 @@ from summa import scene
 
 __all__ = [ 'Layer', 'MultiplexLayer']
 
-class Layer(cocosnode.CocosNode, scene.EventHandlerMixin):
-    """a CocosNode that automatically handles listening to director.window events"""
+class Layer(cocosnode.SummaNode, scene.EventHandlerMixin):
+    """a SummaNode that automatically handles listening to director.window events"""
 
     #: if True the layer will listen to director.window events
     #: Default: False

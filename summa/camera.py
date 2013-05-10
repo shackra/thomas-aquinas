@@ -43,7 +43,7 @@ __all__ = ['Camera']
 
 class Camera(object):
     """
-    Camera used in every `CocosNode`.
+    Camera used in every `SummaNode`.
     Useful to look at the object from different views.
     The OpenGL gluLookAt() function is used to locate the
     camera.

@@ -341,7 +341,7 @@ class Menu(Layer):
                 break
 
 
-class BaseMenuItem( CocosNode ):
+class BaseMenuItem( SummaNode ):
     """An abstract menu item. It triggers a function when it is activated"""
 
     selected_effect = None

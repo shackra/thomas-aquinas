@@ -38,7 +38,7 @@ Actions
 
 Actions purpose is to modify along the time some trait of an object.
 The object that the action will modify is the action's target.
-Usually the target will be an instance of some CocosNode subclass.
+Usually the target will be an instance of some SummaNode subclass.
 
 Example::
 
@@ -141,7 +141,7 @@ Example::
 
      position = (100, 100); duration = 10
      move = MoveTo(position, duration)
-     blue_bird = Bird_CocosNode_subclass(...)
+     blue_bird = Bird_SummaNode_subclass(...)
      blue_move = blue_bird.do(move)
 
 Here move plays the template role and blue_move plays the worker role.
@@ -300,7 +300,7 @@ and Repeat operators will broke, and maybe some more.
 The section name states a precise requeriment, but it is a bit concise. Let see
 some common situations where you can be in trouble and how to manage them.
 
-  - you try to pass a CocosNode instance in init, and init stores that in an
+  - you try to pass a SummaNode instance in init, and init stores that in an
     action member
 
   - you try to pass a callback f = some_cocosnode.a_method, with the idea that
@@ -412,7 +412,7 @@ class Action(object):
         """dont override - use init"""
         self.duration = None # The base action has potentially infinite duration
         self.init(*args, **kwargs)
-        self.target = None              #: `CocosNode` object that is the target of the action
+        self.target = None              #: `SummaNode` object that is the target of the action
         self._elapsed = 0.0
         self._done = False
         self.scheduled_to_remove = False # exclusive use by cocosnode.remove_action

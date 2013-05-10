@@ -53,7 +53,7 @@ __all__ = [
             ]
 
 class Place( InstantAction ):
-    """Place the `CocosNode` object in the position x,y.
+    """Place the `SummaNode` object in the position x,y.
 
     Example::
 
@@ -73,7 +73,7 @@ class Place( InstantAction ):
         self.target.position = self.position
 
 class Hide( InstantAction ):
-    """Hides the `CocosNode` object. To show it again call the `Show` () action
+    """Hides the `SummaNode` object. To show it again call the `Show` () action
 
     Example::
 
@@ -87,7 +87,7 @@ class Hide( InstantAction ):
         return Show()
 
 class Show( InstantAction ):
-    """Shows the `CocosNode` object. To hide it call the `Hide` () action
+    """Shows the `SummaNode` object. To hide it call the `Hide` () action
 
     Example::
 
@@ -101,7 +101,7 @@ class Show( InstantAction ):
         return Hide()
 
 class ToggleVisibility( InstantAction ):
-    """Toggles the visible attribute of a `CocosNode` object
+    """Toggles the visible attribute of a `SummaNode` object
 
     Example::
 

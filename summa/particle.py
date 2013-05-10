@@ -43,7 +43,7 @@ import copy
 import numpy
 import ctypes
 
-from summanode import CocosNode
+from summanode import SummaNode
 from euclid import Point2
 
 # for dev and diagnostic, None means real automatic, True / False means
@@ -89,7 +89,7 @@ class Color( object ):
         return self.r, self.g, self.b, self.a
 
 
-class ParticleSystem( CocosNode ):
+class ParticleSystem( SummaNode ):
     """
     Base class for many flawors of cocos particle systems
 
@@ -116,7 +116,7 @@ class ParticleSystem( CocosNode ):
     #: Gravity of the particles
     gravity = Point2(0.0, 0.0)
 
-    #: position is from "superclass" CocosNode
+    #: position is from "superclass" SummaNode
     #: Position variance
     pos_var = Point2(0.0, 0.0)
 

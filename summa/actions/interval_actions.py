@@ -151,7 +151,7 @@ class Lerp( IntervalAction ):
         return Lerp(self.attrib, self.end_p, self.start_p, self.duration)
         
 class RotateBy( IntervalAction ):
-    """Rotates a `CocosNode` object clockwise a number of degrees
+    """Rotates a `SummaNode` object clockwise a number of degrees
     by modiying it's rotation attribute.
 
     Example::
@@ -186,7 +186,7 @@ Rotate = RotateBy
 
 
 class RotateTo( IntervalAction ):
-    """Rotates a `CocosNode` object to a certain angle by modifying it's
+    """Rotates a `SummaNode` object to a certain angle by modifying it's
     rotation attribute.
     The direction will be decided by the shortest angle.
 
@@ -332,7 +332,7 @@ class AccelDeccel( IntervalAction ):
 
 
 class MoveTo( IntervalAction ):
-    """Moves a `CocosNode` object to the position x,y. x and y are absolute coordinates
+    """Moves a `SummaNode` object to the position x,y. x and y are absolute coordinates
     by modifying it's position attribute.
 
     Example::
@@ -364,7 +364,7 @@ class MoveTo( IntervalAction ):
         self.target.position = self.start_position + self.delta * t
 
 class MoveBy( MoveTo ):
-    """Moves a `CocosNode` object x,y pixels by modifying it's 
+    """Moves a `SummaNode` object x,y pixels by modifying it's 
     position attribute.
     x and y are relative to the position of the object.
     Duration is is seconds.
@@ -395,7 +395,7 @@ class MoveBy( MoveTo ):
         return MoveBy(-self.delta, self.duration)
 
 class FadeOut( IntervalAction ):
-    """Fades out a `CocosNode` object by modifying it's opacity attribute.
+    """Fades out a `SummaNode` object by modifying it's opacity attribute.
 
     Example::
 
@@ -418,7 +418,7 @@ class FadeOut( IntervalAction ):
         return FadeIn( self.duration )
 
 class FadeTo( IntervalAction ):
-    """Fades a `CocosNode` object to a specific alpha value by modifying it's opacity attribute.
+    """Fades a `SummaNode` object to a specific alpha value by modifying it's opacity attribute.
 
     Example::
 
@@ -447,7 +447,7 @@ class FadeTo( IntervalAction ):
 
 
 class FadeIn( FadeOut):
-    """Fades in a `CocosNode` object by modifying it's opacity attribute.
+    """Fades in a `SummaNode` object by modifying it's opacity attribute.
 
     Example::
 
@@ -461,7 +461,7 @@ class FadeIn( FadeOut):
         return FadeOut( self.duration )
 
 class ScaleTo(IntervalAction):
-    """Scales a `CocosNode` object to a zoom factor by modifying it's scale attribute.
+    """Scales a `SummaNode` object to a zoom factor by modifying it's scale attribute.
 
     Example::
 
@@ -490,7 +490,7 @@ class ScaleTo(IntervalAction):
 
 
 class ScaleBy(ScaleTo):
-    """Scales a `CocosNode` object a zoom factor by modifying it's scale attribute.
+    """Scales a `SummaNode` object a zoom factor by modifying it's scale attribute.
 
     Example::
 
@@ -508,7 +508,7 @@ class ScaleBy(ScaleTo):
 
 
 class Blink( IntervalAction ):
-    """Blinks a `CocosNode` object by modifying it's visible attribute
+    """Blinks a `SummaNode` object by modifying it's visible attribute
 
     The action ends with the same visible state than at the start time.
 
@@ -545,7 +545,7 @@ class Blink( IntervalAction ):
 
 
 class Bezier( IntervalAction ):
-    """Moves a `CocosNode` object through a bezier path by modifying it's position attribute.
+    """Moves a `SummaNode` object through a bezier path by modifying it's position attribute.
 
     Example::
 
@@ -580,7 +580,7 @@ class Bezier( IntervalAction ):
         return Bezier(self.bezier, self.duration, not self.forward)
 
 class Jump(IntervalAction):
-    """Moves a `CocosNode` object simulating a jump movement by modifying it's position attribute.
+    """Moves a `SummaNode` object simulating a jump movement by modifying it's position attribute.
 
     Example::
 
@@ -625,7 +625,7 @@ class Jump(IntervalAction):
         return Jump(self.y, -self.x, self.jumps, self.duration)
 
 class JumpBy(IntervalAction):
-    """Moves a `CocosNode` object simulating a jump movement by modifying it's position attribute.
+    """Moves a `SummaNode` object simulating a jump movement by modifying it's position attribute.
 
     Example::
 
@@ -668,7 +668,7 @@ class JumpBy(IntervalAction):
         return JumpBy( (-self.position[0],-self.position[1]), self.height, self.jumps, self.duration)
 
 class JumpTo(JumpBy):
-    """Moves a `CocosNode` object to a position simulating a jump movement by modifying
+    """Moves a `SummaNode` object to a position simulating a jump movement by modifying
     it's position attribute.
 
     Example::

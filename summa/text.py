@@ -33,7 +33,7 @@
 # ----------------------------------------------------------------------------
 '''Text support
 
-CocosNodes subclasses supporting text.
+SummaNodes subclasses supporting text.
 They use a suitable pyglet text object to do the work.
 Functionality other that the one common to all cococsnodes, except 'opacity', is
 provided by the member 'element' , which is the underlying pyglet object.
@@ -52,11 +52,11 @@ from pyglet.gl import *
 
 from batch import *
 
-class TextElement(cocosnode.CocosNode):
+class TextElement(cocosnode.SummaNode):
     """
     Base class for all cocos text
 
-    Provides the CocosNode interfase and a pyglet Batch to store parts
+    Provides the SummaNode interfase and a pyglet Batch to store parts
     Functionality other that the one common to all cococsnodes, except 'opacity', is
     provided by the member 'element' , which is the underlying pyglet object.
     """
@@ -133,7 +133,7 @@ class HTMLLabel(TextElement):
     klass = pyglet.text.HTMLLabel
 
 class PygletRichLabel(pyglet.text.DocumentLabel):
-    '''This is not a CocosNode - let instantiation be handled by RichLabel
+    '''This is not a SummaNode - let instantiation be handled by RichLabel
 
     Helper class for RichLabel
     '''

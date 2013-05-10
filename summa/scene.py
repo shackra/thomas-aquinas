@@ -74,7 +74,7 @@ class EventHandlerMixin(object):
 
 
 
-class Scene(cocosnode.CocosNode, EventHandlerMixin):
+class Scene(cocosnode.SummaNode, EventHandlerMixin):
     """
     """
 
