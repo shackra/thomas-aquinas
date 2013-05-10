@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''Implementation of QuadMoveBy actions
 
@@ -53,7 +70,7 @@ __all__ = ['QuadMoveBy',
            'FlipY',
            'SkewHorizontal',
            'SkewVertical',
-           ]
+]
 
 
 class QuadMoveBy( Grid3DAction ):
@@ -66,7 +83,7 @@ class QuadMoveBy( Grid3DAction ):
             v            ^
             |            |
         vertex0 -->-- vertex1
-        
+
         The vertices will move from the origin (src parameters) a relative distance (delta parameters) in duration time.
 
     Example::
@@ -78,13 +95,13 @@ class QuadMoveBy( Grid3DAction ):
 
        '''
 
-    def init( self, 
+    def init( self,
               src0=(0,0), src1=(-1,-1), src2=(-1,-1), src3=(-1,-1),
               delta0=(0,0), delta1=(0,0), delta2=(0,0), delta3=(0,0),
               grid=(1,1),
               *args, **kw ):
         '''Initializes the QuadMoveBy
-        
+
         :Parameters:
             `src0` : (int, int)
                 Initial value for the bottom-left coordinate. Default is (0,0)
@@ -108,25 +125,25 @@ class QuadMoveBy( Grid3DAction ):
             raise GridException("Invalid grid size.")
 
         super( QuadMoveBy, self).init( grid, *args, **kw )
-        
+
         x,y = director.get_window_size()
-        
+
         if src1 == (-1,-1):
             src1 = ( x,0 )
         if src2 == (-1,-1):
             src2 = (x,y)
         if src3 == (-1,-1):
-            src3 = (0,y)  
+            src3 = (0,y)
 
         self.src0 = Point3( src0[0], src0[1], 0 )
-        self.src1 = Point3( src1[0], src1[1], 0 )  
+        self.src1 = Point3( src1[0], src1[1], 0 )
         self.src2 = Point3( src2[0], src2[1], 0 )
         self.src3 = Point3( src3[0], src3[1], 0)
         self.delta0 = Point3( delta0[0], delta0[1], 0)
-        self.delta1 = Point3( delta1[0], delta1[1], 0) 
+        self.delta1 = Point3( delta1[0], delta1[1], 0)
         self.delta2 = Point3( delta2[0], delta2[1], 0)
         self.delta3 = Point3( delta3[0], delta3[1], 0)
-       
+
     def update( self, t ):
         new_pos0 = self.src0 + self.delta0 * t
         new_pos1 = self.src1 + self.delta1 * t
@@ -197,4 +214,3 @@ class SkewVertical( QuadMoveBy ):
         if delta==None:
             delta=y//3
         super(SkewVertical, self).__init__( delta0=(0,delta), delta2=(0,-delta), *args, **kw )
-

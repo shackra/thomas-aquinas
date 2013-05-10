@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
 __docformat__ = 'restructuredtext'
@@ -40,21 +57,21 @@ import summa.euclid as eu
 
 ###### interfaces, abstract base clases ######################################
 
-# cshape reference interfase 
+# cshape reference interfase
 class Cshape(object):
     """
-    Represents an abstract geometric shape in the 2D space, and can 
+    Represents an abstract geometric shape in the 2D space, and can
     answer questions about proximity or intersection with other shapes.
 
     Implementations are free to restrict the type of geometrical shapes
     that will accept, by example circles or axis aligned rectangles.
     """
-    
+
     def overlaps(self, other):
         """
         Returns True if overlapping other, False otherwise
-        
-        :rtype: bool        
+
+        :rtype: bool
         """
         pass
 
@@ -64,8 +81,8 @@ class Cshape(object):
 
         Not necessarily  euclidean distance.
         It is distances between boundaries.
-        
-        :rtype: float        
+
+        :rtype: float
         """
         pass
 
@@ -73,7 +90,7 @@ class Cshape(object):
         """
         Returns a boolean, True if distance(self, other)<=near_distance
 
-        :rtype: bool        
+        :rtype: bool
         """
         pass
 
@@ -81,7 +98,7 @@ class Cshape(object):
         """
         Returns True if the point (x,y) overlaps the shape, False otherwise
 
-        :rtype: bool        
+        :rtype: bool
         """
         pass
 
@@ -89,11 +106,11 @@ class Cshape(object):
         """
         Returns a boolean, True if the shape fully fits into the axis aligned
         rectangle defined by packed_box, False otherwise.
-        
+
         :Parameters:
             `packed_box` : 4-tuple floats
                 An axis aligned rectangle expressed as (minx, maxx, miny, maxy)
-        :rtype: bool        
+        :rtype: bool
         """
         pass
 
@@ -104,16 +121,16 @@ class Cshape(object):
         The rectangle is expressed as a 4-tuple of floats (minx, maxx, miny, maxy)
         Such a rectangle is also know as the Axis Aligned Bounding Box for shape;
         AABB for short.
-        
+
         :rtype: 4-tuple of floats
-            
+
         """
         pass
 
     def copy(self):
         """
         Returns a copy of itself
-        
+
         :rtype: Cshape
         """
         pass
@@ -131,21 +148,21 @@ class CollisionManager(object):
     'add' method with the object instance.
 
     Example questions are:
-    
+
         - which known objects collides with <this object> ?
         - which known objects are near than 6.0 from <this object> ?
 
     Note that explicit objects in the question (call) don't need to be known to
     the collision manager answering the question.
     If the explicit object indeed is known, then it is omitted in the answer as a
-    trivial case. 
+    trivial case.
 
     There can be multiple CollisionManager instances in the same scope, and
     an object can be known to many collision managers at the same time.
 
     Objects that can be known or can be presented to a Collision Manager in
     a question must comply with:
-    
+
         - obj has a member called cshape
         - obj.cshape supports the interface Cshape
 
@@ -160,17 +177,17 @@ class CollisionManager(object):
 
     The known objects collective for each CollisionManager instance is
     manipulated by calling the methods
-    
+
         - clean() \: forgets all objects and empties internal data structures
         - add(obj) \: remember obj as a known object
         - remove_tricky(obj) \: forgets obj
-        
+
     When objects are made known to a collision manager, internal data structures
     are updated based on the obj.cshape value at the 'add' moment.
     In particular, the obj.cshape indirectly tells where in the internal
-    structures certain info will be stored. 
+    structures certain info will be stored.
     Later, the internal data structures are used to accelerate answers.
-    
+
     This  means that modifying obj.cshape after an 'add' can produce a memory
     leak in the next 'remove_tricky', and that in the same situation some
     answers can be partially wrong.
@@ -190,14 +207,14 @@ class CollisionManager(object):
         collision_manager.clear() # fast, no leaks even if changed cshapes
         for actor in moving_actors:
             collision_manager.add(actor)
-            
+
         # game logic
         # do what you need, but defer changes in cshape to next block
         # by example
         for actor in moving_actors:
-            actor.new_pos = actor.cshape.center + dt * vel  
+            actor.new_pos = actor.cshape.center + dt * vel
             #other logic that potentially needs collision info;
-            #it will be accurate because you have not changed cshapes 
+            #it will be accurate because you have not changed cshapes
             ...
 
         # update cshapes for next frame
@@ -213,7 +230,7 @@ class CollisionManager(object):
 
     Examples actors for this case are food, coins, trees, rocks.
     """
-    
+
     def add(self, obj):
         """
         Makes obj a know entity
@@ -237,7 +254,7 @@ class CollisionManager(object):
     def they_collide(self, obj1, obj2):
         """
         Returns a boolean, True if obj1 overlaps objs2
-        obj1, obj2 are not required to be known objects 
+        obj1, obj2 are not required to be known objects
         """
         pass
 
@@ -257,10 +274,10 @@ class CollisionManager(object):
         obj is not required to be a known object
 
         Usage::
-        
+
             for other in collision_manager.iter_colliding(obj):
                 # process event 'obj touches other'
-            
+
         """
         pass
 
@@ -292,7 +309,7 @@ class CollisionManager(object):
         Notice that it includes the ones colliding with obj.
         obj is not required to be a known object
         If the game logic wants the list ordered by ascending distances, use
-        ranked_objs_near instead.        
+        ranked_objs_near instead.
         """
         pass
 
@@ -347,12 +364,12 @@ class CollisionManager(object):
 class CircleShape(object):
     """
     Implements the Cshape interface that uses discs as geometric shape.
-    
+
     Distance is the euclidean distance.
-    
+
     Look at Cshape for other class and methods documentation.
     """
-    
+
     def __init__(self, center, r):
         """
         :Parameters:
@@ -372,7 +389,7 @@ class CircleShape(object):
         if d<0.0:
             d = 0.0
         return d
-    
+
     def near_than(self, other, near_distance):
         return abs(self.center - other.center) <= self.r + other.r + near_distance
 
@@ -397,15 +414,15 @@ class AARectShape(object):
     """
     Implements the Cshape interface that uses rectangles with sides
     paralell to the coordinate axis as geometric shape.
-    
+
     Distance is not the euclidean distance but the rectangular or max-min
     distance, max( min(x0 - x1), min(y0 - y1) : (xi, yi) in recti )
-    
+
     Good if actors don't rotate.
 
     Look at Cshape for other class and methods documentation.
     """
-    
+
     def __init__(self, center, half_width, half_height):
         """
         :Parameters:
@@ -419,7 +436,7 @@ class AARectShape(object):
         self.center = center
         self.rx = half_width
         self.ry = half_height
-        
+
     def overlaps(self, other):
         return ( abs(self.center[0] - other.center[0]) < self.rx + other.rx and
                  abs(self.center[1] - other.center[1]) < self.ry + other.ry )
@@ -430,7 +447,7 @@ class AARectShape(object):
         if d<0.0:
             d = 0.0
         return d
-    
+
     def near_than(self, other, near_distance):
         return ( abs(self.center[0] - other.center[0]) - self.rx - other.rx < near_distance and
                  abs(self.center[1] - other.center[1]) - self.ry - other.ry < near_distance)
@@ -458,11 +475,11 @@ class CollisionManagerBruteForce(object):
     """
     Implements the CollisionManager interface with with the simpler code possible.
 
-    Intended for reference and debuging, it has very bad performance. 
+    Intended for reference and debuging, it has very bad performance.
 
     Look at CollisionManager for other class and methods documentation.
     """
-    
+
     def __init__(self):
         self.objs = set()
 
@@ -496,7 +513,7 @@ class CollisionManagerBruteForce(object):
             if other is not obj and f_near_than(other.cshape,near_distance):
                 return other
         return None
-        
+
     def objs_near(self, obj, near_distance):
         f_near_than = obj.cshape.near_than
         return [other for other in self.objs if
@@ -536,7 +553,7 @@ class CollisionManagerBruteForce(object):
                     break
                 if f_overlaps(other.cshape):
                     yield (obj, other)
-                
+
     def knows(self, obj):
         return obj in self.objs
 
@@ -643,7 +660,7 @@ class CollisionManagerGrid(object):
                     collides.add(other)
         collides.remove(obj)
         return collides
-        
+
     def iter_colliding(self, obj):
         aabb = obj.cshape.minmax()
         f_overlaps = obj.cshape.overlaps
@@ -706,7 +723,7 @@ class CollisionManagerGrid(object):
                         #yield (other, d)
         del collides[obj]
         return [ (other, collides[other]) for other in collides ]
-    
+
     def ranked_objs_near(self, obj, near_distance):
         tmp = self.objs_near_wdistance(obj, near_distance)
         tmp.sort(key=op.itemgetter(1))

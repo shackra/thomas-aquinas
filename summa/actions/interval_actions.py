@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''Interval Action
 
@@ -120,8 +137,8 @@ __all__ = [  'Lerp',                            # interpolation
 
 class Lerp( IntervalAction ):
     """
-    Interpolate between values for some specified attribute 
-    
+    Interpolate between values for some specified attribute
+
     """
     def init(self, attrib, start, end, duration):
         """Init method.
@@ -149,7 +166,7 @@ class Lerp( IntervalAction ):
 
     def __reversed__(self):
         return Lerp(self.attrib, self.end_p, self.start_p, self.duration)
-        
+
 class RotateBy( IntervalAction ):
     """Rotates a `SummaNode` object clockwise a number of degrees
     by modiying it's rotation attribute.
@@ -175,10 +192,10 @@ class RotateBy( IntervalAction ):
 
     def start( self ):
         self.start_angle = self.target.rotation
-        
+
     def update(self, t):
         self.target.rotation = (self.start_angle + self.angle * t ) % 360
-            
+
     def __reversed__(self):
         return RotateBy(-self.angle, self.duration)
 
@@ -212,17 +229,17 @@ class RotateTo( IntervalAction ):
         ea = self.angle
         sa = self.start_angle = (self.target.rotation%360)
         self.angle = ((ea%360) - (sa%360))
-        if self.angle > 180: 
+        if self.angle > 180:
             self.angle = -360+self.angle
-        if self.angle < -180: 
+        if self.angle < -180:
             self.angle = 360+self.angle
-        
+
     def update(self, t):
         self.target.rotation = (self.start_angle + self.angle * t ) % 360
 
     def __reversed__(self):
         return RotateTo(-self.angle, self.duration)
-        
+
 class Speed( IntervalAction ):
     """
     Changes the speed of an action, making it take longer (speed>1)
@@ -364,7 +381,7 @@ class MoveTo( IntervalAction ):
         self.target.position = self.start_position + self.delta * t
 
 class MoveBy( MoveTo ):
-    """Moves a `SummaNode` object x,y pixels by modifying it's 
+    """Moves a `SummaNode` object x,y pixels by modifying it's
     position attribute.
     x and y are relative to the position of the object.
     Duration is is seconds.
@@ -533,7 +550,7 @@ class Blink( IntervalAction ):
         self.duration = duration
 
     def start(self):
-        self.end_invisible = not self.target.visible 
+        self.end_invisible = not self.target.visible
 
     def update(self, t):
         slice = 1 / float( self.times )
@@ -605,7 +622,7 @@ class Jump(IntervalAction):
 
         import warnings
         warnings.warn('Deprecated "Jump" action. Consider using JumpBy instead', DeprecationWarning)
-        
+
 
         self.y = y
         self.x = x
@@ -630,7 +647,7 @@ class JumpBy(IntervalAction):
     Example::
 
         # Move the sprite 200 pixels to the right and up
-        action = JumpBy((100,100),200, 5, 6)    
+        action = JumpBy((100,100),200, 5, 6)
         sprite.do( action )            # in 6 seconds, doing 5 jumps
                                        # of 200 pixels of height
     """
@@ -640,7 +657,7 @@ class JumpBy(IntervalAction):
 
         :Parameters:
             `position` : integer x integer tuple
-                horizontal and vertical movement relative to the 
+                horizontal and vertical movement relative to the
                 starting position
             `height` : integer
                 Height of jumps
@@ -657,13 +674,13 @@ class JumpBy(IntervalAction):
     def start( self ):
         self.start_position = self.target.position
         self.delta = Vector2(*self.position)
-        
+
     def update(self, t):
         y = self.height * abs( math.sin( t * math.pi * self.jumps ) )
         y = int(y+self.delta[1] * t)
         x = self.delta[0] * t
         self.target.position = self.start_position + Point2(x,y)
-        
+
     def __reversed__(self):
         return JumpBy( (-self.position[0],-self.position[1]), self.height, self.jumps, self.duration)
 
@@ -682,7 +699,7 @@ class JumpTo(JumpBy):
     def start( self ):
         self.start_position = self.target.position
         self.delta = Vector2(*self.position)-self.start_position
-          
+
 
 class Delay(IntervalAction):
     """Delays the action a certain amount of seconds
@@ -703,7 +720,7 @@ class Delay(IntervalAction):
 
     def __reversed__(self):
         return self
-        
+
 
 class RandomDelay(Delay):
     """Delays the actions between *min* and *max* seconds
@@ -736,4 +753,3 @@ class RandomDelay(Delay):
         if other <= 1:
             return self
         return RandomDelay(low*other, hi*other)
-

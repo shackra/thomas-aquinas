@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''Implementation of TiledGrid3DAction actions
 '''
@@ -43,19 +60,19 @@ from summa.director import director
 rr = random.randrange
 
 __all__ = [ 'FadeOutTRTiles',             # actions that don't modify the z coordinate
-           'FadeOutBLTiles',
-           'FadeOutUpTiles',
-           'FadeOutDownTiles',
-           'ShuffleTiles',
-           'TurnOffTiles',
-           'SplitRows',
-           'SplitCols',
+            'FadeOutBLTiles',
+            'FadeOutUpTiles',
+            'FadeOutDownTiles',
+            'ShuffleTiles',
+            'TurnOffTiles',
+            'SplitRows',
+            'SplitCols',
 
            'ShakyTiles3D',              # actions that modify the z coordinate
-           'ShatteredTiles3D',
-           'WavesTiles3D',
-           'JumpTiles3D',
-           ]
+            'ShatteredTiles3D',
+            'WavesTiles3D',
+            'JumpTiles3D',
+]
 
 # Don't export this class
 class Tile(object):
@@ -72,7 +89,7 @@ class ShakyTiles3D( TiledGrid3DAction ):
     '''Simulates a shaky floor composed of tiles
 
     Example::
-    
+
        scene.do( ShakyTiles3D( randrange=6, grid=(4,4), duration=10) )
     '''
 
@@ -88,7 +105,7 @@ class ShakyTiles3D( TiledGrid3DAction ):
     def update( self, t ):
         for i in xrange(0, self.grid.x):
             for j in xrange(0, self.grid.y):
-                    coords = self.get_original_tile(i,j)   
+                    coords = self.get_original_tile(i,j)
                     for k in xrange(0,len(coords),3):
                         x = rr(-self.randrange, self.randrange+1)
                         y = rr(-self.randrange, self.randrange+1)
@@ -97,15 +114,15 @@ class ShakyTiles3D( TiledGrid3DAction ):
                         coords[k+1] += y
                         coords[k+2] += z
                     self.set_tile(i,j,coords)
-                
+
 
 class ShatteredTiles3D( TiledGrid3DAction ):
     '''ShatterTiles shatters the tiles according to a random value.
     It is similar to shakes (see `ShakyTiles3D`) the tiles just one frame, and then continue with
     that state for duration time.
-    
+
     Example::
-    
+
         scene.do( ShatteredTiles3D( randrange=12 ) )
     '''
 
@@ -123,7 +140,7 @@ class ShatteredTiles3D( TiledGrid3DAction ):
         if not self._once:
             for i in xrange(0, self.grid.x):
                 for j in xrange(0, self.grid.y):
-                    coords = self.get_original_tile(i,j)   
+                    coords = self.get_original_tile(i,j)
                     for k in xrange(0,len(coords),3):
                         x = rr(-self.randrange, self.randrange+1)
                         y = rr(-self.randrange, self.randrange+1)
@@ -133,7 +150,7 @@ class ShatteredTiles3D( TiledGrid3DAction ):
                         coords[k+2] += z
                     self.set_tile(i,j,coords)
             self._once = True
-                
+
 
 class ShuffleTiles( TiledGrid3DAction ):
     '''ShuffleTiles moves the tiles randomly across the screen.
@@ -152,7 +169,7 @@ class ShuffleTiles( TiledGrid3DAction ):
         '''
         super(ShuffleTiles,self).init(*args, **kw)
         self.seed = seed
-        
+
     def start(self):
         super(ShuffleTiles,self).start()
 
@@ -169,27 +186,27 @@ class ShuffleTiles( TiledGrid3DAction ):
 
         for i in xrange(self.grid.x):
             for j in xrange(self.grid.y):
-                self.tiles[(i,j)] = Tile( position = Point2(i,j), 
-                                          start_position = Point2(i,j), 
+                self.tiles[(i,j)] = Tile( position = Point2(i,j),
+                                          start_position = Point2(i,j),
                                           delta= self._get_delta(i,j) )
- 
+
     def place_tile(self, i, j):
         t = self.tiles[(i,j)]
         coords = self.get_original_tile(i,j)
 
-        for k in xrange(0,len(coords),3):                      
+        for k in xrange(0,len(coords),3):
             coords[k] += int( t.position.x * self.target.grid.x_step )
             coords[k+1] += int( t.position.y * self.target.grid.y_step )
         self.set_tile(i,j,coords)
-        
+
     def update(self, t ):
         for i in xrange(0, self.grid.x):
             for j in xrange(0, self.grid.y):
                 self.tiles[(i,j)].position = self.tiles[(i,j)].delta * t
                 self.place_tile(i,j)
-                
+
     # private method
-    def _get_delta(self, x, y):      
+    def _get_delta(self, x, y):
         idx = x * self.grid.y + y
         i,j = divmod( self.tiles_order[idx], self.grid.y )
         return Point2(i,j)-Point2(x,y)
@@ -197,14 +214,14 @@ class ShuffleTiles( TiledGrid3DAction ):
 
 class FadeOutTRTiles( TiledGrid3DAction ):
     '''Fades out each tile following a diagonal Top-Right path until all the tiles are faded out.
-    
+
     Example::
-    
+
        scene.do( FadeOutTRTiles( grid=(16,12), duration=10) )
     '''
 
     def update( self, t ):
-                
+
         # direction right - up
         for i in xrange(self.grid.x):
             for j in xrange(self.grid.y):
@@ -244,35 +261,35 @@ class FadeOutTRTiles( TiledGrid3DAction ):
     def test_func(self, i,j, t ):
         x,y = self.grid * t
         if x+y==0:
-            return 1 
+            return 1
         return pow( (i+j) / float(x+y), 6 )
 
 class FadeOutBLTiles( FadeOutTRTiles):
     '''Fades out each tile following an Bottom-Left path until all the tiles are faded out.
-    
+
     Example::
-    
+
        scene.do( FadeOutBLTiles( grid=(16,12), duration=5) )
     '''
 
     def test_func(self, i,j,t):
         x,y = self.grid * (1-t)
         if i+j==0:
-            return 1 
+            return 1
         return pow( (x+y) / float(i+j), 6)
 
 class FadeOutUpTiles( FadeOutTRTiles):
     '''Fades out each tile following an upwards path until all the tiles are faded out.
-    
+
     Example::
-    
+
        scene.do( FadeOutUpTiles( grid=(16,12), duration=5) )
     '''
 
     def test_func(self, i,j, t):
         x,y = self.grid * t
         if y==0:
-            return 1 
+            return 1
         return pow( (j) / float(y), 6 )
 
     def transform_tile(self, x, y, t ):
@@ -289,31 +306,31 @@ class FadeOutUpTiles( FadeOutTRTiles):
 
 class FadeOutDownTiles( FadeOutUpTiles):
     '''Fades out each tile following an downwards path until all the tiles are faded out.
-    
+
     Example::
-    
+
        scene.do( FadeOutDownTiles( grid=(16,12), duration=5) )
     '''
 
     def test_func(self, i,j, t):
         x,y = self.grid * (1-t)
         if j==0:
-            return 1 
+            return 1
         return pow( (y) / float(j), 6 )
 
 
 class TurnOffTiles( TiledGrid3DAction ):
     '''TurnOffTiles turns off each in random order
-    
+
     Example::
-    
+
        scene.do( TurnOffTiles( grid=(16,12), seed=1, duration=10) )
     '''
 
     def init(self, seed=-1, *args, **kw):
-        super(TurnOffTiles,self).init( *args, **kw )    
+        super(TurnOffTiles,self).init( *args, **kw )
         self.seed = seed
-        
+
     def start(self):
         super(TurnOffTiles,self).start()
 
@@ -323,7 +340,7 @@ class TurnOffTiles( TiledGrid3DAction ):
         self.nr_of_tiles = self.grid.x * self.grid.y
         self.tiles_order = range(self.nr_of_tiles )
         random.shuffle( self.tiles_order )
-        
+
     def update( self, t ):
         l = int( t * self.nr_of_tiles )
         for i in xrange( self.nr_of_tiles):
@@ -335,7 +352,7 @@ class TurnOffTiles( TiledGrid3DAction ):
 
     def get_tile_pos(self, idx):
         return divmod(idx, self.grid.y)
-    
+
     def turn_on_tile(self, t):
         x,y = self.get_tile_pos(t)
         self.set_tile(x,y, self.get_original_tile(x,y) )
@@ -348,7 +365,7 @@ class WavesTiles3D( TiledGrid3DAction ):
     '''Simulates waves using the math.sin() function in the z-axis of each tile
 
     Example::
-    
+
        scene.do( WavesTiles3D( waves=5, amplitude=120, grid=(16,16), duration=10) )
     '''
 
@@ -364,7 +381,7 @@ class WavesTiles3D( TiledGrid3DAction ):
 
         #: Total number of waves to perform
         self.waves=waves
-  
+
         #: amplitude rate. Default: 1.0
         #: This value is modified by other actions like `AccelAmplitude`.
         self.amplitude_rate = 1.0
@@ -391,7 +408,7 @@ class JumpTiles3D( TiledGrid3DAction ):
     while the even tiles will perform a jump using sine+pi function
 
     Example::
-    
+
        scene.do( JumpTiles3D( jumps=5, amplitude=40, grid=(16,16), duration=10) )
     '''
 
@@ -407,7 +424,7 @@ class JumpTiles3D( TiledGrid3DAction ):
 
         #: Total number of jumps to perform
         self.jumps=jumps
-  
+
         #: amplitude rate. Default: 1.0
         #: This value is modified by other actions like `AccelAmplitude`.
         self.amplitude_rate = 1.0
@@ -439,7 +456,7 @@ class SplitRows( TiledGrid3DAction ):
     the right.
 
     Example::
-    
+
        scene.do( SplitRows( rows=3, duration=2) )
     '''
 
@@ -481,7 +498,7 @@ class SplitCols( TiledGrid3DAction ):
     columns are moved to the downwards.
 
     Example::
-    
+
        scene.do( SplitCols( cols=3, duration=2) )
     '''
 

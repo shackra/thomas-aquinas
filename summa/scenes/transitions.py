@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''Transitions between Scenes'''
 
@@ -73,14 +90,14 @@ __all__ = [ 'TransitionScene',
 class TransitionScene(scene.Scene):
     """TransitionScene
     A Scene that takes two scenes and makes a transition between them.
-    
+
     The input scenes are put into envelopes (Scenes) that are made childs to
     the transition scene.
     Proper transitions are allowed to modify any parameter for the envelopes,
     but must not modify directly the input scenes; that would corrupt the input
     scenes in the general case.
     """
-    
+
     def __init__(self, dst, duration=1.25, src=None):
         '''Initializes the transition
 
@@ -103,7 +120,7 @@ class TransitionScene(scene.Scene):
                 tmp = src.in_scene.get('dst')
                 src.finish()
                 src = tmp
-                
+
         if src is dst:
             raise Exception("Incoming scene must be different from outgoing scene")
 
@@ -119,7 +136,7 @@ class TransitionScene(scene.Scene):
             self.duration = 1.25
 
         self.start()
-        
+
     def start(self):
         '''Adds the incoming scene with z=1 and the outgoing scene with z=0'''
         self.add( self.in_scene, z=1 )
@@ -135,7 +152,7 @@ class TransitionScene(scene.Scene):
         # if you can't, add in the docstring for your class that is not usable
         # for that recipe, and bonus points if you add to the recipe that
         # your class is not elegible for pop transitions
-        dst = self.in_scene.get('dst')        
+        dst = self.in_scene.get('dst')
         src = self.out_scene.get('src')
         director.replace( dst )
 
@@ -154,9 +171,9 @@ class TransitionScene(scene.Scene):
         glPushMatrix()
         super(TransitionScene, self).visit()
         glPopMatrix()
-        
+
 class RotoZoomTransition(TransitionScene):
-    '''Rotate and zoom out the outgoing scene, and then rotate and zoom in the incoming 
+    '''Rotate and zoom out the outgoing scene, and then rotate and zoom in the incoming
     '''
 
     def __init__( self, *args, **kwargs ):
@@ -174,11 +191,11 @@ class RotoZoomTransition(TransitionScene):
                      Rotate(360 * 2, duration=self.duration/2.0 ) ) + \
                 Delay( self.duration / 2.0 )
 
-        self.out_scene.do( rotozoom ) 
+        self.out_scene.do( rotozoom )
         self.in_scene.do( Reverse(rotozoom) + CallFunc(self.finish) )
 
 class JumpZoomTransition(TransitionScene):
-    '''Zoom out and jump the outgoing scene, and then jump and zoom in the incoming 
+    '''Zoom out and jump the outgoing scene, and then jump and zoom in the incoming
     '''
 
     def __init__( self, *args, **kwargs ):
@@ -199,7 +216,7 @@ class JumpZoomTransition(TransitionScene):
         jumpzoomin = jump + scalein
 
         delay = Delay( self.duration / 2.0 )
-        self.out_scene.do(  jumpzoomout ) 
+        self.out_scene.do(  jumpzoomout )
         self.in_scene.do( delay + jumpzoomin + CallFunc(self.finish) )
 
 
@@ -325,7 +342,7 @@ class FlipX3DTransition(TransitionScene):
                 FlipX3D(duration=0) + \
                 CallFunc( self.hide_out_show_in ) + \
                 flipback90
-        
+
         self.do( flip + \
                 CallFunc(self.finish) + \
                 StopGrid() )
@@ -351,7 +368,7 @@ class FlipY3DTransition(TransitionScene):
                 FlipX3D(duration=0) + \
                 CallFunc( self.hide_out_show_in ) + \
                 flipback90
-        
+
         self.do( flip + \
                     CallFunc(self.finish) + \
                     StopGrid() )
@@ -376,7 +393,7 @@ class FlipAngular3DTransition(TransitionScene):
                 FlipX3D(duration=0) + \
                 CallFunc( self.hide_out_show_in ) + \
                 flipback90
-        
+
         self.do( flip + \
                     CallFunc(self.finish) + \
                     StopGrid() )
@@ -529,7 +546,7 @@ class TurnOffTilesTransition(TransitionScene):
 
 class FadeTransition(TransitionScene):
     '''Fade out the outgoing scene and then fade in the incoming scene.
-    
+
     Optionally supply the color to fade to in-between as an RGB color tuple.
     '''
     def __init__( self, *args, **kwargs ):
@@ -565,7 +582,7 @@ class SplitColsTransition(TransitionScene):
         flip = flip_a + \
                 CallFunc( self.hide_out_show_in ) + \
                 Reverse(flip_a)
-        
+
         self.do( AccelDeccel(flip) + \
                     CallFunc(self.finish) + \
                     StopGrid() )
@@ -615,7 +632,7 @@ class ZoomTransition(TransitionScene):
         buffer = pyglet.image.BufferManager()
         image = buffer.get_color_buffer()
 
-        width, height = director.window.width, director.window.height 
+        width, height = director.window.width, director.window.height
         actual_width, actual_height = director.get_window_size()
 
         out = Sprite(image)

@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''Foundation for all actions
 
@@ -112,30 +129,30 @@ Example::
     position = (100, 100); duration = 10
     move = MoveTo(position, duration)
     move is playing here the template role.
-    
+
 
 Worker role
 -----------
 
 Carry on with the changes desired when the action is initiated.
 You obtain an action in the worker role by calling the method
-do in a cocosnode instance, like::
+do in a summanode instance, like::
 
-    worker_action = cocosnode.do(template_action, target=...)
+    worker_action = summanode.do(template_action, target=...)
 
 The most usual is to call without the target kw-param, thus by default
-setting target to the same cocosnode that performs the do.
+setting target to the same summanode that performs the do.
 The worker action begins to perform at the do call, and will carry on
 with the desired modifications to target in subsequent frames.
 If you want the capabilty to stop the changes midway, then you must
 retain the worker_action returned by the do and then, when you want stop
 the changes, call::
 
-    cocosnode.remove_action(worker_action)
-    ( the cocosnode must be the same as in the do call )
+    summanode.remove_action(worker_action)
+    ( the summanode must be the same as in the do call )
 
 Also, if your code need access to the action that performs the changes,
-have in mind that you want the worker_action (but this is discouraged, 
+have in mind that you want the worker_action (but this is discouraged,
 
 Example::
 
@@ -146,7 +163,7 @@ Example::
 
 Here move plays the template role and blue_move plays the worker role.
 The target for blue_move has been set for the do method.
-When the do call omits the target parameter it defaults to the cocosnode where
+When the do call omits the target parameter it defaults to the summanode where
 the do is called, so in the example the target for blue_move is blue_bird.
 In subsequents frames after this call, the blue_bird will move to the position
 (100, 100), arriving there 10 seconds after the do was executed.
@@ -205,7 +222,7 @@ Example::
     What we see is both birds moving smooth to right by 100, taking 10 seconds
     to arrive at final position.
     Note that even if both worker actions derive for the same template, they
-    don't interfere one with the other. 
+    don't interfere one with the other.
 
 
 A worker action instance should not be used as a template
@@ -277,7 +294,7 @@ by example::
     layer.add(guy)
 
 Here the guy will mode in diagonal, ending 300 right and 300 up, the two
-actions have combined. 
+actions have combined.
 
 
 Action's instances in the template role must be (really) deepcopyiable
@@ -294,7 +311,7 @@ If you cheat deepcopy by overriding __deepcopy__ in your class like::
     def __deepcopy__(self):
         return self
 
-you will not get a traceback, but the Worker Independence will broke, the Loop 
+you will not get a traceback, but the Worker Independence will broke, the Loop
 and Repeat operators will broke, and maybe some more.
 
 The section name states a precise requeriment, but it is a bit concise. Let see
@@ -303,7 +320,7 @@ some common situations where you can be in trouble and how to manage them.
   - you try to pass a SummaNode instance in init, and init stores that in an
     action member
 
-  - you try to pass a callback f = some_cocosnode.a_method, with the idea that
+  - you try to pass a callback f = some_summanode.a_method, with the idea that
     it shoud be called when some condition is meet, and init stores it in an
     action member
 
@@ -314,15 +331,15 @@ some common situations where you can be in trouble and how to manage them.
 Workarounds:
 
     - store the data that you do not want to deepcopy in some member in the
-      cocosnode
+      summanode
 
     - use an init2 fuction to pass the params you want to not deepcopy::
-    
+
         worker = node.do(template)
-        worker.init2(another_cocosnode)
+        worker.init2(another_summanode)
 
       (see test_action_non_interval.py for an example)
- 
+
 
 Future:
 Next cocos version probably will provide an easier mechanism to designate some
@@ -415,7 +432,7 @@ class Action(object):
         self.target = None              #: `SummaNode` object that is the target of the action
         self._elapsed = 0.0
         self._done = False
-        self.scheduled_to_remove = False # exclusive use by cocosnode.remove_action
+        self.scheduled_to_remove = False # exclusive use by summanode.remove_action
 
     def init(*args, **kwargs):
         """

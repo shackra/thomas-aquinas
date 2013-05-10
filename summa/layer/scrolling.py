@@ -1,35 +1,52 @@
-# ----------------------------------------------------------------------------
-# cocos2d
-# Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
-# Lucio Torre
-# All rights reserved.
+# coding: utf-8
+# Copyright (c) 2013 Jorge Javier Araya Navarro <jorgean@lavabit.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# This file is free software: you may copy, redistribute and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of cocos2d nor the names of its
-#     contributors may be used to endorse or promote products
-#     derived from this software without specific prior written
-#     permission.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#     cocos2d
+#     Copyright (c) 2008-2012 Daniel Moisset, Ricardo Quesada, Rayentray Tappa,
+#     Lucio Torre
+#     All rights reserved.
+#
+#     Redistribution and use in source and binary forms, with or without
+#     modification, are permitted provided that the following conditions are met:
+#
+#       * Redistributions of source code must retain the above copyright
+#         notice, this list of conditions and the following disclaimer.
+#       * Redistributions in binary form must reproduce the above copyright
+#         notice, this list of conditions and the following disclaimer in
+#         the documentation and/or other materials provided with the
+#         distribution.
+#       * Neither the name of cocos2d nor the names of its
+#         contributors may be used to endorse or promote products
+#         derived from this software without specific prior written
+#         permission.
+#
+#     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#     COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#     INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 '''This module defines the ScrollableLayer and ScrollingManager classes.
 
@@ -105,12 +122,12 @@ class ScrollableLayer(Layer):
         self.batch = pyglet.graphics.Batch()
 
     def on_enter(self):
-        director.push_handlers(self.on_cocos_resize)        
+        director.push_handlers(self.on_cocos_resize)
         super(ScrollableLayer, self).on_enter()
 
     def on_exit(self):
         super(ScrollableLayer, self).on_exit()
-        director.pop_handlers()        
+        director.pop_handlers()
 
     def set_view(self, x, y, w, h, viewport_ox=0, viewport_oy=0):
         x *= self.parallax
@@ -169,7 +186,7 @@ class ScrollingManager(Layer):
         # to the viewport. If the Layer is not scrolled or scaled then this
         # will be a one to one mapping.
         self.view_x, self.view_y = 0, 0
-        self.view_w, self.view_h = 1, 1 
+        self.view_w, self.view_h = 1, 1
         self.childs_ox = 0
         self.childs_oy = 0
 
@@ -215,7 +232,7 @@ class ScrollingManager(Layer):
         # when using an explicit viewport you should adjust the viewport for
         # resize changes here, before the lines that follows.
         # Also, if your app performs other changes in viewport it should
-        # use the lines that follows to update viewport-related internal state 
+        # use the lines that follows to update viewport-related internal state
         self.update_view_size()
         self.refresh_focus()
 
@@ -254,7 +271,7 @@ class ScrollingManager(Layer):
 
         # get the map-space dimensions
         vx, vy = self.childs_ox, self.childs_oy
-        
+
         # get our scaled view size
         w = int(self.view_w / self.scale)
         h = int(self.view_h / self.scale)
@@ -272,7 +289,7 @@ class ScrollingManager(Layer):
         screen_x = self.scale*(x-self.childs_ox)
         screen_y = self.scale*(y-self.childs_oy)
         return int(screen_x), int(screen_y)
-                
+
     _old_focus = None
     def set_focus(self, fx, fy, force=False):
         '''Determine the viewport based on a desired focus pixel in the
@@ -400,7 +417,7 @@ class ScrollingManager(Layer):
             glEnable(GL_SCISSOR_TEST)
 
         glScissor(*self._scissor_flat)
-        
+
     def unset_state(self):
         # restore gl scissors info
         glScissor(*self._old_scissor_flat)
