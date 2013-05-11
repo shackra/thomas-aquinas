@@ -139,11 +139,11 @@ import pyglet
 from pyglet import window, event
 from pyglet import clock
 #from pyglet import media
-from pyglet.gl import *
+from pyglet import gl
 
 import summa, summa.audio, summa.custom_clocks
 
-if hasattr(sys, 'is_epydoc') and sys.is_epydoc:
+if hasattr(sys, 'is_epydoc'):
     __all__ = ['director', 'Director', 'DefaultHandler']
 else:
     __all__ = ['director', 'DefaultHandler']
@@ -159,7 +159,7 @@ class DefaultHandler( object ):
             return True
 
         elif symbol == pyglet.window.key.P and (modifiers & pyglet.window.key.MOD_ACCEL):
-            import scenes.pause as pause
+            import summa.scenes.pause as pause
             pause_sc = pause.get_pause_scene()
             if pause:
                 director.push( pause_sc )
@@ -168,16 +168,16 @@ class DefaultHandler( object ):
         elif symbol == pyglet.window.key.W and (modifiers & pyglet.window.key.MOD_ACCEL):
 #            import wired
             if self.wired == False:
-                glDisable(GL_TEXTURE_2D);
-                glPolygonMode(GL_FRONT, GL_LINE);
-                glPolygonMode(GL_BACK, GL_LINE);
+                gl.glDisable(gl.GL_TEXTURE_2D)
+                gl.glPolygonMode(gl.GL_FRONT, gl.GL_LINE)
+                gl.glPolygonMode(gl.GL_BACK, gl.GL_LINE)
 #                wired.wired.install()
 #                wired.wired.uset4F('color', 1.0, 1.0, 1.0, 1.0 )
                 self.wired = True
             else:
-                glEnable(GL_TEXTURE_2D);
-                glPolygonMode(GL_FRONT, GL_FILL);
-                glPolygonMode(GL_BACK, GL_FILL);
+                gl.glEnable(gl.GL_TEXTURE_2D)
+                gl.glPolygonMode(gl.GL_FRONT, gl.GL_FILL)
+                gl.glPolygonMode(gl.GL_BACK, gl.GL_FILL)
                 self.wired = False
 #                wired.wired.uninstall()
             return True
@@ -187,7 +187,7 @@ class DefaultHandler( object ):
             return True
 
         elif symbol == pyglet.window.key.I and (modifiers & pyglet.window.key.MOD_ACCEL):
-            from layer import PythonInterpreterLayer
+            from summa.layer import PythonInterpreterLayer
 
             if not director.show_interpreter:
                 if director.python_interpreter == None:
@@ -370,7 +370,7 @@ class Director(event.EventDispatcher):
         if not os.environ.get('cocos_utest', False):
             summa.audio.initialize(audio_settings)
 
-        return self.window
+        #return self.window
 
     fps_display = None
     def set_show_FPS(self, value):
@@ -450,9 +450,9 @@ class Director(event.EventDispatcher):
         self.window.clear()
 
         # draw all the objects
-        glPushMatrix()
+        gl.glPushMatrix()
         self.scene.visit()
-        glPopMatrix()
+        gl.glPopMatrix()
 
         # finally show the FPS
         if self.show_FPS:
@@ -657,18 +657,16 @@ class Director(event.EventDispatcher):
         # virtual (desired) view size
         vw, vh = self.get_window_size()
 
-        glViewport(self._offset_x, self._offset_y, self._usable_width, self._usable_height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(60, self._usable_width/float(self._usable_height), 0.1, 3000.0)
-        glMatrixMode(GL_MODELVIEW)
+        gl.glViewport(self._offset_x, self._offset_y, self._usable_width, self._usable_height)
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity()
+        gl.gluPerspective(60, self._usable_width/float(self._usable_height), 0.1, 3000.0)
+        gl.glMatrixMode(gl.GL_MODELVIEW)
 
-        glLoadIdentity()
-        gluLookAt( vw/2.0, vh/2.0, vh/1.1566,   # eye
-                   vw/2.0, vh/2.0, 0,           # center
-                   0.0, 1.0, 0.0                # up vector
-                   )
-
+        gl.glLoadIdentity()
+        gl.gluLookAt(vw/2.0, vh/2.0, vh/1.1566,   # eye
+                     vw/2.0, vh/2.0, 0,           # center
+                     0.0, 1.0, 0.0)                # up vector
 
     def set_projection2D(self):
         """Sets a 2D projection (ortho) covering all the window"""
@@ -685,21 +683,21 @@ class Director(event.EventDispatcher):
         On by default.
         """
         if on:
-            glEnable(GL_BLEND)
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            gl.glEnable(gl.GL_BLEND)
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
         else:
-            glDisable(GL_BLEND)
+            gl.glDisable(gl.GL_BLEND)
 
     def set_depth_test( sefl, on=True ):
         '''Enables z test. On by default
         '''
         if on:
-            glClearDepth(1.0)
-            glEnable(GL_DEPTH_TEST)
-            glDepthFunc(GL_LEQUAL)
-            glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+            gl.glClearDepth(1.0)
+            gl.glEnable(gl.GL_DEPTH_TEST)
+            gl.glDepthFunc(gl.GL_LEQUAL)
+            gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST)
         else:
-            glDisable( GL_DEPTH_TEST )
+            gl.glDisable(gl.GL_DEPTH_TEST)
 
 event_loop = pyglet.app.event_loop
 if not hasattr(event_loop, "event"):

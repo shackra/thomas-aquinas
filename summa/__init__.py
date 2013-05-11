@@ -66,14 +66,14 @@ import sys
 import os, pyglet
 pyglet.resource.path.append(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources")
-    )
+)
 pyglet.resource.reindex()
 
 try:
     unittesting = os.environ['cocos_utest']
 except KeyError:
     unittesting = False
-del os, pyglet
+    del os, pyglet
 
 # in windows we use the pygame package to get the SDL dlls
 # we must get the path here because the inner pygame module will hide the real
@@ -84,22 +84,3 @@ if sys.platform == 'win32':
         del dummy
     except ImportError:
         sdl_lib_path = None
-
-def import_all():
-    import actions
-    import director
-    import layer
-    import menu
-    import sprite
-    import path
-    import scene
-    import grid
-    import text
-    import camera
-    import draw
-    import skeleton
-    import rect
-    import tiles
-
-if not unittesting:
-    import_all()
