@@ -75,23 +75,23 @@ from pyglet.window import key
 from pyglet import gl
 import pyglet.graphics
 
-from layer import *
-from director import *
-from summanode import *
-from actions import *
-from sprite import Sprite
-import rect
+from . import layer as lyr
+from . import director as drt
+from . import summanode as smm
+from . import actions as act
+from . import sprite as spr
+from . import rect
 
-__all__ = [ 'Menu',                                         # menu class
-
-            'MenuItem', 'ToggleMenuItem',  # menu items classes
+__all__ = [ 'Menu', # menu class
+            'MenuItem', 'ToggleMenuItem', # menu items classes
             'MultipleMenuItem', 'EntryMenuItem', 'ImageMenuItem',
             'ColorMenuItem',
-            'verticalMenuLayout', 'fixedPositionMenuLayout',   # Different menu layou functions
-            'CENTER', 'LEFT', 'RIGHT', 'TOP', 'BOTTOM',     # menu aligment
-
-            'shake', 'shake_back','zoom_in','zoom_out'      # Some useful actions for the menu items
-            ]
+            # Different menu layou functions
+            'verticalMenuLayout', 'fixedPositionMenuLayout',
+            # menu aligment
+            'CENTER', 'LEFT', 'RIGHT', 'TOP', 'BOTTOM',
+            # Some useful actions for the menu items
+            'shake', 'shake_back','zoom_in','zoom_out']
 
 #
 # Class Menu
@@ -106,8 +106,8 @@ RIGHT = font.Text.RIGHT
 TOP = font.Text.TOP
 BOTTOM = font.Text.BOTTOM
 
-def verticalMenuLayout (menu):
-    width, height = director.get_window_size()
+def verticalMenuLayout(menu):
+    width, height = drt.director.get_window_size()
     fo = font.load(menu.font_item['font_name'], menu.font_item['font_size'])
     fo_height = int( (fo.ascent - fo.descent) * 0.9 )
 
@@ -124,30 +124,31 @@ def verticalMenuLayout (menu):
         item = i[1]
         if menu.menu_valign == CENTER:
             pos_y = (height + (len(menu.children) - 2 * idx)
-                         * fo_height - menu.title_height) * 0.5
+                     * fo_height - menu.title_height) * 0.5
         elif menu.menu_valign == TOP:
             pos_y = (height - ((idx + 0.8) * fo_height )
-                         - menu.title_height - menu.menu_vmargin)
+                     - menu.title_height - menu.menu_vmargin)
         elif menu.menu_valign == BOTTOM:
             pos_y = (0 + fo_height * (len(menu.children) - idx) +
-                         menu.menu_vmargin)
-        item.transform_anchor = (pos_x, pos_y)
-        item.generateWidgets (pos_x, pos_y, menu.font_item,
-                              menu.font_item_selected)
+                     menu.menu_vmargin)
+            item.transform_anchor = (pos_x, pos_y)
+            item.generateWidgets (pos_x, pos_y, menu.font_item,
+                                  menu.font_item_selected)
 
-def fixedPositionMenuLayout (positions):
+def fixedPositionMenuLayout(positions):
     def fixedMenuLayout(menu):
-        width, height = director.get_window_size()
-        for idx,i in enumerate( menu.children):
+        width, height = drt.director.get_window_size()
+        for idx,i in enumerate(menu.children):
             item = i[1]
             pos_x = positions[idx][0]
             pos_y = positions[idx][1]
             item.transform_anchor = (pos_x, pos_y)
-            item.generateWidgets (pos_x, pos_y, menu.font_item,
-                                        menu.font_item_selected)
+            item.generateWidgets(pos_x, pos_y, menu.font_item,
+                                 menu.font_item_selected)
+
     return fixedMenuLayout
 
-class Menu(Layer):
+class Menu(lyr.Layer):
     """Abstract base class for menu layers.
 
     Normal usage is:
@@ -222,7 +223,7 @@ class Menu(Layer):
 
 
     def _generate_title( self ):
-        width, height = director.get_window_size()
+        width, height = drt.director.get_window_size()
 
         self.font_title['x'] = width // 2
         self.font_title['text'] = self.title
@@ -261,8 +262,8 @@ class Menu(Layer):
     def _activate_item( self ):
         if self.activate_sound:
             self.activate_sound.play()
-        self.children[ self.selected_index][1].on_activated()
-        self.children[ self.selected_index ][1].on_key_press( key.ENTER, 0 )
+            self.children[ self.selected_index][1].on_activated()
+            self.children[ self.selected_index ][1].on_key_press( key.ENTER, 0 )
 
     def create_menu(self, items, selected_effect=None, unselected_effect=None,
                     activated_effect=None, layout_strategy=verticalMenuLayout):
@@ -301,20 +302,20 @@ class Menu(Layer):
             z += 1
 
         self._generate_title() # If you generate the title after the items
-                # the V position of the items can't consider the title's height
+        # the V position of the items can't consider the title's height
         if items:
             self._build_items(layout_strategy)
 
     def draw( self ):
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
         self.title_label.draw()
-        glPopMatrix()
+        gl.glPopMatrix()
 
     def on_text( self, text ):
         if text=='\r':
             return
-        return self.children[self.selected_index][1].on_text(text)
+            return self.children[self.selected_index][1].on_text(text)
 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.ESCAPE:
@@ -333,6 +334,7 @@ class Menu(Layer):
                 new_idx = len(self.children) -1
             elif new_idx > len(self.children) -1:
                 new_idx = 0
+
             self._select_item( new_idx )
             return True
         else:
@@ -342,15 +344,16 @@ class Menu(Layer):
             # play sound if key was handled
             if ret and self.activate_sound:
                 self.activate_sound.play()
+
             return ret
 
     def on_mouse_release( self, x, y, buttons, modifiers ):
-        (x,y) = director.get_virtual_coordinates(x,y)
+        (x,y) = drt.director.get_virtual_coordinates(x,y)
         if self.children[ self.selected_index ][1].is_inside_box(x,y):
             self._activate_item()
 
     def on_mouse_motion( self, x, y, dx, dy ):
-        (x,y) = director.get_virtual_coordinates(x,y)
+        (x,y) = drt.director.get_virtual_coordinates(x,y)
         for idx,i in enumerate( self.children):
             item = i[1]
             if item.is_inside_box( x, y):
@@ -358,7 +361,7 @@ class Menu(Layer):
                 break
 
 
-class BaseMenuItem( SummaNode ):
+class BaseMenuItem(smm.SummaNode):
     """An abstract menu item. It triggers a function when it is activated"""
 
     selected_effect = None
@@ -372,7 +375,6 @@ class BaseMenuItem( SummaNode ):
             `callback_func` : function
                 The callback function
         """
-
         super( BaseMenuItem, self).__init__()
 
         self.callback_func = callback_func
@@ -445,11 +447,11 @@ class BaseMenuItem( SummaNode ):
 
         x1 = self.get_item_x() + x_diff
         y1 = self.get_item_y() + y_diff
-#        x1 += self.parent.x
-#        y1 += self.parent.y
-#        x2 = x1 + width
-#        y2 = y1 + height
-#        return (x1,y1,x2,y2)
+        #        x1 += self.parent.x
+        #        y1 += self.parent.y
+        #        x2 = x1 + width
+        #        y2 = y1 + height
+        #        return (x1,y1,x2,y2)
         return rect.Rect(x1,y1,width,height)
 
     def draw( self ):
@@ -468,13 +470,14 @@ class BaseMenuItem( SummaNode ):
 
         :rtype: bool
         """
-#        (ax,ay,bx,by) = self.get_box()
-#        if( x >= ax and x <= bx and y >= ay and y <= by ):
-#            return True
-#        return False
-        rect = self.get_box()
-        p = self.point_to_local( (x,y) )
-        return rect.contains( p.x, p.y )
+        # (ax,ay,bx,by) = self.get_box()
+        # if( x >= ax and x <= bx and y >= ay and y <= by ):
+        #     return True
+        # return False
+
+        brect = self.get_box()
+        p = self.point_to_local((x, y))
+        return brect.contains(p.x, p.y)
 
 
     def on_selected( self ):
@@ -492,7 +495,7 @@ class BaseMenuItem( SummaNode ):
             self.stop()
             self.do( self.activated_effect )
 
-class MenuItem (BaseMenuItem):
+class MenuItem(BaseMenuItem):
     """A menu item that shows a label. """
     def __init__ (self, label, callback_func, *args, **kwargs):
         """Creates a new menu item
@@ -523,13 +526,14 @@ class MenuItem (BaseMenuItem):
         self.item_selected = pyglet.text.Label( **font_item_selected )
 
     def draw( self ):
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
         if self.is_selected:
             self.item_selected.draw()
         else:
             self.item.draw()
-        glPopMatrix()
+
+        gl.glPopMatrix()
 
 
 class ImageMenuItem (BaseMenuItem):
@@ -542,24 +546,25 @@ class ImageMenuItem (BaseMenuItem):
         anchors = {'left': 0, 'center': 0.5, 'right': 1, 'top': 1, 'bottom': 0}
         anchor=(anchors[font_item['anchor_x']] * self.image.width,
                 anchors[font_item['anchor_y']] * self.image.height)
-        self.item = Sprite(self.image, anchor=anchor, opacity=255,
-                           color=font_item['color'][:3])
+        self.item = spr.Sprite(self.image, anchor=anchor, opacity=255,
+                               color=font_item['color'][:3])
         self.item.scale = font_item['font_size'] / float(self.item.height )
         self.item.position = int(pos_x), int(pos_y)
-        self.selected_item = Sprite(self.image, anchor=anchor,
-                                    color=font_item_selected['color'][:3])
+        self.selected_item = spr.Sprite(self.image, anchor=anchor,
+                                        color=font_item_selected['color'][:3])
         self.selected_item.scale = (font_item_selected['font_size'] /
-                                     float(self.selected_item.height))
+                                    float(self.selected_item.height))
         self.selected_item.position = int(pos_x), int(pos_y)
 
     def draw (self):
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
         if self.is_selected:
             self.selected_item.draw()
         else:
             self.item.draw()
-        glPopMatrix()
+
+        gl.glPopMatrix()
 
 
 class MultipleMenuItem( MenuItem ):
@@ -594,6 +599,7 @@ class MultipleMenuItem( MenuItem ):
         self.idx = default_item
         if self.idx < 0 or self.idx >= len(self.items):
             raise Exception("Index out of bounds")
+
         super( MultipleMenuItem, self).__init__( self._get_label(), callback_func )
 
     def _get_label(self):
@@ -611,7 +617,7 @@ class MultipleMenuItem( MenuItem ):
             self.callback_func( self.idx )
             return True
 
-class ToggleMenuItem( MultipleMenuItem ):
+class ToggleMenuItem(MultipleMenuItem):
     '''A menu item for a boolean toggle option.
 
     Example::
@@ -630,14 +636,14 @@ class ToggleMenuItem( MultipleMenuItem ):
             `value` : bool
                 Default value of the item: False is 'OFF', True is 'ON'. Default:False
         """
-
         super(ToggleMenuItem, self).__init__( label, callback_func, ['OFF','ON'],  int(value) )
 
     def on_key_press( self, symbol, mod ):
         if symbol in (key.LEFT, key.RIGHT, key.ENTER):
             self.idx += 1
-            if self.idx > 1:
-                self.idx = 0
+
+        if self.idx > 1:
+            self.idx = 0
             self.item.text = self._get_label()
             self.item_selected.text = self._get_label()
             self.callback_func( int(self.idx) )
@@ -667,13 +673,14 @@ class EntryMenuItem(MenuItem):
         """
         self._value = list(value)
         self._label = label
-        super(EntryMenuItem, self).__init__( "%s %s" %(label,value), callback_func )
+        super(EntryMenuItem, self).__init__("{} {}".format(label,value), callback_func )
         self.max_length = max_length
 
     def on_text( self, text ):
         if self.max_length == 0 or len(self._value) < self.max_length:
             self._value.append(text)
             self._calculate_value()
+
         return True
 
     def on_key_press(self, symbol, modifiers):
@@ -682,6 +689,7 @@ class EntryMenuItem(MenuItem):
                 self._value.pop()
             except IndexError:
                 pass
+
             self._calculate_value()
             return True
 
@@ -722,16 +730,17 @@ class ColorMenuItem( MenuItem ):
         self.idx = default_item
         if self.idx < 0 or self.idx >= len(self.items):
             raise Exception("Index out of bounds")
+
         super( ColorMenuItem, self).__init__( self._get_label(), callback_func )
 
     def _get_label(self):
-        return self.my_label + "        "
+        return u"".join([self.my_label, "        "])
 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.LEFT:
-            self.idx = max(0, self.idx-1)
+            self.idx = max(0, self.idx - 1)
         elif symbol in (key.RIGHT, key.ENTER):
-            self.idx = min(len(self.items)-1, self.idx+1)
+            self.idx = min(len(self.items) - 1, self.idx+1)
 
         if symbol in (key.LEFT, key.RIGHT, key.ENTER):
             self.item.text = self._get_label()
@@ -755,7 +764,7 @@ class ColorMenuItem( MenuItem ):
 
     def draw(self, *args, **kwargs):
         super(ColorMenuItem, self).draw()
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
 
         if self.is_selected:
@@ -770,7 +779,7 @@ class ColorMenuItem( MenuItem ):
         pyglet.graphics.draw(4, pyglet.graphics.GL_QUADS,
                              ('v2f', (x1, y1, x1, y2, x2, y2, x2, y1)),
                              ('c3B', self.items[self.idx] * 4))
-        glPopMatrix()
+        gl.glPopMatrix()
 
 
 def shake():
@@ -780,18 +789,18 @@ def shake():
     angle = 05
     duration = 0.05
 
-    rot = Accelerate(RotateBy( angle, duration ), 2)
-    rot2 = Accelerate(RotateBy( -angle*2, duration), 2)
-    return rot + (rot2 + Reverse(rot2)) * 2 + Reverse(rot)
+    rot = act.Accelerate(act.RotateBy( angle, duration ), 2)
+    rot2 = act.Accelerate(act.RotateBy( -angle*2, duration), 2)
+    return rot + (rot2 + act.Reverse(rot2)) * 2 + act.Reverse(rot)
 
 def shake_back():
     '''Predefined action that rotates to 0 degrees in 0.1 seconds'''
-    return RotateTo(0,0.1)
+    return act.RotateTo(0,0.1)
 
 def zoom_in():
     '''Predefined action that scales to 1.5 factor in 0.2 seconds'''
-    return ScaleTo( 1.5, duration=0.2 )
+    return act.ScaleTo( 1.5, duration=0.2 )
 
 def zoom_out():
     '''Predefined action that scales to 1.0 factor in 0.2 seconds'''
-    return ScaleTo( 1.0, duration=0.2 )
+    return act.ScaleTo( 1.0, duration=0.2 )

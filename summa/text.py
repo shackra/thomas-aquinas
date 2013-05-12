@@ -58,16 +58,16 @@ provided by the member 'element' , which is the underlying pyglet object.
 
 __docformat__ = 'restructuredtext'
 
-from director import director
-import summanode
-from batch import *
+from .director import director
+from . import summanode
+from . import batch
 
 import pyglet
 from pyglet.graphics import OrderedGroup
 from pyglet import image
 from pyglet import gl
 
-from batch import *
+#from batch import *
 
 class TextElement(summanode.SummaNode):
     """
@@ -82,7 +82,7 @@ class TextElement(summanode.SummaNode):
         self.position = position
         self.args = []
         self.kwargs = kwargs
-        kwargs['text']=text
+        kwargs['text'] = text
         self.group = None
         self.batch = None
 
@@ -90,20 +90,23 @@ class TextElement(summanode.SummaNode):
         self.create_element()
 
     def create_element(self):
-        self.element = self.klass(group=self.group, batch=self.batch, **self.kwargs)
+        self.element = self.klass(group = self.group,
+                                  batch = self.batch,
+                                  **self.kwargs)
 
     def draw(self):
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
         self.element.draw()
-        glPopMatrix()
+        gl.glPopMatrix()
 
-    def _get_opacity(self):
+    @property
+    def opacity(self):
         return self.element.color[3]
-    def _set_opacity(self, value):
-        self.element.color = tuple(self.element.color[:3]) + (int(value),)
-    opacity = property(_get_opacity, _set_opacity)
 
+    @opacity.setter
+    def opacity(self, value):
+        self.element.color = tuple(self.element.color[:3]) + (int(value),)
 
 class Label(TextElement):
     '''Plain text support
@@ -208,21 +211,25 @@ class PygletRichLabel(pyglet.text.DocumentLabel):
 
         '''
 
-        text = '{color (255, 255, 255, 255)}' + text
+        text = "".join(['{color (255, 255, 255, 255)}', text])
         document = pyglet.text.decode_attributed(text)
         super(PygletRichLabel, self).__init__(document, x, y, width, height,
-                                    anchor_x, anchor_y,
-                                    multiline, dpi, batch, group)
+                                              anchor_x, anchor_y,
+                                              multiline, dpi, batch, group)
         style = dict(halign=halign)
 
         if font_name:
             style['font_name'] = font_name
+
         if font_size:
             style['font_size'] = font_size
+
         if bold:
             style['bold'] = bold
+
         if italic:
             style['italic'] = italic
+
         if color:
             style['color'] = color
 
@@ -244,7 +251,7 @@ class RichLabel(TextElement):
         - height: Height of the label in pixels, or None
         - anchor_x: "left", "center" or "right"
         - anchor_y: one of "bottom", "baseline", "center" or "top"
-        - halign :  only when a width is supplied. One of "left", "center", "right".
+        - halign:  only when a width is supplied. One of "left", "center", "right".
         - multiline : bool
         - dpi : Resolution of the fonts in this layout.  Defaults to 96.
 
