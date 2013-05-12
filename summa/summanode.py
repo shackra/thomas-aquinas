@@ -57,7 +57,7 @@ __docformat__ = 'restructuredtext'
 import bisect, copy
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 from director import director
 from camera import Camera
@@ -71,8 +71,9 @@ __all__ = ['SummaNode']
 
 class SummaNode(object):
     """
-    Cocosnode is the main element. Anything thats gets drawn or contains things that get drawn is a summanode.
-    The most popular summanodes are scenes, layers and sprites.
+    Cocosnode is the main element. Anything thats gets drawn or contains things
+    that get drawn is a summanode. The most popular summanodes are scenes,
+    layers and sprites.
 
     The main features of a summanode are:
         - They can contain other cocos nodes (add, get, remove, etc)
@@ -82,14 +83,15 @@ class SummaNode(object):
     Some summanodes provide extra functionality for them or their children.
 
     Subclassing a summanode usually means (one/all) of:
-        - overriding __init__ to initialize resources and schedule calbacks
+        - overriding __init__ to initialize resources and schedule callbacks
         - create callbacks to handle the advancement of time
         - overriding draw to render the node
     """
     def __init__(self):
         # composition stuff
 
-        #: list of (int, child-reference) where int is the z-order, sorted by ascending z (back to front order)
+        #: list of (int, child-reference) where int is the z-order, sorted by
+        #: ascending z (back to front order)
         self.children = []
 
         #: dictionary that maps children names with children references
@@ -99,11 +101,13 @@ class SummaNode(object):
 
         # drawing stuff
 
-        #: x-position of the object relative to its parent's children_anchor_x value.
+        #: x-position of the object relative to its
+        # parent's children_anchor_x value.
         #: Default: 0
         self._x = 0
 
-        #: y-position of the object relative to its parent's children_anchor_y value.
+        #: y-position of the object relative to its
+        # parent's children_anchor_y value.
         #: Default: 0
         self._y = 0
 
@@ -111,7 +115,8 @@ class SummaNode(object):
         #: Default: 1.0
         self._scale = 1.0
 
-        #: a float, in degrees, alters the rotation of this node and its children.
+        #: a float, in degrees, alters the rotation
+        # of this node and its children.
         #: Default: 0.0
         self._rotation = 0.0
 
@@ -161,7 +166,7 @@ class SummaNode(object):
         # schedule stuff
         self.scheduled = False          # deprecated, soon to be removed
         self.scheduled_calls = []       #: list of scheduled callbacks
-        self.scheduled_interval_calls = []  #: list of scheduled interval callbacks
+        self.scheduled_interval_calls = [] #: list of scheduled interval callbacks
         self.is_running = False         #: whether of not the object is running
 
         # matrix stuff
@@ -170,16 +175,19 @@ class SummaNode(object):
         self.is_inverse_transform_dirty = False
         self.inverse_transform_matrix = euclid.Matrix3().identity()
 
-
     def make_property(attr):
         def set_attr():
             def inner(self, value):
-                setattr(self, "transform_"+attr,value)
+                setattr(self, "_".join(["transform", attr]), value)
+
             return inner
+
         def get_attr():
             def inner(self):
-                return getattr(self,"transform_"+attr)
+                return getattr(self,"_".join(["transform", attr]))
+
             return inner
+
         return property(
             get_attr(),
             set_attr(),
@@ -203,11 +211,15 @@ class SummaNode(object):
     def make_property(attr):
         def set_attr():
             def inner(self, value):
-                setattr(self, attr+"_x",value[0])
-                setattr(self, attr+"_y",value[1])
+                setattr(self, "_".join([attr, "_x"]), value[0])
+                setattr(self, "_".join([attr, "_y"]), value[1])
+
             return inner
+
         def get_attr(self):
-            return getattr(self,attr+"_x"),  getattr(self,attr+"_y")
+            return (getattr(self, "_".join([attr, "_x"])),
+                    getattr(self, "_".join([attr, "_y"])))
+
         return property(
             get_attr,
             set_attr(),
@@ -245,9 +257,9 @@ class SummaNode(object):
         """
         if self.is_running:
             pyglet.clock.schedule_interval(callback, interval, *args, **kwargs)
+
         self.scheduled_interval_calls.append(
-                (callback, interval, args, kwargs)
-                )
+            (callback, interval, args, kwargs))
 
     def schedule(self, callback, *args, **kwargs):
         """
@@ -273,9 +285,9 @@ class SummaNode(object):
         """
         if self.is_running:
             pyglet.clock.schedule(callback, *args, **kwargs)
+
         self.scheduled_calls.append(
-                (callback, args, kwargs)
-                )
+            (callback, args, kwargs))
 
     def unschedule(self, callback):
         """
@@ -298,11 +310,12 @@ class SummaNode(object):
 
         total_len = len(self.scheduled_calls + self.scheduled_interval_calls)
         self.scheduled_calls = [
-                c for c in self.scheduled_calls if c[0] != callback
-                ]
+            c for c in self.scheduled_calls if c[0] != callback
+        ]
+
         self.scheduled_interval_calls = [
-                c for c in self.scheduled_interval_calls if c[0] != callback
-                ]
+            c for c in self.scheduled_interval_calls if c[0] != callback
+        ]
 
         if self.is_running:
             pyglet.clock.unschedule( callback )
@@ -314,6 +327,7 @@ class SummaNode(object):
         """
         for c, i, a, k in self.scheduled_interval_calls:
             pyglet.clock.schedule_interval(c, i, *a, **k)
+
         for c, a, k in self.scheduled_calls:
             pyglet.clock.schedule(c, *a, **k)
 
@@ -324,24 +338,30 @@ class SummaNode(object):
         """
         for f in set(
                 [ x[0] for x in self.scheduled_interval_calls ] +
-                [ x[0] for x in self.scheduled_calls ]
-                ):
+                [ x[0] for x in self.scheduled_calls ]):
             pyglet.clock.unschedule(f)
+
         for arg in self.scheduled_calls:
             pyglet.clock.unschedule(arg[0])
 
-    def _get_parent(self):
-        if self._parent is None: return None
-        else: return self._parent()
 
-    def _set_parent(self, parent):
-        if parent is None: self._parent = None
-        else: self._parent = weakref.ref(parent)
+    @property
+    def parent(self):
+        """ The parent of this object
 
-    parent = property(_get_parent, _set_parent, doc='''The parent of this object.
+        :type: object
+        """
+        if self._parent is None:
+            return None
+        else:
+            return self._parent()
 
-    :type: object
-    ''')
+    @parent.setter
+    def parent(self, parent):
+        if parent is None:
+            self._parent = None
+        else:
+            self._parent = weakref.ref(parent)
 
     def get_ancestor(self, klass):
         """
@@ -352,6 +372,7 @@ class SummaNode(object):
         """
         if isinstance(self, klass):
             return self
+
         parent = self.parent
         if parent:
             return parent.get_ancestor( klass )
@@ -359,59 +380,74 @@ class SummaNode(object):
     #
     # Transform properties
     #
-    def _get_x(self):
+    def __dirty(self, transform_dirty=True, inverse_transform=True):
+        self.is_transform_dirty = transform_dirty
+        self.is_inverse_transform_dirty = inverse_transform
+
+    @property
+    def x(self):
+        """ The x coordinate of the object
+        """
         return self._x
-    def _set_x(self, x):
-        self._x = x
-        self.is_transform_dirty = True
-        self.is_inverse_transform_dirty = True
-    x = property(_get_x, lambda self,x:self._set_x(x), doc="The x coordinate of the object")
 
-    def _get_y(self):
+    @x.setter
+    def x(self, value):
+        self._x = value
+        self.__dirty()
+
+    @property
+    def y(self):
+        """The y coordinate of the object
+        """
         return self._y
-    def _set_y(self, y):
-        self._y = y
-        self.is_transform_dirty = True
-        self.is_inverse_transform_dirty = True
-    y = property(_get_y, lambda self,y:self._set_y(y), doc="The y coordinate of the object")
 
-    def _get_position(self):
+    @y.setter
+    def y(self, value):
+        self._y = value
+        self.__dirty()
+
+    @property
+    def position(self):
+        """ The (X, Y) coordinates of the object
+
+        :type: (int, int)
+        """
         return (self._x, self._y)
-    def _set_position(self, (x,y)):
+
+    @position.setter
+    def position(self, (x, y)):
         self._x = x
         self._y = y
         self.is_transform_dirty = True
         self.is_inverse_transform_dirty = True
 
-    position = property(_get_position, lambda self,p:self._set_position(p),
-                        doc='''The (x, y) coordinates of the object.
-
-    :type: (int, int)
-    ''')
-
-    def _get_scale( self ):
+    @property
+    def scale(self):
+        """ The scale of the object
+        """
         return self._scale
 
-    def _set_scale( self, s ):
+    @scale.setter
+    def scale(self, s):
         self._scale = s
-        self.is_transform_dirty = True
+        self.is_tranform_dirty = True
         self.is_inverse_transform_dirty = True
 
-    scale = property( _get_scale, lambda self, scale: self._set_scale(scale))
-
-    def _get_rotation( self ):
+    @property
+    def rotation(self):
+        """ The rotation of the object
+        """
         return self._rotation
 
-    def _set_rotation( self, a ):
+    @rotation.setter
+    def rotation(self, a):
         self._rotation = a
         self.is_transform_dirty = True
         self.is_inverse_transform_dirty = True
 
-    rotation = property( _get_rotation, lambda self, angle: self._set_rotation(angle))
-
-
-    def add(self, child, z=0, name=None ):
-        """Adds a child and if it becomes part of the active scene calls its on_enter method
+    def add(self, child, z=0, name=None):
+        """Adds a child and if it becomes part of the active scene
+        calls its on_enter method
 
         :Parameters:
             `child` : SummaNode
@@ -432,14 +468,17 @@ class SummaNode(object):
         if name:
             if name in self.children_names:
                 raise Exception("Name already exists: %s" % name )
-            self.children_names[ name ] = child
+
+            self.children_names[name] = child
 
         child.parent = self
 
         elem = z, child
-        bisect.insort( self.children,  elem )
+        bisect.insort(self.children, elem)
+
         if self.is_running:
             child.on_enter()
+
         return self
 
     def kill(self):
@@ -467,11 +506,12 @@ class SummaNode(object):
                 child = self.children_names.pop( obj )
                 self._remove( child )
             else:
-                raise Exception("Child not found: %s" % obj )
+                raise Exception("Child not found: {}".format(obj))
+
         else:
             self._remove(obj)
 
-    def _remove( self, child ):
+    def _remove(self, child):
         l_old = len(self.children)
         self.children = [ (z,c) for (z,c) in self.children if c != child ]
 
@@ -493,7 +533,7 @@ class SummaNode(object):
     def __contains__(self, child):
         return child in self.get_children()
 
-    def get( self, name ):
+    def get(self, name):
         """Gets a child given its name
 
         :Parameters:
@@ -503,16 +543,16 @@ class SummaNode(object):
         :rtype: SummaNode
         :return: the child named 'name'. Will raise Exception if not present
 
-        Warning: if a node is added with name, then removed not by name, the name
-        cannot be recycled: attempting to add other node with this name will
-        produce an Exception.
+        Warning: if a node is added with name, then removed not by name,
+        the name cannot be recycled: attempting to add other node with this
+        name will produce an Exception.
         """
         if name in self.children_names:
-            return self.children_names[ name ]
+            return self.children_names[name]
         else:
-            raise Exception("Child not found: %s" % name )
+            raise Exception("Child not found: {}".format(name))
 
-    def on_enter( self ):
+    def on_enter(self):
         """
         Called every time just before the node enters the stage.
 
@@ -535,8 +575,7 @@ class SummaNode(object):
         for c in self.get_children():
             c.on_enter()
 
-
-    def on_exit( self ):
+    def on_exit(self):
         """
         Called every time just before the node leaves the stage
 
@@ -560,32 +599,32 @@ class SummaNode(object):
         for c in self.get_children():
             c.on_exit()
 
-    def transform( self ):
+    def transform(self):
         """
         Apply ModelView transformations
 
         you will most likely want to wrap calls to this function with
         glPushMatrix/glPopMatrix
         """
-        x,y = director.get_window_size()
+        x, y = director.get_window_size()
 
         if not(self.grid and self.grid.active):
             # only apply the camera if the grid is not active
             # otherwise, the camera will be applied inside the grid
             self.camera.locate()
 
-        glTranslatef( self.position[0], self.position[1], 0 )
-        glTranslatef( self.transform_anchor_x, self.transform_anchor_y, 0 )
+        gl.glTranslatef( self.position[0], self.position[1], 0 )
+        gl.glTranslatef( self.transform_anchor_x, self.transform_anchor_y, 0 )
 
 
         if self.rotation != 0.0:
-            glRotatef( -self._rotation, 0, 0, 1)
+            gl.glRotatef( -self._rotation, 0, 0, 1)
 
         if self.scale != 1.0:
-            glScalef( self._scale, self._scale, 1)
+            gl.glScalef( self._scale, self._scale, 1)
 
         if self.transform_anchor != (0,0):
-            glTranslatef(
+            gl.glTranslatef(
                 - self.transform_anchor_x,
                 - self.transform_anchor_y,
                 0 )
@@ -647,28 +686,27 @@ class SummaNode(object):
             self.grid.before_draw()
 
         # we visit all nodes that should be drawn before ourselves
-
-
         if self.children and self.children[0][0] < 0:
-            glPushMatrix()
+            gl.glPushMatrix()
             self.transform()
             for z,c in self.children:
                 if z >= 0: break
                 position += 1
                 c.visit()
 
-            glPopMatrix()
+            gl.glPopMatrix()
 
         # we draw ourselves
         self.draw()
 
         # we visit all the remaining nodes, that are over ourselves
         if position < len(self.children):
-            glPushMatrix()
+            gl.glPushMatrix()
             self.transform()
             for z,c in self.children[position:]:
                 c.visit()
-            glPopMatrix()
+
+            gl.glPopMatrix()
 
         if self.grid and self.grid.active:
             self.grid.after_draw( self.camera )
@@ -690,7 +728,7 @@ class SummaNode(object):
         """
         pass
 
-    def do( self, action, target=None ):
+    def do(self, action, target=None):
         '''Executes an *action*.
         When the action finished, it will be removed from the node's actions
         container.
@@ -717,15 +755,18 @@ class SummaNode(object):
         if not self.scheduled:
             if self.is_running:
                 self.scheduled = True
-                pyglet.clock.schedule( self._step )
+                pyglet.clock.schedule(self._step)
+
         return a
 
     def remove_action(self, action):
-        """Removes an action from the node actions container, potentially calling action.stop()
+        """Removes an action from the node actions container, potentially
+        calling action.stop()
 
         If action was running, action.stop is called
         Mandatory interfase to remove actions in the node actions container.
-        When skipping this there is the posibility to double call the action.stop
+        When skipping this there is the posibility to
+        double call the action.stop
 
         :Parameters:
             `action` : Action
@@ -745,6 +786,7 @@ class SummaNode(object):
         """
         if not self.scheduled:
             return
+
         self.scheduled = False
         pyglet.clock.unschedule( self._step )
 
@@ -754,6 +796,7 @@ class SummaNode(object):
         """
         if self.scheduled:
             return
+
         self.scheduled = True
         pyglet.clock.schedule( self._step )
         self.skip_frame = True
@@ -789,7 +832,8 @@ class SummaNode(object):
         """
         for x in self.to_remove:
             if x in self.actions:
-                self.actions.remove( x )
+                self.actions.remove(x)
+
         self.to_remove = []
 
         if self.skip_frame:
@@ -798,33 +842,29 @@ class SummaNode(object):
 
         if len( self.actions ) == 0:
             self.scheduled = False
-            pyglet.clock.unschedule( self._step )
+            pyglet.clock.unschedule(self._step)
 
         for action in self.actions:
             if not action.scheduled_to_remove:
                 action.step(dt)
                 if action.done():
-                    self.remove_action( action )
+                    self.remove_action(action)
 
     # world to local / local to world methods
-    def get_local_transform( self ):
+    def get_local_transform(self):
         '''returns an euclid.Matrix3 with the local transformation matrix
 
         :rtype: euclid.Matrix3
         '''
         if self.is_transform_dirty:
-
             matrix = euclid.Matrix3().identity()
-
             matrix.translate(self._x, self._y)
             matrix.translate( self.transform_anchor_x, self.transform_anchor_y )
             matrix.rotate( math.radians(-self.rotation) )
             matrix.scale(self._scale, self._scale)
             matrix.translate( -self.transform_anchor_x, -self.transform_anchor_y )
 
-
             self.is_transform_dirty = False
-
             self.transform_matrix = matrix
 
         return self.transform_matrix
@@ -843,16 +883,16 @@ class SummaNode(object):
 
         return matrix
 
-    def point_to_world( self, p ):
+    def point_to_world(self, p):
         '''returns an euclid.Vector2 converted to world space
 
         :rtype: euclid.Vector2
         '''
         v = euclid.Point2( p[0], p[1] )
         matrix = self.get_world_transform()
-        return matrix *  v
+        return matrix * v
 
-    def get_local_inverse( self ):
+    def get_local_inverse(self):
         '''returns an euclid.Matrix3 with the local inverse transformation matrix
 
         :rtype: euclid.Matrix3
@@ -865,7 +905,7 @@ class SummaNode(object):
 
         return self.inverse_transform_matrix
 
-    def get_world_inverse( self ):
+    def get_world_inverse(self):
         '''returns an euclid.Matrix3 with the world inverse transformation matrix
 
         :rtype: euclid.Matrix3
@@ -886,4 +926,4 @@ class SummaNode(object):
         '''
         v = euclid.Point2( p[0], p[1] )
         matrix = self.get_world_inverse()
-        return matrix *  v
+        return matrix * v
