@@ -88,7 +88,7 @@ __docformat__ = 'restructuredtext'
 from summa.director import director
 from summa.layer.base_layers import Layer
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 class ScrollableLayer(Layer):
     '''A Cocos Layer that is scrollable in a Scene.

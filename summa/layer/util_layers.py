@@ -63,7 +63,7 @@ the event and accepts it.
 __docformat__ = 'restructuredtext'
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 from summa.director import *
 from base_layers import Layer

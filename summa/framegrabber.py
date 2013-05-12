@@ -40,7 +40,7 @@ need it. If you are curious, check implementation of effects to see an example.
 __docformat__ = 'restructuredtext'
 
 from gl_framebuffer_object import FramebufferObject
-from pyglet.gl import *
+from pyglet import gl
 from director import director
 from pyglet import image
 import pyglet
@@ -59,67 +59,69 @@ def TextureGrabber():
 
     if _best_grabber is not None:
         return _best_grabber()
-    # Preferred method: framebuffer object
-    try:
-        # TEST XXX
-        #_best_grabber = GenericGrabber
-        _best_grabber = FBOGrabber
-        return _best_grabber()
-    except:
-        import traceback
-        traceback.print_exc()
-    # Fallback: GL generic grabber
-    raise Exception("ERROR: GPU doesn't support Frame Buffers Objects. Can't continue")
-#    _best_grabber = GenericGrabber
-#    return _best_grabber()
+        # Preferred method: framebuffer object
+        try:
+            # TEST XXX
+            #_best_grabber = GenericGrabber
+            _best_grabber = FBOGrabber
+            return _best_grabber()
+        except:
+            import traceback
+            traceback.print_exc()
+            # Fallback: GL generic grabber
+            raise Exception("ERROR: GPU doesn't support Frame Buffers Objects. Can't continue")
+            #    _best_grabber = GenericGrabber
+            #    return _best_grabber()
 
 class _TextureGrabber(object):
     def __init__(self):
         """Create a texture grabber."""
-        
+
     def grab(self, texture):
         """Capture the current screen."""
-        
+
     def before_render(self, texture):
         """Setup call before rendering begins."""
-        
+
     def after_render(self, texture):
         """Rendering done, make sure texture holds what has been rendered."""
-        
+
 class GenericGrabber(_TextureGrabber):
     """A simple render-to-texture mechanism. Destroys the current GL display;
     and considers the whole layer as opaque. But it works in any GL
     implementation."""
     def __init__(self):
+        super(GenericGrabber, self).__init__(self)
         self.before = None
         x1 = y1 = 0
         x2, y2 = director.get_window_size()
-        self.vertex_list = pyglet.graphics.vertex_list(4,
+        self.vertex_list = pyglet.graphics.vertex_list(
+            4,
             ('v2f', [x1, y1, x2, y1, x2, y2, x1, y2]),
-            ('c4B', [255,255,255,255]*4)
+            ('c4B', [255, 255, 255, 255] * 4)
         )
-        
+
     def before_render (self, texture):
         #self.before = image.get_buffer_manager().get_color_buffer()
         director.window.clear()
 
     def after_render (self, texture):
-        buffer = image.get_buffer_manager().get_color_buffer()
+        fgbuffer = image.get_buffer_manager().get_color_buffer()
         texture.blit_into(buffer, 0, 0, 0)
         director.window.clear()
         return
-        
-        self.before.blit(0,0)
-        glEnable(self.before.texture.target)
-        glBindTexture(self.before.texture.target, self.before.texture.id)
 
-        glPushAttrib(GL_COLOR_BUFFER_BIT)
+        self.before.blit(0, 0)
+        gl.glEnable(self.before.texture.target)
+        gl.glBindTexture(self.before.texture.target, self.before.texture.id)
 
-        self.vertex_list.draw(pyglet.gl.GL_QUADS)
-               
-        glPopAttrib()
-        glDisable(self.before.texture.target)
-        
+        gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
+
+        self.vertex_list.draw(gl.GL_QUADS)
+
+        gl.glPopAttrib()
+        gl.glDisable(self.before.texture.target)
+
 class PbufferGrabber(_TextureGrabber):
     """A render-to texture mechanism using pbuffers.
     Requires pbuffer extensions. Currently only implemented in GLX.
@@ -130,13 +132,13 @@ class PbufferGrabber(_TextureGrabber):
     """
     def grab (self, texture):
         self.pbuf = Pbuffer(director.window, [
-            GLX_CONFIG_CAVEAT, GLX_NONE,
-            GLX_RED_SIZE, 8,
-            GLX_GREEN_SIZE, 8,
-            GLX_BLUE_SIZE, 8,
-            GLX_DEPTH_SIZE, 24,
-            GLX_DOUBLEBUFFER, 1,
-            ])
+            gl.GLX_CONFIG_CAVEAT, gl.GLX_NONE,
+            gl.GLX_RED_SIZE, 8,
+            gl.GLX_GREEN_SIZE, 8,
+            gl.GLX_BLUE_SIZE, 8,
+            gl.GLX_DEPTH_SIZE, 24,
+            gl.GLX_DOUBLEBUFFER, 1,
+        ])
 
     def before_render (self, texture):
         self.pbuf.switch_to()
@@ -148,8 +150,8 @@ class PbufferGrabber(_TextureGrabber):
         gl.glEnable (gl.GL_TEXTURE_2D)
 
     def after_render (self, texture):
-        buffer = image.get_buffer_manager().get_color_buffer()
-        texture.blit_into (buffer, 0, 0, 0)
+        pbbuffer = image.get_buffer_manager().get_color_buffer()
+        texture.blit_into (pbbuffer, 0, 0, 0)
         director.window.switch_to()
 
 
@@ -161,6 +163,7 @@ class FBOGrabber(_TextureGrabber):
     Requires framebuffer_object extensions"""
     def __init__ (self):
         # This code is on init to make creation fail if FBOs are not available
+        super(FBOGrabber, self).__init__(self)
         self.fbuf = FramebufferObject()
         self.fbuf.check_status()
 
@@ -172,7 +175,7 @@ class FBOGrabber(_TextureGrabber):
 
     def before_render (self, texture):
         self.fbuf.bind()
-        glClear(GL_COLOR_BUFFER_BIT)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
     def after_render (self, texture):
         self.fbuf.unbind()

@@ -76,7 +76,7 @@ To understand visually the difference between these 2 kinds of grids, try these 
 
 __docformat__ = 'restructuredtext'
 
-from pyglet.gl import *
+from pyglet import gl
 
 from summa.grid import Grid3D, TiledGrid3D
 from summa.director import director

@@ -72,7 +72,7 @@ __docformat__ = 'restructuredtext'
 import pyglet
 from pyglet import font
 from pyglet.window import key
-from pyglet.gl import *
+from pyglet import gl
 import pyglet.graphics
 
 from layer import *

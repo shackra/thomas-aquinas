@@ -53,7 +53,7 @@
 __docformat__ = 'restructuredtext'
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 from summa.actions import *
 import summa.scene as scene

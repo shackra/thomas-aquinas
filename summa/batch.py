@@ -65,7 +65,7 @@ from batch import *
 import pyglet
 from pyglet.graphics import OrderedGroup
 from pyglet import image
-from pyglet.gl import *
+from pyglet import gl
 
 __all__ = ['BatchNode','BatchableNode']
 

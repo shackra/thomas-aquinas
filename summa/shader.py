@@ -33,7 +33,7 @@
 # ----------------------------------------------------------------------------
 from ctypes import *
 
-from pyglet.gl import *
+from pyglet import gl
 
 class GLSLException(Exception): pass
 

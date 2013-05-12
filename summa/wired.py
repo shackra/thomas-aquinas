@@ -31,7 +31,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-from pyglet.gl import *
+from pyglet import gl
 from pyglet import window, image
 
 import shader

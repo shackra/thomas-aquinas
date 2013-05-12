@@ -85,7 +85,7 @@ import math
 
 import pyglet
 from pyglet import image
-from pyglet.gl import *
+from pyglet import gl
 
 import summanode
 from batch import *

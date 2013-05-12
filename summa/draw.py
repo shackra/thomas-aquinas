@@ -50,7 +50,7 @@
 # ----------------------------------------------------------------------------
 import summanode
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 from euclid import *
 import math
 import copy

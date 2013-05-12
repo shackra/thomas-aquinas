@@ -37,7 +37,7 @@ __docformat__ = 'restructuredtext'
 
 from director import director
 from euclid import Point3
-from pyglet.gl import *
+from pyglet import gl
 
 __all__ = ['Camera']
 

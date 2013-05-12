@@ -55,7 +55,7 @@ import summa
 from summa import euclid
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 import copy
 

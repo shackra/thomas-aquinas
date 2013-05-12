@@ -54,10 +54,10 @@ class Conf:
         
         if cls.getosname() != "nt":
             cls.__USERFOLDER = cls.joinpaths(os.environ["HOME"],
-                                               ".{game}")
+                                             ".{game}")
         else:
             cls.__USERFOLDER = cls.joinpaths(os.environ["APPDATA"],
-                                               "{game}")
+                                             "{game}")
 
         cls.__USERFOLDER = cls.__USERFOLDER.format(
             game=cls.__gamefolder)
@@ -85,14 +85,14 @@ class Conf:
                 if cls.__os == "posix":
                     if cls.__parsed.has_option("DATA_PATH", "root_path"):
                         cls.__ROOTFOLDER = cls.__parsed.get("DATA_PATH",
-                                                              "root_path")
+                                                            "root_path")
                     else:
                         cls.__ROOTFOLDER = "/usr/share/games/{game}"
 
                 elif cls.__os == "nt":
                     if cls.__parsed.has_option("DATA_PATH", "root_path"):
                         cls.__ROOTFOLDER = cls.__parsed.get("DATA_PATH",
-                                                              "root_path")
+                                                            "root_path")
                     else:
                         cls.__ROOTFOLDER = cls.joinpaths(
                             os.environ["PROGRAMFILES"], "{game}")
@@ -115,7 +115,7 @@ class Conf:
         La configuración se guarda en la carpeta del juego, dentro de la
         carpeta personal del usuario."""
         with open(cls.joinpaths(cls.getuserfolder(),
-                "gameconf.ini"), "w") as conf:
+                                "gameconf.ini"), "w") as conf:
             cls.__parsed.write(conf)
 
     @classmethod
@@ -177,7 +177,7 @@ class Conf:
             else:
                 logging.debug("No hay nada que convertir, "
                               "no estamos en Windows")
-            return whichone
+                return whichone
 
         elif isinstance(whichone, unicode):
             # Si la cadena de caracteres ya estaba como unicode
@@ -189,7 +189,7 @@ class Conf:
             else:
                 logging.debug("No hay nada que convertir, "
                               "no estamos en Windows")
-            return whichone
+                return whichone
 
         elif isinstance(whichone, list):
             logging.debug("Hemos recibido una lista")
@@ -200,9 +200,9 @@ class Conf:
                 thisone = cls.__convertpath(thisone)
                 logging.debug("Convertido: %s" % thisone)
                 pathlist.append(thisone)
-            return pathlist
-        else:
-            raise ValueError, "argument is not a str or list object"
+                return pathlist
+            else:
+                raise ValueError, "argument is not a str or list object"
 
     @classmethod
     def _checkconf(cls):
@@ -219,9 +219,9 @@ class Conf:
                 if not cls.__parsed.has_option("DATA_PATH", opcion):
                     raise TAConfOptionException, ("{0} no existe en "
                                                   "DATA_PATH".format(opcion))
-        else:
-            raise TAConfSectionException, ("La sección DATA_PATH no existe"
-                                           " en la configuración")
+                else:
+                    raise TAConfSectionException, ("La sección DATA_PATH no existe"
+                                                   " en la configuración")
 
         # Variables que contienen la distribución básica de los botones del
         # control del jugador.
@@ -232,9 +232,9 @@ class Conf:
                 if not cls.__parsed.has_option("CONTROLLER", opcion):
                     raise TAConfOptionException, ("{0} no existe en "
                                                   "CONTROLLER".format(opcion))
-        else:
-            raise TAConfSectionException, ("La sección CONTROLLER no existe"
-                                           " en la configuración")
+                else:
+                    raise TAConfSectionException, ("La sección CONTROLLER no existe"
+                                                   " en la configuración")
 
         # Variables que contienen los valores de configuración de visualización
         # del juego.
@@ -243,9 +243,9 @@ class Conf:
                 if not cls.__parsed.has_option("DISPLAY", opcion):
                     raise TAConfOptionException, ("{0} no existe en "
                                                   "DISPLAY".format(opcion))
-        else:
-            raise TAConfSectionException, ("La sección DISPLAY no existe"
-                                           " en la configuración")
+                else:
+                    raise TAConfSectionException, ("La sección DISPLAY no existe"
+                                                   " en la configuración")
 
     @classmethod
     def getosname(cls):
@@ -335,10 +335,10 @@ class Conf:
           · Joystick"""
 
         actualvalue = cls.__parsed.getboolean("CONTROLLER",
-                                               "keyboard_or_joystick")
+                                              "keyboard_or_joystick")
         cls.__parsed.set("CONTROLLER", "keyboard_or_joystick",
-                          str(int(not actualvalue)))
-
+                         str(int(not actualvalue)))
+        
 if __name__ != "__main__":
     ### NO MODIFICAR ###
     ROOTCONFPATH = "/".join([os.path.dirname(__file__), "gameconf.ini"])

@@ -163,24 +163,24 @@ class DefaultHandler( object ):
             pause_sc = pause.get_pause_scene()
             if pause:
                 director.push( pause_sc )
-            return True
+                return True
 
         elif symbol == pyglet.window.key.W and (modifiers & pyglet.window.key.MOD_ACCEL):
-#            import wired
+            #            import wired
             if self.wired == False:
                 gl.glDisable(gl.GL_TEXTURE_2D)
                 gl.glPolygonMode(gl.GL_FRONT, gl.GL_LINE)
                 gl.glPolygonMode(gl.GL_BACK, gl.GL_LINE)
-#                wired.wired.install()
-#                wired.wired.uset4F('color', 1.0, 1.0, 1.0, 1.0 )
+                #                wired.wired.install()
+                #                wired.wired.uset4F('color', 1.0, 1.0, 1.0, 1.0 )
                 self.wired = True
             else:
                 gl.glEnable(gl.GL_TEXTURE_2D)
                 gl.glPolygonMode(gl.GL_FRONT, gl.GL_FILL)
                 gl.glPolygonMode(gl.GL_BACK, gl.GL_FILL)
                 self.wired = False
-#                wired.wired.uninstall()
-            return True
+                #                wired.wired.uninstall()
+                return True
 
         elif symbol == pyglet.window.key.X and (modifiers & pyglet.window.key.MOD_ACCEL):
             director.show_FPS = not director.show_FPS
@@ -193,12 +193,12 @@ class DefaultHandler( object ):
                 if director.python_interpreter == None:
                     director.python_interpreter = summa.scene.Scene( PythonInterpreterLayer() )
                     director.python_interpreter.enable_handlers( True )
-                director.python_interpreter.on_enter()
-                director.show_interpreter = True
-            else:
-                director.python_interpreter.on_exit()
-                director.show_interpreter= False
-            return True
+                    director.python_interpreter.on_enter()
+                    director.show_interpreter = True
+                else:
+                    director.python_interpreter.on_exit()
+                    director.show_interpreter= False
+                    return True
 
         elif symbol == pyglet.window.key.S and (modifiers & pyglet.window.key.MOD_ACCEL):
             import time
@@ -219,17 +219,19 @@ class Director(event.EventDispatcher):
             from summa.director import director
 
        to access the only one Director instance.
-       """
-    #: a dict with locals for the interactive python interpreter (fill with what you need)
+    """
+    #: a dict with locals for the interactive python interpreter
+    #: (fill with what you need)
     interpreter_locals = {}
     __singleton = None
 
     def __new__(cls):
         if cls.__singleton is None:
             cls.__singleton = super(Director, cls).__new__(cls)
+
         return cls.__singleton
 
-    def __init__(self, *args, **kwargs):
+    def init(self, *args, **kwargs):
         """
         Initializes the Director creating the main window.
 
@@ -321,8 +323,8 @@ class Director(event.EventDispatcher):
         # also set the appropiate on_resize handler
         if self._window_virtual_width is None:
             self._window_virtual_width = self.window.width
-        if self._window_virtual_height is None:
-            self._window_virtual_height = self.window.height
+            if self._window_virtual_height is None:
+                self._window_virtual_height = self.window.height
 
         self._window_virtual_aspect = (
             self._window_virtual_width / float( self._window_virtual_height ))
@@ -336,10 +338,10 @@ class Director(event.EventDispatcher):
         else:
             resize_handler = self.scaled_resize_window
             self.set_projection = self.set_projection3D
-        # the offsets and size for the viewport will be proper after this
-        self._resize_no_events = True
-        resize_handler(self.window.width, self.window.height)
-        self._resize_no_events = False
+            # the offsets and size for the viewport will be proper after this
+            self._resize_no_events = True
+            resize_handler(self.window.width, self.window.height)
+            self._resize_no_events = False
 
         self.window.push_handlers(on_resize=resize_handler)
 
@@ -354,15 +356,15 @@ class Director(event.EventDispatcher):
         # Environment variable COCOS2d_NOSOUND=1 overrides audio settings
         if getenv('COCOS2D_NOSOUND', None) == '1' or audio_backend == 'pyglet':
             audio_settings = None
-        # if audio is not working, better to not work at all. Except if
-        # explicitely instructed to continue
-        if not summa.audio._working and audio_settings is not None:
-            from summa.audio.exceptions import NoAudioError
-            msg = ("summa.audio isn't able to work without needed dependencies. "
-                  "Try installing pygame for fixing it, or forcing no audio "
-                  "mode by calling director.init with audio=None, or setting the "
-                  "COCOS2D_NOSOUND=1 variable in your env.")
-            raise NoAudioError(msg)
+            # if audio is not working, better to not work at all. Except if
+            # explicitely instructed to continue
+            if not summa.audio._working and audio_settings is not None:
+                from summa.audio.exceptions import NoAudioError
+                msg = ("summa.audio isn't able to work without needed dependencies. "
+                       "Try installing pygame for fixing it, or forcing no audio "
+                       "mode by calling director.init with audio=None, or setting the "
+                       "COCOS2D_NOSOUND=1 variable in your env.")
+                raise NoAudioError(msg)
 
         # Audio setup:
         #TODO: reshape audio to not screw unittests
@@ -370,7 +372,7 @@ class Director(event.EventDispatcher):
         if not os.environ.get('cocos_utest', False):
             summa.audio.initialize(audio_settings)
 
-        #return self.window
+        return self.window
 
     fps_display = None
     def set_show_FPS(self, value):
@@ -381,7 +383,7 @@ class Director(event.EventDispatcher):
             self.fps_display = None
 
     show_FPS = property(lambda self: self.fps_display is not None,
-        set_show_FPS)
+                        set_show_FPS)
 
     def run(self, scene):
         """Runs a scene, entering in the Director's main loop.
@@ -688,7 +690,7 @@ class Director(event.EventDispatcher):
         else:
             gl.glDisable(gl.GL_BLEND)
 
-    def set_depth_test( sefl, on=True ):
+    def set_depth_test(self, on=True):
         '''Enables z test. On by default
         '''
         if on:
@@ -705,9 +707,6 @@ if not hasattr(event_loop, "event"):
 
 director = Director()
 director.event = event_loop.event
-
-"""The singleton; check `summa.director.Director` for details on usage.
-Don't instantiate Director(). Just use this singleton."""
 
 director.interpreter_locals["director"] = director
 director.interpreter_locals["cocos"] = summa

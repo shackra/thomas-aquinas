@@ -55,7 +55,7 @@ __docformat__ = 'restructuredtext'
 
 __all__ = ['Scene']
 
-from pyglet.gl import *
+from pyglet import gl
 
 import summa
 from summa.director import director

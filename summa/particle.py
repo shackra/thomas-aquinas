@@ -54,7 +54,7 @@ __docformat__ = 'restructuredtext'
 
 import random
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 import math
 import copy
 import numpy

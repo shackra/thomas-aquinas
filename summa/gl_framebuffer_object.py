@@ -37,7 +37,7 @@ __docformat__ = 'restructuredtext'
 
 import ctypes as ct
 
-from pyglet.gl import *
+from pyglet import gl
 
 class FramebufferObject (object):
     """

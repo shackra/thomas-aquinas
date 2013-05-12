@@ -54,7 +54,7 @@ __docformat__ = 'restructuredtext'
 
 import pyglet
 from pyglet import image
-from pyglet.gl import *
+from pyglet import gl
 from euclid import Point2, Point3
 
 from director import director

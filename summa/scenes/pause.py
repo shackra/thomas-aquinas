@@ -58,7 +58,7 @@ from summa.scene import Scene
 
 import pyglet
 
-from pyglet.gl import *
+from pyglet import gl
 
 __pause_scene_generator__ = None
 
