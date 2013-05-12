@@ -9,3 +9,6 @@ src/scenes/*
 cover*
 .coverage
 *.orig
+bin/
+lib/
+include/

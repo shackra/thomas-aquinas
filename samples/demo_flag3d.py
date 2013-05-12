@@ -14,13 +14,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import pyglet
 from pyglet.gl import *
-import cocos
-from cocos.director import director
-from cocos.euclid import Point2,Point3
+import summa
+from summa.director import director
+from summa.euclid import Point2,Point3
 import math
 
 
-class Flag3D( cocos.layer.Layer ):
+class Flag3D( summa.layer.Layer ):
 
     def __init__( self ):
 
@@ -211,6 +211,6 @@ if __name__ == '__main__':
     # enable depth test
     director.set_depth_test()
 
-    s = cocos.scene.Scene()
+    s = summa.scene.Scene()
     s.add( Flag3D() )
     director.run( s )
