@@ -418,8 +418,7 @@ class SummaNode(object):
     def position(self, (x, y)):
         self._x = x
         self._y = y
-        self.is_transform_dirty = True
-        self.is_inverse_transform_dirty = True
+        self.__dirty()
 
     @property
     def scale(self):
@@ -430,8 +429,7 @@ class SummaNode(object):
     @scale.setter
     def scale(self, s):
         self._scale = s
-        self.is_tranform_dirty = True
-        self.is_inverse_transform_dirty = True
+        self.__dirty()
 
     @property
     def rotation(self):
@@ -442,8 +440,7 @@ class SummaNode(object):
     @rotation.setter
     def rotation(self, a):
         self._rotation = a
-        self.is_transform_dirty = True
-        self.is_inverse_transform_dirty = True
+        self.__dirty()
 
     def add(self, child, z=0, name=None):
         """Adds a child and if it becomes part of the active scene
