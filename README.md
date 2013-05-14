@@ -1,5 +1,7 @@
 ***El desarrollo de este proyecto (así como su Wiki y el bugtrack) se lleva acabo en [bitbucket.org](https://bitbucket.org/shackra/thomas-aquinas).***
 
+[![Build Status](https://travis-ci.org/shackra/thomas-aquinas.png?branch=stable-branch)](https://travis-ci.org/shackra/thomas-aquinas)
+
 ## ¿Qué cosa?
 
 Bueno, quiero decir que el proyecto es algo así como un motor para desarrollar videojuegos 2D usando Python y SFML debajo del capo. Quiero dedicarme al desarrollo de vídeo juegos como independiente (aka desarrollador indie de vídeo juegos), así que primero debo refactorizar todas esas lineas de codigo que pueden existir entre diferentes títulos en un solo modulo.
@@ -20,12 +22,12 @@ provee:
 
 ## ¿Thomas Aquinas?
 
-Thomas Aquinas, o precisamente St. Thomas Aquinas (Santo Tomás de Aquino) [Según Wikipedia](https://es.wikipedia.org/wiki/Tom%C3%A1s_de_Aquino): 
+Thomas Aquinas, o precisamente St. Thomas Aquinas (Santo Tomás de Aquino) [Según Wikipedia](https://es.wikipedia.org/wiki/Tom%C3%A1s_de_Aquino):
 
 ![](http://marccortez.com/wp-content/uploads/2012/03/St-Thomas-Aquinas.jpg)
 
 > (en italiano Tommaso D'Aquino) (Roccasecca o Belcastro,1 Italia, 1224/1225 – Abadía de Fossanuova, 7 de marzo de 1274) fue un teólogo y filósofo católico perteneciente a la Orden de Predicadores, el principal representante de la tradición escolástica, y fundador de la escuela tomista de teología y filosofía. Es conocido también como "Doctor Angélico" , "Doctor Común" y " Doctor Universal".
-> 
+>
 > Es considerado santo por la Iglesia Católica. Su trabajo más conocido es la Suma Teológica, tratado en el cual pretende exponer de modo ordenado la doctrina católica. Canonizado en 1323, fue declarado Doctor de la Iglesia en 1567 y santo patrón de las universidades y centros de estudio católicos en 1880. Su festividad se celebra el 28 de enero.
 
 ## Tu proyecto usa la licencia GNU GPL 3 ¿No tienes una versión LGPL?
