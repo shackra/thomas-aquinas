@@ -60,7 +60,7 @@ import copy
 import numpy
 import ctypes
 
-from summanode import SummaNode
+from .summanode import SummaNode
 from euclid import Point2
 
 # for dev and diagnostic, None means real automatic, True / False means
@@ -73,13 +73,15 @@ def point_sprites_available():
     be set to force the desired return value
     """
     if forced_point_sprites is not None:
+        have_point_sprites = True
         return forced_point_sprites
-    have_point_sprites = True
+
     try:
-        glEnable(GL_POINT_SPRITE)
-        glDisable(GL_POINT_SPRITE)
+        gl.glEnable(gl.GL_POINT_SPRITE)
+        gl.glDisable(gl.GL_POINT_SPRITE)
     except:
         have_point_sprites = False
+
     return have_point_sprites
 
 
@@ -204,26 +206,36 @@ class ParticleSystem( SummaNode ):
 
         # particles
         # position x 2
-        self.particle_pos = numpy.zeros( (self.total_particles, 2), numpy.float32 )
+        self.particle_pos = numpy.zeros( (self.total_particles, 2),
+                                         numpy.float32 )
         # direction x 2
-        self.particle_dir = numpy.zeros( (self.total_particles, 2), numpy.float32 )
+        self.particle_dir = numpy.zeros( (self.total_particles, 2),
+                                         numpy.float32 )
         # rad accel x 1
-        self.particle_rad = numpy.zeros( (self.total_particles, 1), numpy.float32 )
+        self.particle_rad = numpy.zeros( (self.total_particles, 1),
+                                         numpy.float32 )
         # tan accel x 1
-        self.particle_tan = numpy.zeros( (self.total_particles, 1), numpy.float32 )
+        self.particle_tan = numpy.zeros( (self.total_particles, 1),
+                                         numpy.float32 )
         # gravity x 2
-        self.particle_grav = numpy.zeros( (self.total_particles, 2), numpy.float32 )
+        self.particle_grav = numpy.zeros( (self.total_particles, 2),
+                                          numpy.float32 )
         # colors x 4
-        self.particle_color = numpy.zeros( (self.total_particles, 4), numpy.float32 )
+        self.particle_color = numpy.zeros( (self.total_particles, 4),
+                                           numpy.float32 )
         # delta colors x 4
-        self.particle_delta_color = numpy.zeros( (self.total_particles, 4), numpy.float32 )
+        self.particle_delta_color = numpy.zeros( (self.total_particles, 4),
+                                                 numpy.float32 )
         # life x 1
-        self.particle_life = numpy.zeros( (self.total_particles, 1), numpy.float32 )
+        self.particle_life = numpy.zeros( (self.total_particles, 1),
+                                          numpy.float32 )
         self.particle_life.fill(-1.0)
         # size x 1
-        self.particle_size = numpy.zeros( (self.total_particles, 1), numpy.float32 )
+        self.particle_size = numpy.zeros( (self.total_particles, 1),
+                                          numpy.float32 )
         # start position
-        self.start_pos = numpy.zeros( (self.total_particles, 2), numpy.float32 )
+        self.start_pos = numpy.zeros( (self.total_particles, 2),
+                                      numpy.float32 )
 
         #: How many particles can be emitted per second
         self.emit_counter = 0
@@ -237,6 +249,7 @@ class ParticleSystem( SummaNode ):
         #: rendering mode; True is quads, False is point_sprites, None is auto fallback
         if fallback is None:
             fallback = not point_sprites_available()
+
         self.fallback = fallback
         if fallback:
             self._fallback_init()
@@ -249,63 +262,63 @@ class ParticleSystem( SummaNode ):
         super( ParticleSystem, self).on_enter()
         #self.add_particle()
 
-    def draw( self ):
-        glPushMatrix()
+    def draw(self):
+        gl.glPushMatrix()
         self.transform()
 
         # color preserve - at least nvidia 6150SE needs that
-        glPushAttrib(GL_CURRENT_BIT)
-        glPointSize( self.size )
+        gl.glPushAttrib(gl.GL_CURRENT_BIT)
+        gl.glPointSize( self.size )
 
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, self.texture.id )
+        gl.glEnable(gl.GL_TEXTURE_2D)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.texture.id )
 
-        glEnable(GL_POINT_SPRITE)
-        glTexEnvi( GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE )
+        gl.glEnable(gl.GL_POINT_SPRITE)
+        gl.glTexEnvi(gl.GL_POINT_SPRITE, gl.GL_COORD_REPLACE, gl.GL_TRUE )
 
 
-        glEnableClientState(GL_VERTEX_ARRAY)
+        gl.glEnableClientState(gl.GL_VERTEX_ARRAY)
         vertex_ptr = PointerToNumpy( self.particle_pos )
-        glVertexPointer(2,GL_FLOAT,0,vertex_ptr);
+        gl.glVertexPointer(2, gl.GL_FLOAT, 0, vertex_ptr)
 
-        glEnableClientState(GL_COLOR_ARRAY)
+        gl.glEnableClientState(gl.GL_COLOR_ARRAY)
         color_ptr = PointerToNumpy( self.particle_color)
-        glColorPointer(4,GL_FLOAT,0,color_ptr);
+        gl.glColorPointer(4, gl.GL_FLOAT, 0, color_ptr)
 
-        glPushAttrib(GL_COLOR_BUFFER_BIT)
-        glEnable(GL_BLEND)
+        gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
+        gl.glEnable(gl.GL_BLEND)
         if self.blend_additive:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE)
         else:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-#        mode = GLint()
-#        glTexEnviv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode )
-#
-#        if self.color_modulate:
-#            glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE )
-#        else:
-#            glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE )
+        # mode = GLint()
+        # glTexEnviv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode )
+        #
+        # if self.color_modulate:
+        #     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE )
+        # else:
+        #     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE )
 
 
-        glDrawArrays(GL_POINTS, 0, self.total_particles);
+        gl.glDrawArrays(gl.GL_POINTS, 0, self.total_particles)
 
         # un -blend
-        glPopAttrib()
+        gl.glPopAttrib()
 
         # color restore
-        glPopAttrib()
+        gl.glPopAttrib()
 
-#        # restore env mode
-#        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode)
+        # restore env mode
+        # glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode)
 
         # disable states
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisable(GL_POINT_SPRITE);
-        glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(gl.GL_COLOR_ARRAY)
+        gl.glDisableClientState(gl.GL_VERTEX_ARRAY)
+        gl.glDisable(gl.GL_POINT_SPRITE)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
-        glPopMatrix()
+        gl.glPopMatrix()
 
 
     def step( self, delta ):
@@ -317,10 +330,11 @@ class ParticleSystem( SummaNode ):
             rate = 1.0 / self.emission_rate
             self.emit_counter += delta
 
-#            if random.random() < 0.01:
-#                delta += 0.5
+            # if random.random() < 0.01:
+            #     delta += 0.5
 
-            while self.particle_count < self.total_particles and self.emit_counter > rate:
+            while (self.particle_count < self.total_particles and
+                   self.emit_counter > rate):
                 self.add_particle()
                 self.emit_counter -= rate
 
@@ -336,7 +350,7 @@ class ParticleSystem( SummaNode ):
             self.unschedule( self.step )
             self.parent.remove( self )
 
-    def add_particle( self ):
+    def add_particle(self):
         """
         Code calling add_particle must be either:
           be sure there is room for the particle
@@ -384,8 +398,8 @@ class ParticleSystem( SummaNode ):
 
         # position: free or grouped
         if self.position_type == self.POSITION_FREE:
-            tuple = numpy.array( [self.x, self.y] )
-            tmp = tuple - self.start_pos
+            atuple = numpy.array( [self.x, self.y] )
+            tmp = atuple - self.start_pos
             self.particle_pos -= tmp
 
 
@@ -393,14 +407,17 @@ class ParticleSystem( SummaNode ):
         self.particle_color += self.particle_delta_color * delta
 
         # if life < 0, set alpha in 0
-        self.particle_color[:,3] = numpy.select( [self.particle_life[:,0] < 0], [0], default=self.particle_color[:,3] )
+        self.particle_color[:,3] = numpy.select([self.particle_life[:,0] < 0],
+                                                [0],
+                                                default=self.\
+                                                particle_color[:,3])
 
-#        print self.particles[0]
-#        print self.pas[0,0:4]
+        # print self.particles[0]
+        # print self.pas[0,0:4]
 
     def init_particle( self ):
         # position
-#        p=self.particles[idx]
+        # p=self.particles[idx]
 
         a = self.particle_life < 0
         idxs = a.nonzero()
@@ -424,11 +441,11 @@ class ParticleSystem( SummaNode ):
         v = Point2( math.cos( a ), math.sin( a ) )
         s = self.speed + self.speed_var * rand()
 
-        dir = v * s
+        adir = v * s
 
         # direction
-        self.particle_dir[idx][0] = dir.x
-        self.particle_dir[idx][1] = dir.y
+        self.particle_dir[idx][0] = adir.x
+        self.particle_dir[idx][1] = adir.y
 
         # radial accel
         self.particle_rad[idx] = self.radial_accel + self.radial_accel_var * rand()
@@ -484,12 +501,16 @@ class ParticleSystem( SummaNode ):
 
     def _fallback_init(self):
         self.vertexs = numpy.zeros((self.total_particles * 4, 2), numpy.float32)
-        tex_coords_for_quad = numpy.array([[0.0, 1.0], [0.0, 0.0], [1.0, 0.0], [1.0, 1.0]], numpy.float32)
-        self.tex_coords = numpy.zeros((self.total_particles * 4, 2), numpy.float32)
+        tex_coords_for_quad = numpy.array([[0.0, 1.0], [0.0, 0.0], [1.0, 0.0],
+                                           [1.0, 1.0]], numpy.float32)
+        self.tex_coords = numpy.zeros((self.total_particles * 4, 2),
+                                      numpy.float32)
         all_tex_coords = self.tex_coords
         for i in xrange(0,len(self.vertexs),4):
             all_tex_coords[i : i + 4 ] = tex_coords_for_quad
-        self.per_vertex_colors = numpy.zeros( (self.total_particles * 4, 4), numpy.float32)
+
+        self.per_vertex_colors = numpy.zeros((self.total_particles * 4, 4),
+                                             numpy.float32)
         self.delta_pos_to_vertex = numpy.zeros((4, 2), numpy.float32)
 
 
@@ -498,50 +519,50 @@ class ParticleSystem( SummaNode ):
         self.update_vertexs_from_pos()
         self.update_per_vertex_colors()
 
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
 
         # color preserve - at least intel 945G needs that
-        glPushAttrib(GL_CURRENT_BIT)
+        gl.glPushAttrib(gl.GL_CURRENT_BIT)
 
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, self.texture.id )
+        gl.glEnable(gl.GL_TEXTURE_2D)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.texture.id )
 
-	glEnableClientState(GL_VERTEX_ARRAY)
+	gl.glEnableClientState(gl.GL_VERTEX_ARRAY)
         vertexs_ptr = PointerToNumpy(self.vertexs)
-	glVertexPointer(2, GL_FLOAT, 0, vertexs_ptr)
+        gl.glVertexPointer(2, gl.GL_FLOAT, 0, vertexs_ptr)
 
-	glEnableClientState(GL_COLOR_ARRAY)
+	gl.glEnableClientState(gl.GL_COLOR_ARRAY)
         color_ptr = PointerToNumpy(self.per_vertex_colors)
-	#glColorPointer(4, GL_UNSIGNED_BYTE, 0, color_ptr)
-        glColorPointer(4, GL_FLOAT, 0, color_ptr)
+        #glColorPointer(4, GL_UNSIGNED_BYTE, 0, color_ptr)
+        gl.glColorPointer(4, gl.GL_FLOAT, 0, color_ptr)
 
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY )
-	tex_coord_ptr = PointerToNumpy(self.tex_coords)
-        glTexCoordPointer(2, GL_FLOAT, 0, tex_coord_ptr)
+	gl.glEnableClientState(gl.GL_TEXTURE_COORD_ARRAY)
+        tex_coord_ptr = PointerToNumpy(self.tex_coords)
+        gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, tex_coord_ptr)
 
-        glPushAttrib(GL_COLOR_BUFFER_BIT)
-        glEnable(GL_BLEND)
+        gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
+        gl.glEnable(gl.GL_BLEND)
         if self.blend_additive:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE)
         else:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-	glDrawArrays(GL_QUADS, 0, len(self.vertexs))
+        gl.glDrawArrays(gl.GL_QUADS, 0, len(self.vertexs))
 
         # un -blend
-        glPopAttrib()
+        gl.glPopAttrib()
 
         # color restore
-        glPopAttrib()
+        gl.glPopAttrib()
 
         # disable states
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-        glDisableClientState(GL_COLOR_ARRAY)
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisable(GL_TEXTURE_2D);
+        gl.glDisableClientState(gl.GL_TEXTURE_COORD_ARRAY)
+        gl.glDisableClientState(gl.GL_COLOR_ARRAY)
+        gl.glDisableClientState(gl.GL_VERTEX_ARRAY)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
-        glPopMatrix()
+        gl.glPopMatrix()
 
     def update_vertexs_from_pos(self):
         vertexs = self.vertexs

@@ -59,8 +59,8 @@ Batches allow you to optimize the number of gl calls using pyglets batch
 
 __docformat__ = 'restructuredtext'
 
-import summanode
-from batch import *
+from . import summanode
+#from . import batch
 
 import pyglet
 from pyglet.graphics import OrderedGroup
@@ -71,12 +71,14 @@ __all__ = ['BatchNode','BatchableNode']
 
 
 def ensure_batcheable(node):
-    if not isinstance(node, BatchableNode):
-        raise Exception("Children node of a batch must be of class BatchableNode")
+    if not isinstance(node, batch.BatchableNode):
+        raise Exception("Children node of a batch"
+                        " must be of class BatchableNode")
+
     for c in  node.get_children():
         ensure_batcheable(c)
 
-class BatchNode( summanode.SummaNode ):
+class BatchNode(summanode.SummaNode):
     def __init__(self):
         super(BatchNode, self).__init__()
         self.batch = pyglet.graphics.Batch()
@@ -90,24 +92,26 @@ class BatchNode( summanode.SummaNode ):
     def visit(self):
         """ All children are placed in to self.batch, so nothing to visit """
         if not self.visible:
-           return
-        glPushMatrix()
+            return
+
+        gl.glPushMatrix()
         self.transform()
         self.batch.draw()
-        glPopMatrix()
+        gl.glPopMatrix()
 
     def remove(self, child):
         if isinstance(child, str):
             child_node = self.get(child)
         else:
             child_node = child
+
         child_node.set_batch(None)
         super(BatchNode, self).remove(child)
 
     def draw(self):
         pass # All drawing done in visit!
 
-class BatchableNode( summanode.SummaNode ):
+class BatchableNode(summanode.SummaNode):
     def add(self, child, z=0, name=None):
         batchnode = self.get_ancestor(BatchNode)
         if not batchnode:
@@ -126,6 +130,7 @@ class BatchableNode( summanode.SummaNode ):
             child_node = self.get(child)
         else:
             child_node = child
+
         child_node.set_batch(None)
         super(BatchableNode, self).remove(child)
 
@@ -138,6 +143,7 @@ class BatchableNode( summanode.SummaNode ):
             if group is None:
                 group = pyglet.graphics.Group()
                 groups[z] = group
+
             self.group = group
-        for childZ, child in self.children:
-            child.set_batch(self.batch, groups, z + childZ)
+            for childZ, child in self.children:
+                child.set_batch(self.batch, groups, z + childZ)

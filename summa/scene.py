@@ -55,9 +55,9 @@ __docformat__ = 'restructuredtext'
 
 __all__ = ['Scene']
 
-from pyglet import gl
+# from pyglet import gl
 
-import summa
+from . import audio
 from summa.director import director
 import summa.summanode as summanode
 import summa.audio.music
@@ -69,10 +69,9 @@ class EventHandlerMixin(object):
         scene = self.get(Scene)
         if not scene: return
 
-        if (    scene._handlers_enabled and
-                scene.is_running and
-                isinstance(child, summa.layer.Layer)
-                ):
+        if (scene._handlers_enabled and
+            scene.is_running and
+            isinstance(child, summa.layer.Layer)):
             child.push_all_handlers()
 
 
@@ -82,13 +81,10 @@ class EventHandlerMixin(object):
         scene = self.get(Scene)
         if not scene: return
 
-        if (    scene._handlers_enabled and
-                scene.is_running and
-                isinstance(child, summa.layer.Layer)
-                ):
+        if (scene._handlers_enabled and
+            scene.is_running and
+            isinstance(child, summa.layer.Layer)):
             child.remove_all_handlers()
-
-
 
 
 class Scene(summanode.SummaNode, EventHandlerMixin):
@@ -114,7 +110,7 @@ class Scene(summanode.SummaNode, EventHandlerMixin):
         for i, c in enumerate(children):
             self.add( c, z=i )
 
-        x,y = director.get_window_size()
+        x, y = director.get_window_size()
 
         self.transform_anchor_x = x/2
         self.transform_anchor_y = y/2
@@ -124,18 +120,19 @@ class Scene(summanode.SummaNode, EventHandlerMixin):
     def on_enter(self):
         for c in self.get_children():
             c.parent = self
+
         super(Scene, self).on_enter()
         if self.music is not None:
-            summa.audio.music.control.load(self.music)
+            audio.music.control.load(self.music)
+
         if self.music_playing:
-            summa.audio.music.control.play()
+            audio.music.control.play()
 
     def on_exit(self):
         super(Scene, self).on_exit()
         # _apply_music after super, because is_running must be already False
         if self.music_playing:
-            summa.audio.music.control.stop()
-
+            audio.music.control.stop()
 
     def push_all_handlers(self):
         for child in self.get_children():
@@ -155,6 +152,7 @@ class Scene(summanode.SummaNode, EventHandlerMixin):
             self.push_all_handlers()
         elif not value and self._handlers_enabled and self.is_running:
             self.remove_all_handlers()
+
         self._handlers_enabled = value
 
 
@@ -184,9 +182,9 @@ class Scene(summanode.SummaNode, EventHandlerMixin):
         self.music_playing = False
         if self.is_running:
             if filename is not None:
-                summa.audio.music.control.load(filename)
+                audio.music.control.load(filename)
             else:
-                summa.audio.music.control.stop()
+                audio.music.control.stop()
 
     def play_music(self):
         """Enable music playback for this scene. Nothing happens if music was already playing
@@ -197,7 +195,7 @@ class Scene(summanode.SummaNode, EventHandlerMixin):
         if self.music is not None and not self.music_playing:
             self.music_playing = True
             if self.is_running:
-                summa.audio.music.control.play()
+                audio.music.control.play()
 
     def stop_music(self):
         """Stops music playback for this scene.

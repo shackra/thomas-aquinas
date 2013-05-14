@@ -48,12 +48,13 @@
 #     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-import summanode
+from . import summanode
 import pyglet
 from pyglet import gl
-from euclid import *
+from . import euclid
 import math
 import copy
+import ctypes
 
 cuadric_t = '''
 void main() {
@@ -70,35 +71,39 @@ void main() {
 class Shader(object):
     def __init__(self, source):
         self.source = source
-        self.shader_no = glCreateShader(self.shader_type)
+        self.shader_no = gl.glCreateShader(self.shader_type)
         if not self.shader_no:
             raise Exception("could not create shader")
-        prog = (c_char_p * 1)(source+chr(0))
-        length = (c_int * 1)(0)
-        glShaderSource(self.shader_no, 1,
-                          cast(prog, POINTER(POINTER(c_char))),
-                          cast(0, POINTER(c_int)))
-        glCompileShader(self.shader_no)
-        self.program_no = glCreateProgram()
+
+        prog = (ctypes.c_char_p * 1)(source+chr(0))
+        length = (ctypes.c_int * 1)(0)
+        gl.glShaderSource(self.shader_no, 1,
+                          ctypes.cast(prog, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))),
+                          ctypes.cast(0, ctypes.POINTER(ctypes.c_int)))
+        gl.glCompileShader(self.shader_no)
+        self.program_no = gl.glCreateProgram()
         if not self.program_no:
             raise Exception("could not create program")
-        glAttachShader(self.program_no, self.shader_no)
-        glLinkProgram(self.program_no)
+
+        gl.glAttachShader(self.program_no, self.shader_no)
+        gl.glLinkProgram(self.program_no)
 
     def begin(self):
-        glUseProgram(self.program_no)
+        gl.glUseProgram(self.program_no)
+
     def end(self):
-        glUseProgram(0)
+        gl.glUseProgram(0)
 
 
 class VertexShader(Shader):
-    shader_type = GL_VERTEX_SHADER
+    shader_type = gl.GL_VERTEX_SHADER
 
 class FragmentShader(Shader):
-    shader_type = GL_FRAGMENT_SHADER
+    shader_type = gl.GL_FRAGMENT_SHADER
 
 #cuadric = FragmentShader(cuadric_t)
 __parameter_count = 0
+
 def parameter(default=None):
     global __parameter_count
     name = str(__parameter_count)
@@ -123,15 +128,15 @@ class Context(object):
         self.stroke_width = 2
         self.cap = ROUND_CAP
         self.join = ROUND_JOIN
-        self.transform = Matrix3()
+        self.transform = euclid.Matrix3()
 
     def set_state(self):
-        glPushAttrib(GL_CURRENT_BIT|GL_LINE_BIT)
-        glColor4ub(*self.color)
-        glLineWidth(self.stroke_width)
+        gl.glPushAttrib(gl.GL_CURRENT_BIT|gl.GL_LINE_BIT)
+        gl.glColor4ub(*self.color)
+        gl.glLineWidth(self.stroke_width)
 
     def unset_state(self):
-        glPopAttrib()
+        gl.glPopAttrib()
 
     def copy(self):
         return copy.deepcopy(self)
@@ -142,12 +147,12 @@ def flatten(*args):
     for a in args:
         for v in a:
             ret.append( v )
-    return ret
+            return ret
 
 class Segment:
     def __init__(self, start, end, width):
-        self.start = Point2(*start)
-        self.end = Point2(*end)
+        self.start = euclid.Point2(*start)
+        self.end = euclind.Point2(*end)
         self.width = width
         self._tl = None
         self._bl = None
@@ -156,27 +161,29 @@ class Segment:
 
     @property
     def direction(self):
-        return Vector2( *(self.end-self.start)).normalized()
+        return euclid.Vector2( *(self.end-self.start)).normalized()
 
     @property
     def line_width(self):
         return (
-            Matrix3.new_rotate(math.radians(90)) * self.direction *
-            (self.width / 2.0)
-            )
+            euclid.Matrix3.new_rotate(math.radians(90)) * self.direction *
+            (self.width / 2.0))
 
     @property
     def tl(self):
         if self._tl: return self._tl
         return self.end + self.line_width
+
     @property
     def tr(self):
         if self._tr: return self._tr
         return self.end - self.line_width
+
     @property
     def bl(self):
         if self._bl: return self._bl
         return self.start + self.line_width
+
     @property
     def br(self):
         if self._br: return self._br
@@ -184,15 +191,17 @@ class Segment:
 
     @property
     def left(self):
-        return LineSegment2( Point2(*self.bl), Point2(*self.tl) )
+        return euclid.LineSegment2(euclid.Point2(*self.bl),
+                                   euclid.Point2(*self.tl))
 
     @property
     def right(self):
-        return LineSegment2( Point2(*self.br), Point2(*self.tr) )
+        return euclid.LineSegment2(euclid.Point2(*self.br),
+                                   euclid.Point2(*self.tr))
 
     @property
     def points(self):
-        return flatten( self.bl, self.br, self.tr, self.bl, self.tr, self.tl )
+        return flatten(self.bl, self.br, self.tr, self.bl, self.tr, self.tl)
 
     def reversed(self):
         return Segment(self.end, self.start, self.width)
@@ -222,23 +231,23 @@ class Canvas(summanode.SummaNode):
             self._dirty = False
 
         # set
-        glEnable(self._texture.target)
-        glBindTexture(self._texture.target, self._texture.id)
-        glPushAttrib(GL_COLOR_BUFFER_BIT)
+        gl.glEnable(self._texture.target)
+        gl.glBindTexture(self._texture.target, self._texture.id)
+        gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
 
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        gl.glEnable(gl.GL_BLEND)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
         #cuadric.begin()
-        self._vertex_list.draw(GL_TRIANGLES)
+        self._vertex_list.draw(gl.GL_TRIANGLES)
         #cuadric.end()
 
         # unset
-        glPopMatrix()
-        glPopAttrib()
-        glDisable(self._texture.target)
+        gl.glPopMatrix()
+        gl.glPopAttrib()
+        gl.glDisable(self._texture.target)
 
     def endcap(self, line, cap_type):
         strip = []
@@ -246,26 +255,26 @@ class Canvas(summanode.SummaNode):
 
         if cap_type == ROUND_CAP:
             s = Segment( line.start,
-                        line.start + (-line.direction) * line.width / 2,
-                        line.width
-                        )
+                         line.start + (-line.direction) * line.width / 2,
+                         line.width)
             strip.extend([int(x) for x in flatten(
-                            s.bl, s.br, s.end,
-                            s.br, s.tr, s.end,
-                            s.bl, s.tl, s.end
-                            )])
+                s.bl, s.br, s.end,
+                s.br, s.tr, s.end,
+                s.bl, s.tl, s.end
+            )])
             texcoord.extend([
-                    0.1,0.9,0.1,0.5,0.5,0.9,
-                    0,0,0.5,0,1,1,
-                    0,0,0.5,0,1,1,
-                    ])
+                0.1, 0.9, 0.1, 0.5, 0.5, 0.9,
+                0, 0, 0.5, 0, 1, 1,
+                0, 0, 0.5, 0, 1, 1,])
         elif cap_type == SQUARE_CAP:
             segment = Segment( line.start,
-                        line.start + (-line.direction) * line.width / 2,
-                        line.width
-                        )
+                               line.start + (-line.direction) * line.width / 2,
+                               line.width
+            )
             strip.extend([int(x) for x in segment.points])
-            texcoord.extend( flatten(*[ (0.1,0.9,0.1,0.5,0.5,0.9) for x in range(len(segment.points)/6) ]) )
+            texcoord.extend( flatten(*[(0.1, 0.9, 0.1, 0.5, 0.5, 0.9)
+                                       for x in range(len(segment.points) / 6)]
+                                 ))
 
         return strip, texcoord
 
@@ -322,28 +331,30 @@ class Canvas(summanode.SummaNode):
 
                     # add elbow
                     if ( prev and inter ):
-                            if ctx.join == BEVEL_JOIN:
+                        if ctx.join == BEVEL_JOIN:
+                            strip.extend( [ int(x) for x in
+                                            list(inter) + list(bottom) + list(top)
+                                        ])
+                            texcoord += [ 0.1,0.9,0.1,0.5,0.5,0.9 ]
+
+                        elif ctx.join in (MITER_JOIN, ROUND_JOIN):
+                            if bottom == top:
+                                far = euclid.Point2(*bottom)
+                            else:
+                                far = euclid.Ray2(
+                                    euclid.Point2(*bottom), prev.direction
+                                ).intersect(euclid.Ray2(
+                                    euclid.Point2(*top), -current.direction
+                                ))
                                 strip.extend( [ int(x) for x in
-                                    list(inter) + list(bottom) + list(top)
-                                ])
-                                texcoord += [ 0.1,0.9,0.1,0.5,0.5,0.9 ]
-                            elif ctx.join in (MITER_JOIN, ROUND_JOIN):
-                                if bottom == top:
-                                    far = Point2(*bottom)
-                                else:
-                                    far = Ray2(
-                                        Point2(*bottom), prev.direction
-                                        ).intersect(Ray2(
-                                        Point2(*top), -current.direction
-                                        ))
-                                strip.extend( [ int(x) for x in
-                                    list(inter) + list(bottom) + list(top) +
-                                    list(bottom) + list(top) + list(far)
-                                ])
-                                if ctx.join == ROUND_JOIN:
-                                    texcoord += [ 0.1,0.9,0.1,0.5,0.5,0.9, 0,0,1,1,0.5,0]
-                                elif ctx.join == MITER_JOIN:
-                                    texcoord += [ 0.1,0.9,0.1,0.5,0.5,0.9,0.1,0.9,0.1,0.5,0.5,0.9 ]
+                                                list(inter) + list(bottom) + list(top) +
+                                                list(bottom) + list(top) + list(far)
+                                            ])
+
+                            if ctx.join == ROUND_JOIN:
+                                texcoord += [ 0.1,0.9,0.1,0.5,0.5,0.9, 0,0,1,1,0.5,0]
+                            elif ctx.join == MITER_JOIN:
+                                texcoord += [ 0.1,0.9,0.1,0.5,0.5,0.9,0.1,0.9,0.1,0.5,0.5,0.9 ]
 
                     # rotate values
                     prev = current
@@ -352,16 +363,15 @@ class Canvas(summanode.SummaNode):
                 for s in segments:
                     strip.extend( [ int(x) for x in s.points ] )
                     texcoord += flatten(*[ (0.1,0.9,0.1,0.5,0.5,0.9)
-                                for x in range( len(s.points)/6)
-                            ])
-
+                                           for x in range( len(s.points)/6)
+                                       ])
 
             colors.extend( list(ctx.color)*((len(strip)-start_len)/2) )
 
         vertex_list = pyglet.graphics.vertex_list(len(strip)/2,
-            ('v2i', strip),
-            ('c4B', colors ),
-            ('t2f', texcoord),
+                                                  ('v2i', strip),
+                                                  ('c4B', colors ),
+                                                  ('t2f', texcoord),
         )
         self._vertex_list = vertex_list
 
@@ -393,11 +403,12 @@ class Canvas(summanode.SummaNode):
 
     def rotate(self, radians):
         self._context.transform.rotate( radians )
+
     def translate(self, vect):
         self._context.transform.translate( *vect )
 
     def move_to(self, position):
-        self._position = self._context.transform * Point2(*position)
+        self._position = self._context.transform * euclid.Point2(*position)
 
     def line_to(self, end):
         if self._context_change:
@@ -408,7 +419,7 @@ class Canvas(summanode.SummaNode):
         else:
             context, parts = self._parts[-1]
 
-        end = self._context.transform * Point2(*end)
+        end = self._context.transform * euclid.Point2(*end)
 
         if parts[-1][-1] == self._position:
             parts[-1].append( end )

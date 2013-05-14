@@ -231,6 +231,10 @@ class Director(event.EventDispatcher):
 
         return cls.__singleton
 
+    def __init__(self):
+        self._window_virtual_width = 0
+        self._window_virtual_height = 0
+
     def init(self, *args, **kwargs):
         """
         Initializes the Director creating the main window.
