@@ -92,8 +92,8 @@ class GridBase(object):
 
         if self.texture is None:
             self.texture = image.Texture.create_for_size(
-                    GL_TEXTURE_2D, width,
-                    height, GL_RGBA)
+                    gl.GL_TEXTURE_2D, width,
+                    height, gl.GL_RGBA)
 
         self.grabber = framegrabber.TextureGrabber()
         self.grabber.grab(self.texture)
