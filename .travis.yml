@@ -3,6 +3,10 @@ python:
   - "2.5"
   - "2.6"
   - "2.7"
+
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
 # command to install dependencies.
 install: "pip install pyglet==1.1.4 --use-mirrors"
 # command to run tests
