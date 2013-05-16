@@ -4,6 +4,6 @@ python:
   - "2.6"
   - "2.7"
 # command to install dependencies.
-install: "pip install pyglet --use-mirrors"
+install: "pip install pyglet==1.1.4 --use-mirrors"
 # command to run tests
-script: nosetests
+script: nosetests tests/
