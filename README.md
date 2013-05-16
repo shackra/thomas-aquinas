@@ -10,6 +10,7 @@ Bueno, quiero decir que el proyecto es algo así como un motor para desarrollar 
 
 provee:
 
+(todo aquello que provee Cocos2D, ya que nos basamos en un fork de ese proyecto para el nuestro)
 * Director de escenas.
 * Escenas (Diseñadas en Tiled: Soporta mapas ortográficos o isometricos).
 * Entidades (Aun bajo fuerte desarrollo).
