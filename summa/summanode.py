@@ -211,14 +211,14 @@ class SummaNode(object):
     def make_property(attr):
         def set_attr():
             def inner(self, value):
-                setattr(self, "_".join([attr, "_x"]), value[0])
-                setattr(self, "_".join([attr, "_y"]), value[1])
+                setattr(self, "_".join([attr, "x"]), value[0])
+                setattr(self, "_".join([attr, "y"]), value[1])
 
             return inner
 
         def get_attr(self):
-            return (getattr(self, "_".join([attr, "_x"])),
-                    getattr(self, "_".join([attr, "_y"])))
+            return (getattr(self, "_".join([attr, "x"])),
+                    getattr(self, "_".join([attr, "y"])))
 
         return property(
             get_attr,
