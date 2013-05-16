@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.5"
   - "2.6"
   - "2.7"
 
@@ -10,4 +9,4 @@ before_install:
 # command to install dependencies.
 install: "pip install pyglet==1.1.4 --use-mirrors"
 # command to run tests
-script: nosetests tests/
+script: nosetests -vv tests/
