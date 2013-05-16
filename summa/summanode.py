@@ -465,8 +465,12 @@ class SummaNode(object):
         if name:
             if name in self.children_names:
                 raise Exception("Name already exists: %s" % name )
+            else:
+                self.children_names[name] = child
 
-            self.children_names[name] = child
+        if not isinstance(z, int):
+            raise TypeError("Z index is not an int object but {}".format(
+                type(z)))
 
         child.parent = self
 
