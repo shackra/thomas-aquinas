@@ -30,7 +30,7 @@ setup(
     description = "a 2D framework for games and multimedia. Based on Cocos2D",
     long_description=long_description,
     url = "http://www.ohloh.net/p/thomas-aquinas",
-    download_url = "https://bitbucket.org/shackra/thomas-aquinas/downloads"
+    download_url = "https://bitbucket.org/shackra/thomas-aquinas/downloads",
     classifiers = [
         "Development Status :: 3 - Alpha",
         "Environment :: MacOS X",
