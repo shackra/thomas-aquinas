@@ -30,8 +30,12 @@ def after_install(options, home_dir):
 
     easyinstall = os.path.join(home_dir, bin, 'easy_install')
     pyglet = [easyinstall, 'pyglet==1.1.4']
+    numpy = [easyinstall, 'numpy']
+    pygame = [easyinstall, 'pygame']
     # instalando los paquetes dentro del entorno
     subprocess.call(pyglet)
+    subprocess.call(numpy)
+    subprocess.call(pygame)
     """
 
 salida = virtualenv.create_bootstrap_script(textwrap.dedent(extra_text))
