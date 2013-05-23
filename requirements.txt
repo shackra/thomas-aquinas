@@ -1,0 +1,5 @@
+nose
+pyglet
+coverage
+numpy
+pylint
