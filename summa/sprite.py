@@ -81,25 +81,24 @@ And now tell the sprite to execute it::
 '''
 
 __docformat__ = 'restructuredtext'
-import math
 
 import pyglet
 from pyglet import image
 from pyglet import gl
 
-import summanode
-from batch import *
-import rect
+from summa import summanode
+from summa import batch
+from summa import rect
 
-import euclid
+from summa import euclid
 import math
 
-__all__ = [ 'Sprite',                     # Sprite class
-            ]
+__all__ = [ 'Sprite', # Sprite class
+]
 
 
 
-class Sprite( BatchableNode, pyglet.sprite.Sprite):
+class Sprite(batch.BatchableNode, pyglet.sprite.Sprite):
     '''A SummaNode that displays a rectangular image.
 
     Example::
@@ -107,11 +106,12 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
         sprite = Sprite('grossini.png')
     '''
 
-    def __init__( self, image, position=(0,0), rotation=0, scale=1, opacity = 255, color=(255,255,255), anchor = None ):
+    def __init__(self, spimage, position=(0,0), rotation=0, scale=1,
+                 opacity = 255, color=(255,255,255), anchor = None):
         '''Initialize the sprite
 
         :Parameters:
-                `image` : string or image
+                `spimage` : string or image
                     name of the image resource or a pyglet image.
                 `position` : tuple
                     position of the anchor. Defaults to (0,0)
@@ -128,22 +128,20 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
         '''
 
         if isinstance(image, str):
-            image = pyglet.resource.image(image)
+            tmpimage = pyglet.resource.image(spimage)
 
         self.transform_anchor_x = 0
         self.transform_anchor_y = 0
         self._image_anchor_x = 0
         self._image_anchor_y = 0
 
-        pyglet.sprite.Sprite.__init__(self, image)
-        BatchableNode.__init__(self)
-
-
+        pyglet.sprite.Sprite.__init__(self, tmpimage)
+        batch.BatchableNode.__init__(self)
 
         if anchor is None:
             if isinstance(self.image, pyglet.image.Animation):
                 anchor = (image.frames[0].image.width / 2,
-                    image.frames[0].image.height / 2)
+                          image.frames[0].image.height / 2)
             else:
                 anchor = image.width / 2, image.height / 2
 
@@ -205,29 +203,29 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
         y = v[1], v[3], v[5], v[7]
         return rect.Rect(min(x),min(y),max(x)-min(x),max(y)-min(y))
 
-    def _set_rotation( self, a ):
-        BatchableNode._set_rotation(self,a)
+    def _set_rotation(self, a):
+        batch.BatchableNode._set_rotation(self, a)
         pyglet.sprite.Sprite._set_rotation(self, a)
 
-    def _set_scale( self, s ):
-        BatchableNode._set_scale(self,s)
+    def _set_scale(self, s):
+        batch.BatchableNode._set_scale(self, s)
         pyglet.sprite.Sprite._set_scale(self,s)
 
-    def _set_position( self, p ):
-        BatchableNode._set_position(self,p)
+    def _set_position(self, p):
+        batch.BatchableNode._set_position(self, p)
         pyglet.sprite.Sprite.set_position(self, *p)
 
     def _set_x(self, x ):
-        BatchableNode._set_x( self, x)
+        batch.BatchableNode._set_x(self, x)
         pyglet.sprite.Sprite._set_x( self, x )
 
     def _set_y(self, y ):
-        BatchableNode._set_y( self, y)
-        pyglet.sprite.Sprite._set_y( self, y )
+        batch.BatchableNode._set_y(self, y)
+        pyglet.sprite.Sprite._set_y(self, y )
 
     def contains(self, x, y):
-        '''Test whether this (untransformed) Sprite contains the pixel coordinates
-        given.
+        '''Test whether this (untransformed) Sprite
+        contains the pixel coordinates given.
         '''
         sx, sy = self.position
         ax, ay = self.image_anchor
@@ -238,31 +236,33 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
         return True
 
 
-    def _set_anchor_x(self, value):
+    @property
+    def image_anchor_x(self):
+        return self._image_anchor_x
+
+    @image_anchor_x.setter
+    def image_anchor_x(self, value):
         self._image_anchor_x = value
         self._update_position()
 
-    def _get_anchor_x(self):
+    @property
+    def image_anchor_y(self):
         return self._image_anchor_x
-    image_anchor_x = property(_get_anchor_x, _set_anchor_x)
 
-    def _set_anchor_y(self, value):
+    @image_anchor_y.setter
+    def image_anchor_y(self, value):
         self._image_anchor_y = value
         self._update_position()
 
-    def _get_anchor_y(self):
-        return self._image_anchor_y
-    image_anchor_y = property(_get_anchor_y, _set_anchor_y)
+    @property
+    def image_anchor(self):
+        return (self.image_anchor_x(), self.image_anchor_y())
 
-    def _set_anchor(self, value):
-        self._image_anchor_x = value[0]
-        self._image_anchor_y = value[1]
+    @image_anchor.setter
+    def image_anchor(self, (x, y)):
+        self._image_anchor_x = x
+        self._image_anchor_y = y
         self._update_position()
-
-    def _get_anchor(self):
-        return (self._get_anchor_x(), self._get_anchor_y())
-
-    image_anchor = property(_get_anchor, _set_anchor)
 
     def draw(self):
         """
@@ -272,7 +272,8 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
         """
         self._group.set_state()
         if self._vertex_list is not None:
-            self._vertex_list.draw(GL_QUADS)
+            self._vertex_list.draw(gl.GL_QUADS)
+
         self._group.unset_state()
 
     def _update_position(self):
@@ -283,7 +284,6 @@ class Sprite( BatchableNode, pyglet.sprite.Sprite):
 
         img = self._texture
         if self.transform_anchor_x == self.transform_anchor_y == 0:
-
             if self._rotation:
                 x1 = -self._image_anchor_x * self._scale
                 y1 = -self._image_anchor_y * self._scale
