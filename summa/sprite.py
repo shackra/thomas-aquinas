@@ -128,14 +128,14 @@ class Sprite(batch.BatchableNode, pyglet.sprite.Sprite):
         '''
 
         if isinstance(image, str):
-            tmpimage = pyglet.resource.image(spimage)
+            spimage = pyglet.resource.image(spimage)
 
         self.transform_anchor_x = 0
         self.transform_anchor_y = 0
         self._image_anchor_x = 0
         self._image_anchor_y = 0
 
-        pyglet.sprite.Sprite.__init__(self, tmpimage)
+        pyglet.sprite.Sprite.__init__(self, spimage)
         batch.BatchableNode.__init__(self)
 
         if anchor is None:
@@ -317,16 +317,16 @@ class Sprite(batch.BatchableNode, pyglet.sprite.Sprite):
                 x2 = x1 + img.width
                 y2 = y1 + img.height
                 self._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
-        else:
-            x1 = int(- self._image_anchor_x)
-            y1 = int(- self._image_anchor_y)
-            x2 = x1 + img.width
-            y2 = y1 + img.height
-            m = self.get_local_transform()
-            p1 = m * euclid.Point2(x1, y1)
-            p2 = m * euclid.Point2(x2, y1)
-            p3 = m * euclid.Point2(x2, y2)
-            p4 = m * euclid.Point2(x1, y2)
+            else:
+                x1 = int(- self._image_anchor_x)
+                y1 = int(- self._image_anchor_y)
+                x2 = x1 + img.width
+                y2 = y1 + img.height
+                m = self.get_local_transform()
+                p1 = m * euclid.Point2(x1, y1)
+                p2 = m * euclid.Point2(x2, y1)
+                p3 = m * euclid.Point2(x2, y2)
+                p4 = m * euclid.Point2(x1, y2)
 
             self._vertex_list.vertices[:] = [
                 int(p1.x), int(p1.y), int(p2.x), int(p2.y),
