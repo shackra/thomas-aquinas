@@ -7,7 +7,7 @@ class TimedScene(Scene):
     def __init__(self, *children):
         super(TimedScene, self).__init__(*children)
         self._dt = 0
-        self._maxtime = 10
+        self._maxtime = 20
         self._next_scene = None
         self._changetype = 0
         self.schedule(self.timeit)

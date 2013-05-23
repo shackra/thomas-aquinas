@@ -21,63 +21,21 @@ from nose.tools import ok_, eq_, raises, with_setup
 from summa.director import director
 from summa.director import Director
 from summa.layer import ColorLayer
-from summa.scene import Scene
-import pyglet
 
-
-class TestDirectorScene(Scene):
-    def __init__(self):
-        super(TestDirectorScene, self).__init__()
-        self._dt = 0
-        self._next_scene = None
-        self._changetype = 0
-        self.schedule(self.timeit)
-
-    def changescene(self):
-        if self._next_scene is None:
-            pyglet.app.exit()
-
-        if self._changetype == 0:
-            director.push(self._next_scene)
-        elif self._changetype == 1:
-            self._next_scene = None
-            director.pop()
-        elif self._changetype == 2:
-            director.replace(self._next_scene)
-        elif self._changetype == 3:
-            self._next_scene = None
-            director.scene.end(True)
-
-    def timeit(self, dt):
-        if self._dt >= 60*5:
-            self._dt = 0
-            self.changescene()
-        else:
-            self._dt += 1
-
-    def setnextscene(self, change, scene):
-        self._next_scene = scene
-        self._changetype = change
-
-
-def setup_func():
-    director.init(width=800, height=600, caption=u"Pruebas Unitarias")
-
-def teardown_func():
-    director.window.close()
+import customstuff
 
 def test_is_singleton():
     ok_(director is Director(), ("La clase Director() "
                                  "no es un singleton"))
 
-@with_setup(setup_func, teardown_func)
 def test_director_init():
-    # iniciamos el director con los valores por defecto.
+    # Debido a que la clase Director es algo difícil de testear
+    # sin que tire una excepción de fallo de segmentación
+    # probare varias cosas relacionadas con esta clase
+    # en una sola prueba.
+    director.init(width=800, height=600, caption=u"Pruebas Unitarias")
     window = director.window
     ok_(window, "No se inicio director de forma exitosa!")
-
-@with_setup(setup_func, teardown_func)
-def test_director_get_window_size():
     one_tuple = director.get_window_size()
     ok_(isinstance(one_tuple, tuple), "El objeto retornado no es una tupla")
     ok_(isinstance(one_tuple[0], int), "El primer objeto de la tupla no es Int")
@@ -86,15 +44,12 @@ def test_director_get_window_size():
     eq_(one_tuple, (800, 600), ("Las dimensiones de la pantalla "
                                 "no son las especificadas en la prueba."
                                 " el director ignora las dimensiones."))
-
-@with_setup(setup_func, teardown_func)
-def test_director_run():
     bluelayer = ColorLayer(0, 0, 255, 255)
     redlayer = ColorLayer(255, 0, 0, 255)
     greenlayer = ColorLayer(0, 255, 0, 255)
-    scene1 = TestDirectorScene()
-    scene2 = TestDirectorScene()
-    scene3 = TestDirectorScene()
+    scene1 = customstuff.TimedScene()
+    scene2 = customstuff.TimedScene()
+    scene3 = customstuff.TimedScene()
     scene1.add(bluelayer)
     scene2.add(redlayer)
     scene3.add(greenlayer)
