@@ -1,5 +1,5 @@
 nose
-pyglet
+pyglet>=1.1.4
 coverage
 numpy
 pylint
