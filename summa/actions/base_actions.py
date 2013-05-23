@@ -417,19 +417,20 @@ __docformat__ = 'restructuredtext'
 import copy
 
 __all__ = [
-            'Action',                           # Base Class
-            'IntervalAction', 'InstantAction',  # Important Subclasses
-            'sequence','spawn','loop', 'Repeat',# Generic Operators
-            'Reverse','_ReverseTime',           # Reverse
-            ]
+    'Action',                           # Base Class
+    'IntervalAction', 'InstantAction',  # Important Subclasses
+    'sequence','spawn','loop', 'Repeat',# Generic Operators
+    'Reverse','_ReverseTime',           # Reverse
+]
 
 class Action(object):
     '''The most general action'''
     def __init__(self, *args, **kwargs):
+        super(Action, self).__init__()
         """dont override - use init"""
         self.duration = None # The base action has potentially infinite duration
         self.init(*args, **kwargs)
-        self.target = None              #: `SummaNode` object that is the target of the action
+        self.target = None #: `SummaNode` object that is the target of the action
         self._elapsed = 0.0
         self._done = False
         self.scheduled_to_remove = False # exclusive use by summanode.remove_action
@@ -486,8 +487,10 @@ class Action(object):
         """
         if not isinstance(other, int):
             raise TypeError("Can only multiply actions by ints")
+
         if other <= 1:
             return self
+
         return  Loop_Action(self, other)
 
     def __or__(self, action):
@@ -500,7 +503,7 @@ class Action(object):
         raise Exception("Action %s cannot be reversed"%(self.__class__.__name__))
 
 
-class IntervalAction( Action ):
+class IntervalAction(Action):
     """
     IntervalAction()
 
@@ -564,12 +567,14 @@ class IntervalAction( Action ):
     def __mul__(self, other):
         if not isinstance(other, int):
             raise TypeError("Can only multiply actions by ints")
+
         if other <= 1:
             return self
+
         return  Loop_IntervalAction(self, other)
 
 
-def Reverse( action ):
+def Reverse(action):
     """Reverses the behavior of the action
 
     Example::
@@ -620,8 +625,10 @@ class InstantAction( IntervalAction ):
     def __mul__(self, other):
         if not isinstance(other, int):
             raise TypeError("Can only multiply actions by ints")
+
         if other <= 1:
             return self
+
         return  Loop_InstantAction(self, other)
 
 def loop(action, times):
@@ -659,7 +666,7 @@ class Loop_Action(Action):
 class Loop_Instant_Action(InstantAction):
     """Repeats one InstantAction for n times
     """
-    def init(one, times):
+    def init(self, one, times):
         self.one = one
         self.times = times
 
@@ -709,7 +716,7 @@ class Loop_IntervalAction(IntervalAction):
 
         if current >= self.times: # we are done
             return
-        # just more dt for the current action
+            # just more dt for the current action
         elif current == self.last:
             self.current_action.update(new_t)
         else:
@@ -750,13 +757,14 @@ def sequence(action_1, action_2):
     """
 
     if (isinstance(action_1,InstantAction) and
-          isinstance(action_2, InstantAction)):
+        isinstance(action_2, InstantAction)):
         cls = Sequence_InstantAction
     elif (isinstance(action_1,IntervalAction) and
           isinstance(action_2, IntervalAction)):
         cls = Sequence_IntervalAction
     else:
         cls = Sequence_Action
+
     return cls(action_1, action_2)
 
 class Sequence_Action(Action):
@@ -787,9 +795,9 @@ class Sequence_Action(Action):
             self.current_action.start()
             if self.current_action.done():
                 self._done = True
-        else:
-            self.current_action = None
-            self._done = True
+            else:
+                self.current_action = None
+                self._done = True
 
     def stop(self):
         if self.current_action:
@@ -835,13 +843,15 @@ class Sequence_IntervalAction(IntervalAction):
         self.actions = [self.one, self.two]
 
         if not hasattr(self.one, "duration") or not hasattr(self.two, "duration"):
-            raise Exception("You can only sequence actions with finite duration, not repeats or others like that")
+            raise Exception("You can only sequence actions with finite "
+                            "duration, not repeats or others like that")
 
         self.duration = float(self.one.duration + self.two.duration)
         try:
             self.split = self.one.duration / self.duration
         except ZeroDivisionError:
             self.split = 0.0
+
         self.last = None
 
     def start(self):
@@ -865,16 +875,18 @@ class Sequence_IntervalAction(IntervalAction):
             self.actions[self.last].stop()
             self.last = current
             self.actions[self.last].start()
+
         if current==0:
             try:
                 sub_t = t/self.split
             except ZeroDivisionError:
                 sub_t = 1.0
-        else:
-            try:
-                sub_t = (t - self.split) / (1.0 - self.split)
-            except ZeroDivisionError:
-                sub_t = 1.0
+            else:
+                try:
+                    sub_t = (t - self.split) / (1.0 - self.split)
+                except ZeroDivisionError:
+                    sub_t = 1.0
+
         self.actions[current].update(sub_t)
 
     def stop(self):
@@ -893,13 +905,14 @@ def spawn(action_1, action_2):
        posible in InstantAction, IntervalAction, Action
     """
     if (isinstance(action_1,InstantAction) and
-          isinstance(action_2, InstantAction)):
+        isinstance(action_2, InstantAction)):
         cls = Spawn_InstantAction
     elif (isinstance(action_1,IntervalAction) and
           isinstance(action_2, IntervalAction)):
         cls = Spawn_IntervalAction
     else:
         cls = Spawn_Action
+
     return cls(action_1, action_2)
 
 
@@ -922,11 +935,13 @@ class Spawn_Action(Action):
             if self.actions[0].done():
                 self.actions[0].stop()
                 self.actions = self.actions[1:]
+
         if self.actions:
             self.actions[-1].step(dt)
             if self.actions[-1].done():
                 self.actions[-1].stop()
                 self.actions = self.actions[:-1]
+
         self._done = len(self.actions)==0
 
     def stop(self):

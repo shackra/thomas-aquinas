@@ -152,15 +152,15 @@ class GridBase(object):
     def _set_active(self, bool):
         if self._active == bool:
             return
-        self._active = bool
-        if self._active == True:
-            pass
-        elif self._active == False:
-            self.vertex_list.delete()
-            # to restore the camera to default position
-            director.set_projection()
-        else:
-            raise Exception("Invalid value for GridBase.active")
+            self._active = bool
+            if self._active == True:
+                pass
+            elif self._active == False:
+                self.vertex_list.delete()
+                # to restore the camera to default position
+                director.set_projection()
+            else:
+                raise Exception("Invalid value for GridBase.active")
 
     def _get_active(self):
         return self._active
@@ -180,23 +180,24 @@ class GridBase(object):
 
     @classmethod
     def _set_3d_projection(cls):
-        glViewport(director._offset_x, director._offset_y, director._usable_width, director._usable_height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(60, 1.0*director._usable_width/director._usable_height, 0.1, 3000.0)
-        glMatrixMode(GL_MODELVIEW)
+        gl.glViewport(director._offset_x, director._offset_y,
+                      director._usable_width, director._usable_height)
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity()
+        gl.gluPerspective((60, 1.0 * director._usable_width
+                           / director._usable_height), 0.1, 3000.0)
+        gl.glMatrixMode(gl.GL_MODELVIEW)
 
     @classmethod
     def _set_2d_projection(cls):
-
-#        director.set_2d_projection()
+        # director.set_2d_projection()
         width, height = director.get_window_size()
-        glLoadIdentity()
-        glViewport(0, 0, width, height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, width, 0, height, -100, 100)
-        glMatrixMode(GL_MODELVIEW)
+        gl.glLoadIdentity()
+        gl.glViewport(0, 0, width, height)
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity()
+        gl.glOrtho(0, width, 0, height, -100, 100)
+        gl.glMatrixMode(gl.GL_MODELVIEW)
 
 
 class Grid3D(GridBase):
@@ -222,7 +223,7 @@ class Grid3D(GridBase):
         #:
         #: for more information refer to pyglet's documentation: pyglet.graphics.vertex_list_indexed
         self.vertex_list = pyglet.graphics.vertex_list_indexed( (self.grid.x+1) * (self.grid.y+1),
-                            idx_pts, "t2f", "v3f/stream","c4B")
+                                                                idx_pts, "t2f", "v3f/stream","c4B")
 
         #: original vertex array of the grid. (read-only)
         self.vertex_points = ver_pts_idx[:]
@@ -360,7 +361,7 @@ class TiledGrid3D(GridBase):
         #:
         #: for more information refer to pyglet's documentation: pyglet.graphics.vertex_list
         self.vertex_list = pyglet.graphics.vertex_list(self.grid.x * self.grid.y * 4,
-                            "t2f", "v3f/stream","c4B")
+                                                       "t2f", "v3f/stream","c4B")
         #: original vertex array of the grid. (read-only)
         self.vertex_points = ver_pts[:]
         self.vertex_list.vertices = ver_pts

@@ -94,7 +94,7 @@ __all__ = [ 'GridException',            # Grid Exceptions
 
             'StopGrid',
             'ReuseGrid',
-            ]
+]
 
 class GridException( Exception ):
     pass
@@ -111,18 +111,23 @@ class GridBaseAction( IntervalAction ):
                 Number of seconds that the action will last
         """
         self.duration = duration
-        if not isinstance(grid,Point2):
+        if not isinstance(grid, Point2):
             grid = Point2( *grid)
+
         self.grid = grid
 
-    def start( self ):
+    def start(self):
         new_grid = self.get_grid()
+
+        if new_grid is None:
+            # self.get_grid() devolvió un objeto None
+            raise TypeError("new_grid cannot be None")
 
         if self.target.grid and self.target.grid.reuse_grid > 0:
             # Reusing the grid
             if self.target.grid.active \
-                    and self.grid == self.target.grid.grid \
-                    and type(new_grid) == type(self.target.grid):
+               and self.grid == self.target.grid.grid \
+               and type(new_grid) == type(self.target.grid):
                 # since we are reusing the grid,
                 # we must "cheat" the action that the original vertex coords are
                 # the ones that were inhereted.
@@ -132,11 +137,15 @@ class GridBaseAction( IntervalAction ):
             else:
                 # condition are not met
                 raise GridException("Cannot reuse grid. class grid or grid size did not match: %s vs %s and %s vs %s"
-                                    % ( str(self.grid), str(self.target.grid.grid), type(new_grid), type(self.target.grid) ) )
+                                    % ( str(self.grid),
+                                        str(self.target.grid.grid),
+                                        type(new_grid), type(self.target.grid)))
+
         else:
             # Not reusing the grid
             if self.target.grid and self.target.grid.active:
                 self.target.grid.active = False
+
             self.target.grid = new_grid
             self.target.grid.init( self.grid )
             self.target.grid.active = True
@@ -405,8 +414,8 @@ class ReuseGrid( InstantAction ):
                 Number of times that the current grid will be reused by Grid actions. Default: 1
         '''
         self.reuse_times = reuse_times
-    def start(self):
-        if self.target.grid and self.target.grid.active:
-            self.target.grid.reuse_grid += self.reuse_times
-        else:
-            raise GridException("ReuseGrid must be used when a grid is still active")
+        def start(self):
+            if self.target.grid and self.target.grid.active:
+                self.target.grid.reuse_grid += self.reuse_times
+            else:
+                raise GridException("ReuseGrid must be used when a grid is still active")

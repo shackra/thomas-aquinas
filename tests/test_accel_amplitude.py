@@ -37,7 +37,7 @@ def test_accel_amplitude():
     # In real code after a sequence of grid actions the StopGrid() action
     # should be called. Omited here to stay in the last grid action render
     action1 = grid3d_actions.Waves3D(waves=16, amplitude=80,
-                                     grid=(16,16), duration=10)
+                                     grid=(16,16), duration=5)
     action2 = basegrid_actions.AccelAmplitude(action1, rate=4.0)
 
     main_scene.do(action2)

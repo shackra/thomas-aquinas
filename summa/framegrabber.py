@@ -77,18 +77,20 @@ def TextureGrabber():
     if _best_grabber is not None:
         return _best_grabber()
         # Preferred method: framebuffer object
-        try:
-            # TEST XXX
-            #_best_grabber = GenericGrabber
-            _best_grabber = FBOGrabber
-            return _best_grabber()
-        except:
-            import traceback
-            traceback.print_exc()
-            # Fallback: GL generic grabber
-            raise Exception("ERROR: GPU doesn't support Frame Buffers Objects. Can't continue")
-            #    _best_grabber = GenericGrabber
-            #    return _best_grabber()
+
+    try:
+        # TEST XXX
+        #_best_grabber = GenericGrabber
+        _best_grabber = FBOGrabber
+        return _best_grabber()
+    except:
+        import traceback
+        traceback.print_exc()
+        # Fallback: GL generic grabber
+        raise Exception("ERROR: GPU doesn't support Frame"
+                        "Buffers Objects. Can't continue")
+        #    _best_grabber = GenericGrabber
+        #    return _best_grabber()
 
 class _TextureGrabber(object):
     def __init__(self):
