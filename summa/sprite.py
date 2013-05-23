@@ -126,14 +126,13 @@ class Sprite(batch.BatchableNode, pyglet.sprite.Sprite):
                 `anchor` : (float, float)
                     (x,y)-point from where the image will be positions, rotated and scaled in pixels. For example (image.width/2, image.height/2) is the center (default).
         '''
-
-        if isinstance(image, str):
-            spimage = pyglet.resource.image(spimage)
-
         self.transform_anchor_x = 0
         self.transform_anchor_y = 0
         self._image_anchor_x = 0
         self._image_anchor_y = 0
+
+        if isinstance(spimage, str) or isinstance(spimage, unicode):
+            spimage = pyglet.resource.image(spimage)
 
         pyglet.sprite.Sprite.__init__(self, spimage)
         batch.BatchableNode.__init__(self)
