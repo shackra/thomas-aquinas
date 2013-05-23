@@ -139,10 +139,10 @@ class Sprite(batch.BatchableNode, pyglet.sprite.Sprite):
 
         if anchor is None:
             if isinstance(self.image, pyglet.image.Animation):
-                anchor = (image.frames[0].image.width / 2,
-                          image.frames[0].image.height / 2)
+                anchor = (spimage.frames[0].image.width / 2,
+                          spimage.frames[0].image.height / 2)
             else:
-                anchor = image.width / 2, image.height / 2
+                anchor = spimage.width / 2, spimage.height / 2
 
 
         self.image_anchor = anchor

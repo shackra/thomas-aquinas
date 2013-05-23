@@ -26,7 +26,7 @@ class TestLayer(summa.layer.Layer):
 
         self.sprite = Sprite('grossini.png')
         self.sprite.position = x/2, y/2
-        self.add( self.sprite  )
+        self.add(self.sprite)
 
 def main():
     director.init()
