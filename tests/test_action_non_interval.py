@@ -11,6 +11,7 @@ from summa.director import director
 import summa.actions as ac
 # import pyglet
 from pyglet import gl
+from customstuff import TimedScene
 ## the following is in case we want to get the images
 ## from other directories:
 # pyglet.resource.path.append("/data/other/directory")
