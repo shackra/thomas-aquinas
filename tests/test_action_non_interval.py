@@ -113,7 +113,7 @@ class Chase(ac.Action):
 
 class CustomLayer(summa.layer.Layer):
     def __init__(self):
-        super(TestLayer, self).__init__()
+        super(CustomLayer, self).__init__()
 
         x,y = director.get_window_size()
 

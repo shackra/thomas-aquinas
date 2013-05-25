@@ -12,7 +12,7 @@ from customstuff import TimedScene
 
 class CustomLayer(summa.layer.Layer):
     def __init__(self):
-        super( TestLayer, self ).__init__()
+        super( CustomLayer, self ).__init__()
         x,y = director.get_window_size()
         self.sprite1 = Sprite( 'grossini.png', (x/4, y/2) )
         self.add( self.sprite1  )
