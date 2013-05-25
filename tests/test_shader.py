@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 testinfo = "s, q"
 tags = "shader, quadric"
 
-from pyglet.gl import *
+from pyglet import gl
 
 import summa
 from summa.director import director

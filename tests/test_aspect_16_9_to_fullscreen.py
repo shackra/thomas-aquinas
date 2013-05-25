@@ -1,15 +1,13 @@
-# This code is so you can run the samples without installing the package
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-#
+# coding: utf-8
 
 testinfo = "s, q"
 tags = "resize, resizable, aspect ratio, set_caption"
 
-from pyglet.gl import *
+from pyglet import gl
 import summa
 from summa.director import director
+
+from customstuff import TimedScene
 
 width = 768
 height = 480
@@ -25,24 +23,27 @@ class ProbeRect(summa.summanode.SummaNode):
         self.vertexes = [(0,0,0),(0,height,0), (width,height,0),(width,0,0)]
 
     def draw(self):
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
-        glBegin(GL_QUADS)
-        glColor4ub( *self.color4 )
+        gl.glBegin(gl.GL_QUADS)
+        gl.glColor4ub( *self.color4 )
         for v in self.vertexes:
-            glVertex3i(*v)
-        glEnd()
-        glPopMatrix()
+            gl.glVertex3i(*v)
+
+        gl.glEnd()
+        gl.glPopMatrix()
 
 class TestLayer(summa.layer.Layer):
     def __init__(self):
         super(TestLayer, self).__init__()
         self.add( ProbeRect(width, height, (0,0,255,255)), z=1)
         border_size = 10
-        inner = ProbeRect(width-2*border_size, height-2*border_size, (255,0,0,255))
+        inner = ProbeRect(width-2*border_size, height-2*border_size,
+                          (255,0,0,255))
         inner.position = (border_size, border_size)
         self.add(inner, z=2 )
-        outer = ProbeRect(width+2*border_size, height+2*border_size, (255,255,0,255))
+        outer = ProbeRect(width+2*border_size, height+2*border_size,
+                          (255,255,0,255))
         outer.position = (-border_size, -border_size)
         self.add(outer, z=0 )
 
@@ -58,13 +59,11 @@ Draw order is yellow, blue, red
 You must see no yellow, and a red rectangle with equal sized blue borders
 """
 
-def main():
+def test_aspect_16_9_to_fullscreen():
     print description
     director.init( width=width, height=height, resizable=False )
-    director.window.set_caption('aspect ratio and fullscreen - see console for usage')
-    scene = summa.scene.Scene()
+    director.window.set_caption('aspect ratio and fullscreen'
+                                ' - see console for usage')
+    scene = TimedScene()
     scene.add(TestLayer())
     director.run( scene )
-
-if __name__ == '__main__':
-    main()

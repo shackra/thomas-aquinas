@@ -1,8 +1,4 @@
-# This code is so you can run the samples without installing the package
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-#
+# coding: utf-8
 
 testinfo = "s, t 0.77, s, q"
 tags = "animation"
@@ -12,6 +8,14 @@ from summa.director import director
 from summa.sprite import Sprite
 import pyglet
 
+from customstuff import TimedScene
+import os
+
+pyglet.resource.path.append(
+    os.path.join(os.path.dirname(os.path.realpath(__file__))))
+pyglet.resource.reindex()
+
+
 class TestLayer(summa.layer.Layer):
     def __init__(self):
         super( TestLayer, self ).__init__()
@@ -20,13 +24,10 @@ class TestLayer(summa.layer.Layer):
 
         self.sprite = Sprite(pyglet.resource.animation('dinosaur.gif'))
         self.sprite.position = x/2, y/2
-        self.add( self.sprite  )
+        self.add(self.sprite)
 
-def main():
+def test_animation():
     director.init()
-    test_layer = TestLayer ()
-    main_scene = summa.scene.Scene (test_layer)
-    director.run (main_scene)
-
-if __name__ == '__main__':
-    main()
+    test_layer = TestLayer()
+    main_scene = TimedScene(test_layer)
+    director.run(main_scene)

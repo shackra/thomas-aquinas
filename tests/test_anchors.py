@@ -1,21 +1,17 @@
-# This code is so you can run the samples without installing the package
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-#
+# coding: utf-8
 
 testinfo = "s, q"
 tags = "transform_anchor, scale, zoom"
 
-import summa
 from summa.director import director
-from summa.sprite import *
-from summa.layer import *
-import pyglet
+from summa.sprite import Sprite
+from summa.layer import ColorLayer
 
-def main():
+from customstuff import TimedScene
+
+def test_anchors():
     director.init( resizable=True )
-    main_scene = summa.scene.Scene()
+    main_scene = TimedScene()
 
     white = ColorLayer(255,255,255,255)
     red = ColorLayer(255,0,0,255)
@@ -43,6 +39,3 @@ def main():
     main_scene.add( green, z=3 )
 
     director.run (main_scene)
-
-if __name__ == '__main__':
-    main()

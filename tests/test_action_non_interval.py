@@ -1,8 +1,4 @@
-# This code is so you can run the samples without installing the package
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-#
+# coding: utf-8
 
 testinfo = "f 10 0.033, s, f 20 0.033, s, f 30 0.033, s, f 30 0.033, s, f 30 0.033, s, q"
 tags = "Action"
@@ -11,10 +7,10 @@ import random
 import math
 import summa
 from summa.director import director
-from summa.sprite import Sprite
+# from summa.sprite import Sprite
 import summa.actions as ac
-import pyglet
-from pyglet.gl import *
+# import pyglet
+from pyglet import gl
 ## the following is in case we want to get the images
 ## from other directories:
 # pyglet.resource.path.append("/data/other/directory")
@@ -27,17 +23,18 @@ class ProbeQuad(summa.summanode.SummaNode):
     def __init__(self, r, color4):
         super(ProbeQuad,self).__init__()
         self.color4 = color4
-        self.vertexes = [(r,0,0),(0,r,0),(-r,0,0),(0,-r,0)]
+        self.vertexes = [(r, 0, 0), (0, r, 0), (-r, 0, 0),( 0, -r, 0)]
 
     def draw(self):
-        glPushMatrix()
+        gl.glPushMatrix()
         self.transform()
-        glBegin(GL_QUADS)
-        glColor4ub( *self.color4 )
+        gl.glBegin(gl.GL_QUADS)
+        gl.glColor4ub( *self.color4 )
         for v in self.vertexes:
-            glVertex3i(*v)
-        glEnd()
-        glPopMatrix()
+            gl.glVertex3i(*v)
+
+        gl.glEnd()
+        gl.glPopMatrix()
 
 ##def random_walk(actor, fastness):
 ##    width, height = director.get_window_size()
@@ -61,16 +58,17 @@ class RandomWalk(ac.Action):
         width, height = director.get_window_size()
         x1 = random.randint(0, width)
         y1 = random.randint(0, height)
-        dx = x1-x0
-        dy = y1-y0
+        dx = x1 - x0
+        dy = y1 - y0
         norm = math.hypot(dx, dy)
         try:
             self.t_arrival = norm/(1.0*self.fastness)
         except ZeroDivisionError:
             norm = 1.0
             self.t_arrival = 0.1
-        self.dx = dx/norm
-        self.dy = dy/norm
+
+        self.dx = dx / norm
+        self.dy = dy / norm
         print 'dx, dy:',dx, dy
         self.x0 = x0
         self.y0 = y0
@@ -79,6 +77,7 @@ class RandomWalk(ac.Action):
         self._elapsed += dt
         if self._elapsed > self.t_arrival:
             self.make_new_leg()
+
         x = self.fastness*self._elapsed*self.dx + self.x0
         y = self.fastness*self._elapsed*self.dy + self.y0
         #print 'x,y:', x,y
@@ -97,6 +96,7 @@ class Chase(ac.Action):
     def step(self, dt):
         if self.chasee is None:
             return
+
         x0, y0 = self.target.position
         x1, y1 = self.chasee.position
         dx , dy = x1-x0, y1-y0
@@ -111,14 +111,14 @@ class Chase(ac.Action):
         self.chasee.do(ac.RotateBy(360, 1.0))
         self.on_bullet_hit(self.target)
 
-class TestLayer(summa.layer.Layer):
+class CustomLayer(summa.layer.Layer):
     def __init__(self):
-        super( TestLayer, self ).__init__()
+        super(TestLayer, self).__init__()
 
         x,y = director.get_window_size()
 
         self.green_obj = ProbeQuad(50, (0,255,0,255))
-        self.add( self.green_obj  )
+        self.add(self.green_obj)
         self.green_obj.do(RandomWalk(fastness_green))
         self.schedule_interval(self.spawn_bullet, 1.0)
 
@@ -134,20 +134,18 @@ class TestLayer(summa.layer.Layer):
     def on_bullet_hit(self, bullet):
         self.remove(bullet)
 
-def main():
+def test_action_non_interval():
     director.init()
     a = summa.summanode.SummaNode()
     class A(object):
         def __init__(self, x):
             self.x = x
+
     z = A(a)
     import copy
     b = copy.deepcopy(a)
     print 'a:', a
     print 'b:', b
-    test_layer = TestLayer ()
-    main_scene = summa.scene.Scene (test_layer)
-    director.run (main_scene)
-
-if __name__ == '__main__':
-    main()
+    test_layer = CustomLayer()
+    main_scene = TimedScene(test_layer)
+    director.run(main_scene)

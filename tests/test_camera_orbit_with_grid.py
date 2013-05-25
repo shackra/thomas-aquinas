@@ -10,7 +10,7 @@ from summa.director import director
 from summa.actions import *
 from summa.layer import *
 
-from pyglet.gl import *
+from pyglet import gl
 
 testinfo = "s, t 3, s, t 6, s, t 8.1, s, q"
 tags = "OrbitCamera, reuse_grid"

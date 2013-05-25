@@ -13,7 +13,7 @@ from summa.sprite import Sprite
 from summa.actions import *
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 
 class BackgroundLayer(summa.layer.Layer):

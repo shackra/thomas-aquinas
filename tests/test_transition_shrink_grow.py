@@ -14,7 +14,7 @@ from summa.layer import *
 from summa.scenes import *
 from summa.sprite import *
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 class BackgroundLayer(summa.layer.Layer):
     def __init__(self):

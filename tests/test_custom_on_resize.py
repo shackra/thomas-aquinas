@@ -9,7 +9,7 @@ tags = "director.on_summa_resize"
 autotest = 0
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 import summa
 from summa.director import director
 from summa.sprite import Sprite

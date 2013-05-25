@@ -8,7 +8,7 @@ testinfo = "s, q"
 tags = "menu items, ToggleMenuItem, MultipleMenuItem, MenuItem, EntryMenuItem, ImageMenuItem, ColorMenuItem"
 
 from pyglet import image
-from pyglet.gl import *
+from pyglet import gl
 from pyglet import font
 
 from summa.director import *

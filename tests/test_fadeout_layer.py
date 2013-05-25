@@ -8,7 +8,7 @@ testinfo = "s, t 1, s, t 2, s, t 3, s, t 4.1, s, t 4.2, s, q"
 tags = "FadeIn, FadeOut, ColorLayer"
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 import summa
 from summa.director import director

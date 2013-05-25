@@ -12,7 +12,7 @@ from summa.director import director
 from summa.actions import *
 from summa.layer import *
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 class BackgroundLayer(summa.layer.Layer):
     def __init__(self):

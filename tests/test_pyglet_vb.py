@@ -8,7 +8,7 @@ testinfo = "dt 0.016, s, f 20 0.016, s, f 20 0.016, s, f 20 0.016, s, q"
 tags = "vertex_list"
 
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 import math
 
 def sign(x): return 1 if x >= 0 else -1

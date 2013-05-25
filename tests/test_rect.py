@@ -14,7 +14,7 @@ from summa.sprite import Sprite
 from summa.layer import ColorLayer
 from summa.actions import *
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 class TestLayer(summa.layer.Layer):
 

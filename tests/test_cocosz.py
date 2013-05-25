@@ -11,7 +11,7 @@ import summa
 from summa.director import director
 from summa.sprite import Sprite
 import pyglet
-from pyglet.gl import *
+from pyglet import gl
 
 class Quad(summa.summanode.SummaNode):
     def __init__(self, color, size):

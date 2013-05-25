@@ -12,7 +12,7 @@ import math
 
 import pyglet
 from pyglet.window import key
-from pyglet.gl import *
+from pyglet import gl
 
 pyglet.resource.path.append(pyglet.resource.get_script_home())
 pyglet.resource.reindex()
