@@ -881,11 +881,12 @@ class Sequence_IntervalAction(IntervalAction):
                 sub_t = t/self.split
             except ZeroDivisionError:
                 sub_t = 1.0
-            else:
-                try:
-                    sub_t = (t - self.split) / (1.0 - self.split)
-                except ZeroDivisionError:
-                    sub_t = 1.0
+
+        else:
+            try:
+                sub_t = (t - self.split) / (1.0 - self.split)
+            except ZeroDivisionError:
+                sub_t = 1.0
 
         self.actions[current].update(sub_t)
 
