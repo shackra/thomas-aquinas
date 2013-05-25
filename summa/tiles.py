@@ -48,6 +48,9 @@
 #     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #     POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+# Usando el parche del usuario Hogne:
+#     https://groups.google.com/d/msg/cocos-discuss/wYhO58_wWho/YMTWNVCoOZwJ
+#
 '''Tile map management and rendering.
 
 This module provides an API for loading, saving and rendering a map
@@ -73,6 +76,9 @@ import summa
 from summa.director import director
 from summa.rect import Rect
 
+import pytmx.pytmx
+import itertools
+
 # Implement these classes for backwards compatibility; some older code
 # expects ScrollableLayer and ScrollingManager to be in the tiles module.
 from summa import layer
@@ -80,13 +86,14 @@ class ScrollableLayer(layer.ScrollableLayer):
     def __init__(self, parallax=1):
         import warnings
         warnings.warn('ScrollableLayer been has moved to summa.layer',
-            DeprecationWarning, stacklevel=2)
+                      DeprecationWarning, stacklevel=2)
         super(ScrollableLayer, self).__init__(parallax=parallax)
+
 class ScrollingManager(layer.ScrollingManager):
     def __init__(self, viewport=None):
         import warnings
         warnings.warn('ScrollingManager been has moved to summa.layer',
-            DeprecationWarning, stacklevel=2)
+                      DeprecationWarning, stacklevel=2)
         super(ScrollingManager, self).__init__(viewport=viewport)
 
 
@@ -118,8 +125,10 @@ class Resource(object):
     def find_file(self, filename):
         if os.path.isabs(filename):
             return filename
+
         if os.path.exists(filename):
             return filename
+
         path = pyglet.resource.location(filename).path
         return os.path.join(path, filename)
 
@@ -128,12 +137,14 @@ class Resource(object):
         def decorate(func):
             cls.factories[name] = func
             return func
+
         return decorate
 
     def handle(self, tag):
         ref = tag.get('ref')
         if not ref:
             return self.factories[tag.tag](self, tag)
+
         return self.get_resource(ref)
 
     def __contains__(self, ref):
@@ -146,9 +157,11 @@ class Resource(object):
             reqns, id = ref.split(':', 1)
         elif id in self.contents:
             return self.contents[id]
+
         for ns, res in self.requires:
             if ns != reqns: continue
             if id in res: return res[id]
+
         raise KeyError(id)
 
     def find(self, cls):
@@ -168,12 +181,14 @@ class Resource(object):
                     yield (ns + ':' + k, self.contents[k])
                 else:
                     yield (k, self.contents[k])
+
         for ns, res in self.requires:
             for item in res.findall(cls, ns):
                 yield item
 
     def add_resource(self, id, resource):
         self.contents[id] = resource
+
     def get_resource(self, ref):
         return self[ref]
 
@@ -188,10 +203,11 @@ class Resource(object):
             r.tail = '\n'
             if namespace:
                 r.set('namespace', namespace)
+
         for element in self.contents.values():
             element._as_xml(root)
-        tree = ElementTree.ElementTree(root)
-        tree.write(filename)
+            tree = ElementTree.ElementTree(root)
+            tree.write(filename)
 
     def resource_factory(self, tag):
         for child in tag:
@@ -209,6 +225,7 @@ class Resource(object):
 
 _cache = weakref.WeakValueDictionary()
 class _NOT_LOADED(object): pass
+
 def load(filename):
     '''Load resource(s) defined in the indicated XML file.
     '''
@@ -221,6 +238,7 @@ def load(filename):
     if filename in _cache:
         if _cache[filename] is _NOT_LOADED:
             raise ResourceError('Loop in tile map files loading "%s"'%filename)
+
         return _cache[filename]
 
     _cache[filename] = _NOT_LOADED
@@ -228,6 +246,7 @@ def load(filename):
         obj = load_tmx(filename)
     else:
         obj = load_tiles(filename)
+
     _cache[filename] = obj
     return obj
 
@@ -239,79 +258,53 @@ def load_tiles(filename):
     root = tree.getroot()
     if root.tag != 'resource':
         raise ResourceError('document is <%s> instead of <resource>'%
-            root.name)
-    resource.handle(root)
+                            root.name)
+        resource.handle(root)
+
     return resource
 
 def load_tmx(filename):
-    '''Load some tile mapping resources from a TMX file.
+    '''Load some tile mapping resources from a TMX file
+       using pytmx
     '''
     resource = Resource(filename)
 
-    tree = ElementTree.parse(resource.path)
-    map = tree.getroot()
-    if map.tag != 'map':
-        raise ResourceError('document is <%s> instead of <map>'%
-            map.name)
+    tmxdata = pytmx.TiledMap(filename)
 
-    width = int(map.attrib['width'])
-    height  = int(map.attrib['height'])
+    width = tmxdata.width
+    height  = tmxdata.height
 
     # XXX this is ASSUMED to be consistent
-    tile_width = int(map.attrib['tilewidth'])
-    tile_height = int(map.attrib['tileheight'])
+    tile_width = tmxdata.tileheight
+    tile_height = tmxdata.tileheight
 
     # load all the tilesets
     tilesets = []
-    for tag in map.findall('tileset'):
-        if 'source' in tag.attrib:
-            firstgid = int(tag.attrib['firstgid'])
-            path = resource.find_file(tag.attrib['source'])
-            with open(path) as f:
-                tag = ElementTree.fromstring(f.read())
-        else:
-            firstgid = int(tag.attrib['firstgid'])
 
-        name = tag.attrib['name']
+    for tmx_tileset in tmxdata.tilesets:
+        path = tmx_tileset.source
+        firstgid = tmx_tileset.firstgid
+        name = tmx_tileset.name
 
-        for c in tag.getchildren():
-            if c.tag == "image":
-                # create a tileset from the image atlas
-                path = resource.find_file(c.attrib['source'])
-                tileset = TileSet.from_atlas(name, firstgid, path, tile_width, tile_height)
-                # TODO consider adding the individual tiles to the resource?
-                tilesets.append(tileset)
-                resource.add_resource(name, tileset)
-            elif c.tag == 'tile':
-                # add properties to tiles in the tileset
-                gid = tileset.firstgid + int(c.attrib['id'])
-                tile = tileset[gid]
-                props = c.find('properties')
-                if props is None:
-                    continue
-                for p in props.findall('property'):
-                    # store additional properties.
-                    name = p.attrib['name']
-                    value = p.attrib['value']
-                    # TODO consider more type conversions?
-                    if value.isdigit():
-                        value = int(value)
-                    tile.properties[name] = value
+        # Not used yet
+        tile_margin = tmx_tileset.margin
+        tile_spacing = tmx_tileset.spacing
+
+        tileset = TileSet.from_atlas(name, firstgid, path, tile_width, tile_height, tmxdata.tile_properties)
+
+        # TODO consider adding the individual tiles to the resource?
+        tilesets.append(tileset)
+        resource.add_resource(name, tileset)
 
     # now load all the layers
-    for layer in map.findall('layer'):
-        data = layer.find('data')
-        if data is None:
-            raise ValueError('layer %s does not contain <data>' % layer.name)
-
-        data = data.text.strip()
-        data = data.decode('base64').decode('zlib')
-        data = struct.unpack('<%di' % (len(data)/4,), data)
-        assert len(data) == width * height
+    for layer in tmxdata.tilelayers:
+        # Convert pytmx layer data array of arrays
+        # to a flat tuple as cocos expects
+        layer_data = tuple(itertools.chain(*layer.data))
 
         cells = [[None] * height for x in range(width)]
-        for n, gid in enumerate(data):
-            if gid < 1:
+        for n, gid in enumerate(layer_data):
+            if gid < firstgid:
                 tile = None
             else:
                 # UGH
@@ -319,14 +312,15 @@ def load_tmx(filename):
                     if gid in ts:
                         tile = ts[gid]
                         break
+
             i = n % width
             j = height - (n // width + 1)
             cells[i][j] = RectCell(i, j, tile_width, tile_height, {}, tile)
 
-        id = layer.attrib['name']
+        id = layer.name
 
         m = RectMapLayer(id, tile_width, tile_height, cells, None, {})
-        m.visible = int(layer.attrib.get('visible', 1))
+        m.visible = int(layer.visible)
 
         resource.add_resource(id, m)
 
@@ -370,10 +364,12 @@ def _handle_properties(tag):
         value = node.get('value')
         if name is None:
             raise TilesPropertyWithoutName("\nnode:\n%s"%ElementTree.tostring(node))
+
         if value is None:
             raise TilesPropertyWithoutValue("\nnode:\n%s"%ElementTree.tostring(node))
-        properties[name] = _xml_to_python[type](value)
-    return properties
+            properties[name] = _xml_to_python[type](value)
+
+        return properties
 
 
 #
@@ -384,6 +380,7 @@ def image_factory(resource, tag):
     filename = resource.find_file(tag.get('file'))
     if not filename:
         raise ResourceError('No file= on <image> tag')
+
     image = pyglet.image.load(filename)
 
     image.properties = _handle_properties(tag)
@@ -399,11 +396,11 @@ def imageatlas_factory(resource, tag):
     filename = resource.find_file(tag.get('file'))
     if not filename:
         raise ResourceError('No file= on <imageatlas> tag')
-    atlas = pyglet.image.load(filename)
-    atlas.properties = _handle_properties(tag)
-    if tag.get('id'):
-        atlas.id = tag.get('id')
-        resource.add_resource(atlas.id, atlas)
+        atlas = pyglet.image.load(filename)
+        atlas.properties = _handle_properties(tag)
+        if tag.get('id'):
+            atlas.id = tag.get('id')
+            resource.add_resource(atlas.id, atlas)
 
     # figure default size if specified
     if tag.get('size'):
@@ -429,9 +426,9 @@ def imageatlas_factory(resource, tag):
         image.texture.id
         gl.glBindTexture(image.texture.target, image.texture.id)
         gl.glTexParameteri(image.texture.target,
-            gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE)
+                           gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE)
         gl.glTexParameteri(image.texture.target,
-            gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE)
+                           gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE)
 
         # save the image off and set properties
         id = child.get('id')
@@ -458,10 +455,12 @@ def tileset_factory(resource, tag):
             offset = map(int, offset.split(','))
         else:
             offset = None
+
         properties = _handle_properties(child)
         image = child.find('image')
         if image is not None:
             image = resource.handle(image)
+
         tile = Tile(id, properties, image, offset)
         resource.add_resource(id, tile)
         tileset[id] = tile
@@ -480,7 +479,7 @@ class Tile(object):
     def __repr__(self):
         return '<%s object at 0x%x id=%r offset=%r properties=%r>'%(
             self.__class__.__name__, id(self), self.id, self.offset,
-                self.properties)
+            self.properties)
 
 class TileSet(dict):
     '''Contains a set of Tile objects referenced by some id.
@@ -503,11 +502,12 @@ class TileSet(dict):
         '''
         if id is None:
             id = self.generate_id()
+
         self[id] = Tile(id, properties, image)
         return self[id]
 
     @classmethod
-    def from_atlas(cls, name, firstgid, file, tile_width, tile_height):
+    def from_atlas(cls, name, firstgid, file, tile_width, tile_height, tile_props = None):
         image = pyglet.image.load(file)
         rows = image.height / tile_height
         columns = image.width / tile_width
@@ -516,10 +516,21 @@ class TileSet(dict):
         id = firstgid
         ts = cls(name, {})
         ts.firstgid = firstgid
+
         for j in range(rows-1, -1, -1):
             for i in range(columns):
-                ts[id] = Tile(id, {}, atlas[j, i])
+                if tile_props:
+                    if id in tile_props:
+                        props = tile_props[id]
+                    else:
+                        props = {}
+
+                else:
+                    props = {}
+
+                ts[id] = Tile(id, props, atlas[j, i])
                 id += 1
+
         return ts
 
 #
@@ -533,6 +544,7 @@ def rectmap_factory(resource, tag):
     origin = tag.get('origin')
     if origin:
         origin = map(int, tag.get('origin').split(','))
+
     id = tag.get('id')
 
     # now load the columns
@@ -542,7 +554,8 @@ def rectmap_factory(resource, tag):
         cells.append(c)
         for j, cell in enumerate(column.getiterator('cell')):
             tile = cell.get('tile')
-            if tile: tile = resource.get_resource(tile)
+            if tile:
+                tile = resource.get_resource(tile)
             else: tile = None
             properties = _handle_properties(cell)
             c.append(RectCell(i, j, width, height, properties, tile))
@@ -560,6 +573,7 @@ def hexmap_factory(resource, tag):
     origin = tag.get('origin')
     if origin:
         origin = map(int, tag.get('origin').split(','))
+
     id = tag.get('id')
 
     # now load the columns
@@ -569,8 +583,10 @@ def hexmap_factory(resource, tag):
         cells.append(c)
         for j, cell in enumerate(column.getiterator('cell')):
             tile = cell.get('tile')
-            if tile: tile = resource.get_resource(tile)
+            if tile:
+                tile = resource.get_resource(tile)
             else: tile = None
+
             properties = _handle_properties(tag)
             c.append(HexCell(i, j, height, properties, tile))
 
@@ -617,6 +633,7 @@ class MapLayer(layer.ScrollableLayer):
     def __getitem__(self, key):
         if key in self.properties:
             return self.properties[key]
+
         raise KeyError(key)
 
     def __setitem__(self, key, value):
@@ -681,18 +698,20 @@ class MapLayer(layer.ScrollableLayer):
             keep.add(key)
             if cell.tile is None:
                 continue
+
             if key not in self._sprites:
                 self._sprites[key] = pyglet.sprite.Sprite(cell.tile.image,
-                    x=cx, y=cy, batch=self.batch)
-            s = self._sprites[key]
-            if self.debug:
-                if getattr(s, '_label', None): continue
-                label = [
-                    'cell=%d,%d'%(cell.i, cell.j),
-                    'origin=%d,%d px'%(cx, cy),
-                ]
+                                                          x=cx, y=cy, batch=self.batch)
+                s = self._sprites[key]
+                if self.debug:
+                    if getattr(s, '_label', None): continue
+                    label = [
+                        'cell=%d,%d'%(cell.i, cell.j),
+                        'origin=%d,%d px'%(cx, cy),
+                    ]
                 for p in cell.properties:
                     label.append('%s=%r'%(p, cell.properties[p]))
+
                 lx, ly = cell.topleft
                 s._label = pyglet.text.Label(
                     '\n'.join(label), multiline=True, x=lx, y=ly,
@@ -700,10 +719,11 @@ class MapLayer(layer.ScrollableLayer):
                     batch=self.batch)
             else:
                 s._label = None
-        for k in list(self._sprites):
-            if k not in keep and k in self._sprites:
-                self._sprites[k]._label = None
-                del self._sprites[k]
+
+            for k in list(self._sprites):
+                if k not in keep and k in self._sprites:
+                    self._sprites[k]._label = None
+                    del self._sprites[k]
 
     def find_cells(self, **requirements):
         '''Find all cells that match the properties specified.
@@ -720,8 +740,9 @@ class MapLayer(layer.ScrollableLayer):
                 for k in requirements:
                     if cell.get(k) != requirements[k]:
                         break
-                else:
-                    r.append(cell)
+                    else:
+                        r.append(cell)
+
         return r
 
 class RegularTesselationMap(object):
@@ -734,6 +755,7 @@ class RegularTesselationMap(object):
         Return None if out of bounds.'''
         if i < 0 or j < 0:
             return None
+
         try:
             return self.cells[i][j]
         except IndexError:
@@ -777,6 +799,7 @@ class RectMap(RegularTesselationMap):
         self.tw, self.th = tw, th
         if origin is None:
             origin = (0, 0, 0)
+
         self.origin_x, self.origin_y, self.origin_z = origin
         self.cells = cells
         self.px_width = len(cells) * tw #? +abs(self.origin_x) ?
@@ -795,11 +818,11 @@ class RectMap(RegularTesselationMap):
         y1 = max(0, (y1 - oy) // self.th)
         x2 = min(len(self.cells), (x2 - ox) // self.tw + 1)
         y2 = min(len(self.cells[0]), (y2 - oy) // self.th + 1)
-##        return [self.cells[i][j]
-##            for i in range(int(x1), int(x2))
-##                for j in range(int(y1), int(y2))]
+        ##        return [self.cells[i][j]
+        ##            for i in range(int(x1), int(x2))
+        ##                for j in range(int(y1), int(y2))]
         res =  [self.cells[i][j]
-            for i in range(int(x1), int(x2))
+                for i in range(int(x1), int(x2))
                 for j in range(int(y1), int(y2))]
         #print 'get_in_region result:', res
         return res
@@ -813,7 +836,7 @@ class RectMap(RegularTesselationMap):
         Return None if out of bounds.
         '''
         return self.get_cell(int((x - self.origin_x) // self.tw),
-            int((y - self.origin_y) // self.th))
+                             int((y - self.origin_y) // self.th))
 
     UP = (0, 1)
     DOWN = (0, -1)
@@ -844,10 +867,12 @@ class RectMap(RegularTesselationMap):
                     if dx or dy:
                         direction = (dx, dy)
                         r[direction] = self.get_cell(cell.i + dx, cell.j + dy)
+
         else:
             for direction in (self.UP, self.RIGHT, self.LEFT, self.DOWN):
                 dx, dy = direction
                 r[direction] = self.get_cell(cell.i + dx, cell.j + dy)
+
         return r
 
     # TODO: add checks to ensure good html. By example, what if cell is None?
@@ -856,8 +881,8 @@ class RectMap(RegularTesselationMap):
 
         """
         m = ElementTree.SubElement(root, 'rectmap', id=self.id,
-            tile_size='%dx%d'%(self.tw, self.th),
-            origin='%s,%s,%s'%(self.origin_x, self.origin_y, self.origin_z))
+                                   tile_size='%dx%d'%(self.tw, self.th),
+                                   origin='%s,%s,%s'%(self.origin_x, self.origin_y, self.origin_z))
         m.tail = '\n'
 
         # map properties
@@ -866,7 +891,7 @@ class RectMap(RegularTesselationMap):
             t = type(v)
             v = _python_to_xml[t](v)
             p = ElementTree.SubElement(m, 'property', name=k, value=v,
-                type=_xml_type[t])
+                                       type=_xml_type[t])
             p.tail = '\n'
 
         # columns / cells
@@ -916,12 +941,15 @@ class RectMapCollider(object):
         for cell in map.get_in_region(*(new.bottomleft + new.topright)):
             if cell is None or cell.tile is None:
                 continue
+
             # don't re-test
             key = (cell.i, cell.j)
             if key in tested:
                 continue
+
             tested.add(cell)
             dx, dy = self.do_collision(cell, last, new, dy, dx)
+
         return dx, dy
 
     # resolve them and re-collide if necessary; make sure the cells
@@ -956,18 +984,22 @@ class RectMapCollider(object):
             dy = last.y - new.y
             new.bottom = cell.top
             if dy: self.collide_bottom(dy)
+
         if (g('left') and last.right <= cell.left and new.right > cell.left):
             dx = last.x - new.x
             new.right = cell.left
             if dx: self.collide_right(dx)
+
         if (g('right') and last.left >= cell.right and new.left < cell.right):
             dx = last.x - new.x
             new.left = cell.right
             if dx: self.collide_left(dx)
+
         if (g('bottom') and last.top <= cell.bottom and new.top > cell.bottom):
             dy = last.y - new.y
             new.top = cell.bottom
             if dy: self.collide_top(dy)
+
         return dx, dy
 
 
@@ -1006,16 +1038,18 @@ class Cell(object):
         c.tail = '\n'
         if self.tile:
             c.set('tile', self.tile.id)
+
         for k in self.properties:
             v = self.properties[k]
             t = type(v)
             v = _python_to_xml[t](v)
             ElementTree.SubElement(c, 'property', name=k, value=v,
-                type=_xml_type[t])
+                                   type=_xml_type[t])
 
     def __contains__(self, key):
         if key in self.properties:
             return True
+
         return key in self.tile.properties
 
     def __getitem__(self, key):
@@ -1023,6 +1057,7 @@ class Cell(object):
             return self.properties[key]
         elif self.tile is not None and key in self.tile.properties:
             return self.tile.properties[key]
+
         raise KeyError(key)
 
     def __setitem__(self, key, value):
@@ -1031,14 +1066,16 @@ class Cell(object):
     def get(self, key, default=None):
         if key in self.properties:
             return self.properties[key]
+
         if self.tile is None:
             return default
+
         return self.tile.properties.get(key, default)
 
     def __repr__(self):
         return '<%s object at 0x%x (%g, %g) properties=%r tile=%r>'%(
             self.__class__.__name__, id(self), self.i, self.j,
-                self.properties, self.tile)
+            self.properties, self.tile)
 
 
 class RectCell(Rect, Cell):
@@ -1105,6 +1142,7 @@ class HexMap(RegularTesselationMap):
         self.th = th
         if origin is None:
             origin = (0, 0, 0)
+
         self.origin_x, self.origin_y, self.origin_z = origin
         self.cells = cells
 
@@ -1148,6 +1186,7 @@ class HexMap(RegularTesselationMap):
             # every second cell is up one
             y -= self.th // 2
             print 'shift y=', y
+
         return self.get_cell(x, y)
 
     UP = 'up'
@@ -1172,21 +1211,25 @@ class HexMap(RegularTesselationMap):
                 return self.get_cell(cell.i - 1, cell.j + 1)
             else:
                 return self.get_cell(cell.i - 1, cell.j)
+
         elif direction is self.UP_RIGHT:
             if cell.i % 2:
                 return self.get_cell(cell.i + 1, cell.j + 1)
             else:
                 return self.get_cell(cell.i + 1, cell.j)
+
         elif direction is self.DOWN_LEFT:
             if cell.i % 2:
                 return self.get_cell(cell.i - 1, cell.j)
             else:
                 return self.get_cell(cell.i - 1, cell.j - 1)
+
         elif direction is self.DOWN_RIGHT:
             if cell.i % 2:
                 return self.get_cell(cell.i + 1, cell.j)
             else:
                 return self.get_cell(cell.i + 1, cell.j - 1)
+
         else:
             raise ValueError, 'Unknown direction %r'%direction
 
@@ -1198,9 +1241,10 @@ class HexMap(RegularTesselationMap):
         '''
         r = {}
         for direction in (self.UP_LEFT, self.UP, self.UP_RIGHT,
-                self.DOWN_LEFT, self.DOWN, self.DOWN_RIGHT):
+                          self.DOWN_LEFT, self.DOWN, self.DOWN_RIGHT):
             dx, dy = direction
             r[direction] = self.get_cell(cell.i + dx, cell.j + dy)
+
         return r
 
 class HexMapLayer(HexMap, MapLayer):
@@ -1271,96 +1315,113 @@ class HexCell(Cell):
         y = self.j * self.height
         if self.i % 2:
             y += self.height // 2
+
         return (x, y)
+
     origin = property(get_origin)
 
     # ro, side in pixels, y extent
     def get_top(self):
         y = self.get_origin()[1]
         return y + self.height
+
     top = property(get_top)
 
     # ro, side in pixels, y extent
     def get_bottom(self):
         return self.get_origin()[1]
+
     bottom = property(get_bottom)
 
     # ro, in pixels, (x, y)
     def get_center(self):
         x, y = self.get_origin()
         return (x + self.width // 2, y + self.height // 2)
+
     center = property(get_center)
 
     # ro, mid-point in pixels, (x, y)
     def get_midtop(self):
         x, y = self.get_origin()
         return (x + self.width // 2, y + self.height)
+
     midtop = property(get_midtop)
 
     # ro, mid-point in pixels, (x, y)
     def get_midbottom(self):
         x, y = self.get_origin()
         return (x + self.width // 2, y)
+
     midbottom = property(get_midbottom)
 
     # ro, side in pixels, x extent
     def get_left(self):
         x, y = self.get_origin()
         return (x, y + self.height // 2)
+
     left = property(get_left)
 
     # ro, side in pixels, x extent
     def get_right(self):
         x, y = self.get_origin()
         return (x + self.width, y + self.height // 2)
+
     right = property(get_right)
 
     # ro, corner in pixels, (x, y)
     def get_topleft(self):
         x, y = self.get_origin()
         return (x + self.width // 4, y + self.height)
+
     topleft = property(get_topleft)
 
     # ro, corner in pixels, (x, y)
     def get_topright(self):
         x, y = self.get_origin()
         return (x + self.width // 2 + self.width // 4, y + self.height)
+
     topright = property(get_topright)
 
     # ro, corner in pixels, (x, y)
     def get_bottomleft(self):
         x, y = self.get_origin()
         return (x + self.width // 4, y)
+
     bottomleft = property(get_bottomleft)
 
     # ro, corner in pixels, (x, y)
     def get_bottomright(self):
         x, y = self.get_origin()
         return (x + self.width // 2 + self.width // 4, y)
+
     bottomright = property(get_bottomright)
 
     # ro, middle of side in pixels, (x, y)
     def get_midtopleft(self):
         x, y = self.get_origin()
         return (x + self.width // 8, y + self.height // 2 + self.height // 4)
+
     midtopleft = property(get_midtopleft)
 
     # ro, middle of side in pixels, (x, y)
     def get_midtopright(self):
         x, y = self.get_origin()
         return (x + self.width // 2 + self.width // 4 + self.width // 8,
-            y + self.height // 2 + self.height // 4)
+                y + self.height // 2 + self.height // 4)
+
     midtopright = property(get_midtopright)
 
     # ro, middle of side in pixels, (x, y)
     def get_midbottomleft(self):
         x, y = self.get_origin()
         return (x + self.width // 8, y + self.height // 4)
+
     midbottomleft = property(get_midbottomleft)
 
     # ro, middle of side in pixels, (x, y)
     def get_midbottomright(self):
         x, y = self.get_origin()
         return (x + self.width // 2 + self.width // 4 + self.width // 8,
-            y + self.height // 4)
+                y + self.height // 4)
+
     midbottomright = property(get_midbottomright)
