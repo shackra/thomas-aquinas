@@ -1,4 +1,4 @@
-***El desarrollo de este proyecto (así como su Wiki y el bugtrack) se lleva acabo en [bitbucket.org](https://bitbucket.org/shackra/thomas-aquinas).***
+***El desarrollo de este proyecto (así como su Wiki y el bugtrack) se lleva acabo en [bitbucket.org](https://bitbucket.org/shackra/thomas-aquinas)***
 
 [![Build Status](https://travis-ci.org/shackra/thomas-aquinas.png?branch=stable-branch)](https://travis-ci.org/shackra/thomas-aquinas)
 
